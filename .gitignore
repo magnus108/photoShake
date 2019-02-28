@@ -1,0 +1,6 @@
+.stack-work/
+dump/
+out/
+_build/
+photoShake.cabal
+*~
