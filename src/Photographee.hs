@@ -33,9 +33,12 @@ findPhotographee location photographeeId = do
     locationData' <- readFile location `catchAny` (\_ -> throw ReadLocationFile)
     let locationData = decode NoHeader $ fromString locationData'
     --could use some case of here and error handling
-    studentData <- case locationData of
+    let studentData = case locationData of
             Left _ -> throw ParseLocationFile
-            Right locData -> return $ find ((photographeeId ==) . _ident ) locData
+            Right locData -> find ((photographeeId ==) . _ident ) locData
 
-    student <- (return $ fromJust studentData) `catchAny` (\_ -> throw FindPhotographee)
+    let student = case studentData of
+            Nothing -> throw FindPhotographee
+            Just x -> x 
+
     return student 
