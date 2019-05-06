@@ -39,7 +39,7 @@ actions config photographee = do
         let dumpFiles = _dumpFiles config
         let photographeeId = _ident photographee
         forM_ dumpFiles $ \ dumpFile -> do
-            let outFile = outDir </> photographeeId </> dumpFile 
+            let outFile = outDir </> photographeeId </> (takeFileName dumpFile)
             want [outFile] 
             outFile %> \f -> do
                 copyFile' dumpFile f
