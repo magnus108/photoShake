@@ -10,6 +10,7 @@ import Control.Exception
 data ShakeError
     = OutDirectoryMissing
     | DumpMissing
+    | DumpConfigFileMissing
     | ConfigMissing
     | ConfigDumpMissing
     | ConfigOutMissing
@@ -25,6 +26,7 @@ instance Show ShakeError where
     show OutDirectoryMissing = "Kunne ikke finde outmappe"
     show ConfigMissing = "Konfigurations filen mangler eller indeholder fejl"
     show ConfigDumpMissing = "Konfigurations filen mangler dump konfiguration"
+    show DumpConfigFileMissing = "Dump konfigurationen findes ikke"
     show ConfigOutMissing = "Konfigurations filen mangler out konfiguration"
     show ConfigLocationMissing = "Konfigurations filen mangler lokations konfiguration"
     show ReadLocationFile = "Kunne ikke finde lokationsfil"

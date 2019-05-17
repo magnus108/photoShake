@@ -26,10 +26,10 @@ catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
 
 
-getDumpDir :: HM.HashMap String String -> String
-getDumpDir config = case (HM.lookup "dumpDir" config) of
+getDumpDir :: HM.HashMap String String -> IO String
+getDumpDir config = case (HM.lookup "dumpConfig" config) of
     Nothing -> throw ConfigDumpMissing
-    Just x -> x
+    Just x -> readFile x `catchAny` (\_ -> throw DumpConfigFileMissing)
 
 getOutDir :: HM.HashMap String String -> String
 getOutDir config = case (HM.lookup "outDir" config) of
@@ -52,7 +52,7 @@ getDumpFiles dumpDir = getDirectoryFilesIO "" [dumpDir ++ "/*"]
 toShakeConfig :: FilePath -> IO ShakeConfig
 toShakeConfig x = do
     config <- readConfigFile x `catchAny` (\_ -> throw ConfigMissing)
-    let dumpDir = getDumpDir config
+    dumpDir <- getDumpDir config
     dumpFiles <- getDumpFiles dumpDir 
     let outDir = getOutDir config
     let location = getLocationConfig config
