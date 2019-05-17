@@ -23,11 +23,9 @@ goldenTests = do
     config <- toShakeConfig "test/config.cfg"    
     let outDir = _outDir config
     
-    let photographee = Photographee { _tea = "TEA_9882123"
-                                    , _ident = "5678"
-                                    , _grade = "9A"
-                                    , _name = "Christian Morling"
-                                    }
+    let location = _location config
+    let photographeeId = "5678"
+    photographee <- findPhotographee location photographeeId 
 
     let ident = _ident photographee
     let goldenDir = "test" </> ident 
