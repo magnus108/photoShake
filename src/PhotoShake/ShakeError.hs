@@ -19,9 +19,11 @@ data ShakeError
     | ConfigDoneshootingMissing
     | ConfigDagsdatoMissing
     | ConfigLocationMissing
+    | ConfigShootingMissing
     | ReadLocationFile
     | ParseLocationFile
     | FindPhotographee
+    | ShootingConfigFileMissing
     deriving (Eq)
 
 
@@ -37,9 +39,11 @@ instance Show ShakeError where
     show ConfigDoneshootingMissing = "Konfigurations filen mangler doneshooting konfiguration"
     show ConfigDagsdatoMissing = "Konfigurations filen mangler dagsdato konfiguration"
     show ConfigLocationMissing = "Konfigurations filen mangler lokations konfiguration"
+    show ConfigShootingMissing = "Konfigurations filen mangler shooting type"
     show ReadLocationFile = "Kunne ikke finde lokationsfil"
     show ParseLocationFile = "Der er fejl i lokationsfil"
     show FindPhotographee = "Kunne ikke finde elev i lokations fil"
+    show ShootingConfigFileMissing = "Shooting type mangler"
 
 
 instance Exception ShakeError

@@ -13,6 +13,7 @@ import System.Directory
 import qualified Data.HashMap.Lazy as HM
 
 import PhotoShake.ShakeError
+import PhotoShake.Shooting
 
 import Control.Exception
 
@@ -21,6 +22,7 @@ data ShakeConfig = ShakeConfig
     { _dumpFiles :: [FilePath]
     , _doneshootingDir :: FilePath
     , _dagsdatoDir :: FilePath
+    , _shootingType :: Shooting
     , _location :: FilePath
     }
 
@@ -59,6 +61,20 @@ getDagsdatoDir config = case (HM.lookup "dagsdatoConfig" config) of
             Just y -> return y
 
 
+getShootingType :: HM.HashMap String String -> IO Shooting
+getShootingType config = case (HM.lookup "shootingConfig" config) of
+    Nothing -> throw ConfigShootingMissing
+    Just x -> do
+        shootingConfig <- readConfigFile x `catchAny` (\_ -> throw ShootingConfigFileMissing)
+        case (HM.lookup "shooting" shootingConfig) of
+            Nothing -> throw ShootingConfigFileMissing -- Same error as above
+            Just y -> do
+                case y of
+                    "normal" -> return Normal
+                    "omfoto" -> return Omfoto
+                    _ -> throw ShootingConfigFileMissing
+
+
 getLocationConfig :: HM.HashMap String String -> String
 getLocationConfig config = case (HM.lookup "location" config) of
     Nothing -> throw ConfigLocationMissing
@@ -78,9 +94,13 @@ toShakeConfig x = do
     dumpFiles <- getDumpFiles dumpDir 
     doneshootingDir <- getDoneshootingDir config
     dagsdatoDir <- getDagsdatoDir config
+
+    shootingType <- getShootingType config
+
     let location = getLocationConfig config
     return $ ShakeConfig { _dumpFiles = dumpFiles
                          , _doneshootingDir = doneshootingDir
                          , _dagsdatoDir = dagsdatoDir
                          , _location = location
+                         , _shootingType = shootingType
                          } 
