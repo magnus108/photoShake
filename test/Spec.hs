@@ -21,7 +21,8 @@ main = do
 goldenTests :: IO TestTree
 goldenTests = do
     config <- toShakeConfig "test/config.cfg"    
-    let outDir = _outDir config
+    let doneshootingDir = _doneshootingDir config
+    let dagsdatoDir = _dagsdatoDir config
     
     let location = _location config
     let photographeeId = "5678"
@@ -30,21 +31,33 @@ goldenTests = do
     let ident = _ident photographee
     let goldenDir = "test" </> ident 
 
-    createDirectoryIfMissing False outDir
-    removeDirectoryRecursive outDir 
+    createDirectoryIfMissing False doneshootingDir
+    removeDirectoryRecursive doneshootingDir 
+
+    createDirectoryIfMissing False dagsdatoDir
+    removeDirectoryRecursive dagsdatoDir 
 
     myShake config photographee
 
-    let path = outDir </> mkPhotographeePath photographee
+    let doneshootingPath = doneshootingDir </> mkDoneshootingPath photographee
+    let dagsdatoPath = dagsdatoDir </> mkDagsdatoPath photographee
 
-    files <- listDirectory path
+    doneShootingFiles <- listDirectory doneshootingPath
+    dagsdatoFiles <- listDirectory dagsdatoPath
 
-    return $ testGroup "all files moved"
+    -- overvej refac
+    return $ testGroup "all files moved" $ 
         [ goldenVsString
             (takeBaseName file)
             goldenFile
             (LBS.readFile file)
-        | file <- fmap (\x -> path </> x) files --could be nicer
+        | file <- fmap (\x -> doneshootingPath </> x) doneShootingFiles --could be nicer
+        , let goldenFile = replaceDirectory file goldenDir
+        ] ++    
+        [ goldenVsString
+            (takeBaseName file)
+            goldenFile
+            (LBS.readFile file)
+        | file <- fmap (\x -> dagsdatoPath </> x) dagsdatoFiles --could be nicer
         , let goldenFile = replaceDirectory file goldenDir
         ]    
-

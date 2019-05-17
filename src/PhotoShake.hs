@@ -3,7 +3,8 @@ module PhotoShake
     ( entry
     , myShake
     , opts
-    , mkPhotographeePath
+    , mkDoneshootingPath
+    , mkDagsdatoPath
     ) where
 
 import Development.Shake
@@ -40,20 +41,33 @@ myShake :: ShakeConfig -> Photographee -> IO ()
 myShake config photographee = shake opts $ actions config photographee
 
 
-mkPhotographeePath :: Photographee -> FilePath
-mkPhotographeePath photographee = grade </> ident
+mkDoneshootingPath :: Photographee -> FilePath
+mkDoneshootingPath photographee = grade </> ident
         where
             ident = _ident photographee
             grade = _grade photographee
 
 
+mkDagsdatoPath:: Photographee -> FilePath
+mkDagsdatoPath photographee = grade </> ident
+        where
+            ident = _ident photographee
+            grade = _grade photographee
+            
+
 actions :: ShakeConfig -> Photographee -> Rules ()
 actions config photographee = do
-        let outDir = _outDir config
+        let doneshootingDir = _doneshootingDir config
+        let dagsdatoDir = _dagsdatoDir config
         let dumpFiles = _dumpFiles config
 
         forM_ dumpFiles $ \ dumpFile -> do
-            let outFile = outDir </> mkPhotographeePath photographee </> takeFileName dumpFile
-            want [outFile] 
-            outFile %> \f -> do
+            let doneshootingFile = doneshootingDir </> mkDoneshootingPath photographee </> takeFileName dumpFile
+            let dagsdatoFile = dagsdatoDir </> mkDagsdatoPath photographee </> takeFileName dumpFile
+            want [doneshootingFile, dagsdatoFile] 
+
+            doneshootingFile %> \f -> do
+                copyFile' dumpFile f
+
+            dagsdatoFile %> \f -> do
                 copyFile' dumpFile f
