@@ -9,7 +9,6 @@ import GHC.Generics (Generic)
 import Data.Csv
 import Data.Vector (find)
 import Data.ByteString.Lazy.UTF8 (fromString)
-import Data.Maybe
 
 import PhotoShake.ShakeConfig
 import ShakeError

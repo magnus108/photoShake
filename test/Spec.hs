@@ -3,7 +3,7 @@ import Development.Shake.FilePath
 import Test.Tasty
 import Test.Tasty.Golden
 
-import Development.Shake
+import System.Directory
 
 import qualified Data.ByteString.Lazy as LBS
 
@@ -28,20 +28,23 @@ goldenTests = do
                                     , _name = "Christian Morling"
                                     }
 
-    let goldenDir = "test" </> (_ident photographee)
+    let ident = _ident photographee
+    let goldenDir = "test" </> ident 
 
-    removeFiles outDir ["//*"]
+    removeDirectoryRecursive outDir
 
     myShake config photographee
 
-    files <- getDirectoryFilesIO outDir ["//*"]
+    let path = outDir </> mkPhotographeePath photographee
+
+    files <- listDirectory path
 
     return $ testGroup "all files moved"
         [ goldenVsString
             (takeBaseName file)
             goldenFile
             (LBS.readFile file)
-        | file <- fmap (\x -> outDir </> x) files --could be nicer
+        | file <- fmap (\x -> path </> x) files --could be nicer
         , let goldenFile = replaceDirectory file goldenDir
         ]    
 
