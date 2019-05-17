@@ -1,4 +1,4 @@
-module ShakeError
+module PhotoShake.ShakeError
     ( ShakeError(..)
     , throw
     ) where

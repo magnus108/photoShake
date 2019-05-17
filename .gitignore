@@ -1,6 +1,6 @@
 .stack-work/
 dump/
 out/
-_build/
+._build/
 photoShake.cabal
 *~

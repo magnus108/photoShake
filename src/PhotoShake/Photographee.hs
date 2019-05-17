@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Photographee
+module PhotoShake.Photographee
     ( Photographee(..)
     , findPhotographee
     ) where
@@ -11,15 +11,16 @@ import Data.Vector (find)
 import Data.ByteString.Lazy.UTF8 (fromString)
 
 import PhotoShake.ShakeConfig
-import ShakeError
+import PhotoShake.ShakeError
 
 type FullName = String
 type Ident = String
 
 
 data Photographee = Photographee 
-    { _name :: FullName
+    { _tea :: String 
     , _grade :: String  -- this is not good
+    , _name :: FullName
     , _ident :: Ident 
     } deriving (Generic, Show)
 

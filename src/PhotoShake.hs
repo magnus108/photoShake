@@ -10,7 +10,7 @@ import Development.Shake
 import Development.Shake.FilePath
 
 import PhotoShake.ShakeConfig
-import Photographee
+import PhotoShake.Photographee
 
 import Control.Monad
 
@@ -25,7 +25,7 @@ entry = do
 
 
 shakeDir :: FilePath
-shakeDir = "_build"
+shakeDir = "._build"
 
 
 opts :: ShakeOptions

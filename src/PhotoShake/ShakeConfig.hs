@@ -9,7 +9,7 @@ import Development.Shake.Config
 
 import qualified Data.HashMap.Lazy as HM
 
-import ShakeError
+import PhotoShake.ShakeError
 
 import Control.Exception
 

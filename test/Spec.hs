@@ -9,7 +9,7 @@ import qualified Data.ByteString.Lazy as LBS
 
 import PhotoShake
 import PhotoShake.ShakeConfig
-import Photographee
+import PhotoShake.Photographee
 
 
 main :: IO ()
@@ -23,8 +23,9 @@ goldenTests = do
     config <- toShakeConfig "test/config.cfg"    
     let outDir = _outDir config
     
-    let photographee = Photographee { _ident = "5678"
-                                    , _grade = "9.A"
+    let photographee = Photographee { _tea = "TEA_9882123"
+                                    , _ident = "5678"
+                                    , _grade = "9A"
                                     , _name = "Christian Morling"
                                     }
 
