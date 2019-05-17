@@ -32,7 +32,8 @@ goldenTests = do
     let ident = _ident photographee
     let goldenDir = "test" </> ident 
 
-    removeDirectoryRecursive outDir
+    createDirectoryIfMissing False outDir
+    removeDirectoryRecursive outDir 
 
     myShake config photographee
 

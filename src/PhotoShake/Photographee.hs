@@ -8,6 +8,7 @@ module PhotoShake.Photographee
 import GHC.Generics (Generic)
 import Data.Csv
 import Data.Vector (find)
+import Data.Char
 import Data.ByteString.Lazy.UTF8 (fromString)
 
 import PhotoShake.ShakeConfig
@@ -28,10 +29,14 @@ data Photographee = Photographee
 instance FromRecord Photographee
 
 
+myOptions :: DecodeOptions
+myOptions = defaultDecodeOptions { decDelimiter = fromIntegral (ord ';') }
+
+
 findPhotographee :: FilePath -> Ident -> IO Photographee
 findPhotographee location photographeeId = do
     locationData' <- readFile location `catchAny` (\_ -> throw ReadLocationFile)
-    let locationData = decode NoHeader $ fromString locationData'
+    let locationData = decodeWith myOptions NoHeader $ fromString locationData'
     --could use some case of here and error handling
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile

@@ -4,8 +4,11 @@ module PhotoShake.ShakeConfig
     , catchAny
     ) where
 
-import Development.Shake
+
 import Development.Shake.Config
+
+import System.FilePath
+import System.Directory
 
 import qualified Data.HashMap.Lazy as HM
 
@@ -29,7 +32,11 @@ catchAny = catch
 getDumpDir :: HM.HashMap String String -> IO String
 getDumpDir config = case (HM.lookup "dumpConfig" config) of
     Nothing -> throw ConfigDumpMissing
-    Just x -> readFile x `catchAny` (\_ -> throw DumpConfigFileMissing)
+    Just x -> do
+        dumpConfig <- readConfigFile x `catchAny` (\_ -> throw DumpConfigFileMissing)
+        case (HM.lookup "location" dumpConfig) of
+            Nothing -> throw DumpConfigFileMissing -- Same error as above
+            Just y -> return y
 
 getOutDir :: HM.HashMap String String -> String
 getOutDir config = case (HM.lookup "outDir" config) of
@@ -44,9 +51,9 @@ getLocationConfig config = case (HM.lookup "location" config) of
 
 
 getDumpFiles :: FilePath -> IO [String]
-getDumpFiles dumpDir = getDirectoryFilesIO "" [dumpDir ++ "/*"]
-    `catchAny` (\_ -> throw DumpMissing)
-
+getDumpFiles dumpDir = do
+     files <- listDirectory dumpDir 
+     return $ fmap (\x -> dumpDir </> x) files -- could be nicer
 
 -- could be better
 toShakeConfig :: FilePath -> IO ShakeConfig
