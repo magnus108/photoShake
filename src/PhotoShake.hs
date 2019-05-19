@@ -52,14 +52,19 @@ mkDagsdatoPath:: Photographee -> FilePath
 mkDagsdatoPath photographee = grade </> ident
         where
             ident = _ident photographee
-            grade = _grade photographee
-            
+            grade = _grade photographee 
 
 actions :: ShakeConfig -> Photographee -> Rules ()
 actions config photographee = do
-        let doneshootingDir = _doneshootingDir config
-        let dagsdatoDir = _dagsdatoDir config
-        let dumpFiles = _dumpFiles config
+        let doneshootingConfig = _doneshootingConfig config
+        let dagsdatoConfig = _dagsdatoConfig config
+
+        -- badIO
+        let dumpConfig = _dumpConfig config
+        dumpDir <- liftIO $ getDumpDir dumpConfig
+        dumpFiles <- liftIO $ getDumpFiles dumpDir
+        dagsdatoDir <- liftIO $ getDagsdatoDir dagsdatoConfig
+        doneshootingDir <- liftIO $ getDoneshootingDir doneshootingConfig
 
         forM_ dumpFiles $ \ dumpFile -> do
             let doneshootingFile = doneshootingDir </> mkDoneshootingPath photographee </> takeFileName dumpFile

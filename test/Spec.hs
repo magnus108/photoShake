@@ -21,8 +21,12 @@ main = do
 goldenTests :: IO TestTree
 goldenTests = do
     config <- toShakeConfig "test/config.cfg"    
-    let doneshootingDir = _doneshootingDir config
-    let dagsdatoDir = _dagsdatoDir config
+    
+    --IO bads
+    let doneshootingConfig = _doneshootingConfig config
+    let dagsdatoConfig = _dagsdatoConfig config
+    dagsdatoDir <- getDagsdatoDir dagsdatoConfig
+    doneshootingDir <- getDoneshootingDir doneshootingConfig
     
     let location = _location config
     let photographeeId = "5678"
