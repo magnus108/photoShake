@@ -28,9 +28,11 @@ goldenTests = do
     dagsdatoDir <- getDagsdatoDir dagsdatoConfig
     doneshootingDir <- getDoneshootingDir doneshootingConfig
     
-    let location = _location config
+    let locationConfig = _locationConfig config
+    locationFile <- getLocationFile locationConfig
+
     let photographeeId = "5678"
-    photographee <- findPhotographee location photographeeId 
+    photographee <- findPhotographee locationFile photographeeId 
 
     let ident = _ident photographee
     let goldenDir = "test" </> ident 

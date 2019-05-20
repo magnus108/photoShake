@@ -24,6 +24,7 @@ data ShakeError
     | ParseLocationFile
     | FindPhotographee
     | ShootingConfigFileMissing
+    | LocationConfigFileMissing
     deriving (Eq)
 
 
@@ -44,6 +45,7 @@ instance Show ShakeError where
     show ParseLocationFile = "Der er fejl i lokationsfil"
     show FindPhotographee = "Kunne ikke finde elev i lokations fil"
     show ShootingConfigFileMissing = "Shooting type mangler"
+    show LocationConfigFileMissing = "lokations konfiguration mangler"
 
 
 instance Exception ShakeError

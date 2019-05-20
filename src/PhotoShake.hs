@@ -19,9 +19,11 @@ import Control.Monad
 entry :: IO ()
 entry = do
     config <- toShakeConfig "config.cfg"
-    let location = _location config
+    let locationConfig = _locationConfig config
+    locationFile <- getLocationFile locationConfig
+
     photographeeId <- getLine
-    photographee <- findPhotographee location photographeeId 
+    photographee <- findPhotographee locationFile photographeeId 
     myShake config photographee
 
 
@@ -56,15 +58,15 @@ mkDagsdatoPath photographee = grade </> ident
 
 actions :: ShakeConfig -> Photographee -> Rules ()
 actions config photographee = do
+        -- badIO
         let doneshootingConfig = _doneshootingConfig config
         let dagsdatoConfig = _dagsdatoConfig config
-
-        -- badIO
         let dumpConfig = _dumpConfig config
         dumpDir <- liftIO $ getDumpDir dumpConfig
         dumpFiles <- liftIO $ getDumpFiles dumpDir
         dagsdatoDir <- liftIO $ getDagsdatoDir dagsdatoConfig
         doneshootingDir <- liftIO $ getDoneshootingDir doneshootingConfig
+        -- badIO
 
         forM_ dumpFiles $ \ dumpFile -> do
             let doneshootingFile = doneshootingDir </> mkDoneshootingPath photographee </> takeFileName dumpFile

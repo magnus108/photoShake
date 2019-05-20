@@ -7,6 +7,7 @@ module PhotoShake.ShakeConfig
     , getDumpConfig
     , getDagsdatoDir
     , getDoneshootingDir
+    , getLocationFile
     ) where
 
 
@@ -27,9 +28,9 @@ data ShakeConfig = ShakeConfig
     { _dumpConfig :: FilePath
     , _doneshootingConfig :: FilePath
     , _dagsdatoConfig:: FilePath
+    , _locationConfig :: FilePath
 
     , _shootingType :: Shooting
-    , _location :: FilePath
     }
 
 
@@ -107,6 +108,14 @@ getDumpFiles dumpDir = do
      return $ fmap (\x -> dumpDir </> x) files -- could be nicer
 
 
+getLocationFile :: FilePath -> IO FilePath
+getLocationFile x = do
+    locationConfig <- readConfigFile x `catchAny` (\_ -> throw LocationConfigFileMissing)
+    case (HM.lookup "location" locationConfig) of
+        Nothing -> throw LocationConfigFileMissing -- Same error 
+        Just y -> return y
+
+
 
 -- could be better
 toShakeConfig :: FilePath -> IO ShakeConfig
@@ -115,13 +124,13 @@ toShakeConfig x = do
     let dumpConfig = getDumpConfig config
     let doneshootingConfig = getDoneshootingConfig config
     let dagsdatoConfig = getDagsdatoConfig config
+    let locationConfig = getLocationConfig config
 
     shootingType <- getShootingType config
 
-    let location = getLocationConfig config
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
                          , _dagsdatoConfig = dagsdatoConfig
-                         , _location = location
+                         , _locationConfig = locationConfig
                          , _shootingType = shootingType
                          } 
