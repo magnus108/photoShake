@@ -88,7 +88,7 @@ getShootingType config = case (HM.lookup "shootingConfig" config) of
 
 
 getLocationConfig :: HM.HashMap String String -> String
-getLocationConfig config = case (HM.lookup "location" config) of
+getLocationConfig config = case (HM.lookup "locationConfig" config) of
     Nothing -> throw ConfigLocationMissing
     Just x -> x
 
