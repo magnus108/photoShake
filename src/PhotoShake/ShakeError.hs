@@ -25,10 +25,12 @@ data ShakeError
     | FindPhotographee
     | ShootingConfigFileMissing
     | LocationConfigFileMissing
+    | BadCsv
     deriving (Eq)
 
 
 instance Show ShakeError where
+    show BadCsv = "lokationsfil er ikke en csv"
     show DumpMissing = "Kunne ikke finde dumpmappe"
     show DoneshootingDirectoryMissing = "Kunne ikke finde doneshootingmappe"
     show DagsdatoDirectoryMissing = "Kunne ikke finde dagsdatomappe"
