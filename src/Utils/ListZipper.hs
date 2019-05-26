@@ -48,8 +48,5 @@ instance Functor ListZipper where
 
 instance Comonad ListZipper where
     extract (ListZipper _ a _) = a
-    duplicate z = ListZipper lefts' z rights'
-        where 
-            lefts' = reverse (iterate back z)
-            rights' = iterate forward z
-
+    duplicate a = ListZipper (shift back) a (shift forward)
+        where shift move = tail $ iterate move a
