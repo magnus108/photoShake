@@ -10,6 +10,8 @@ module PhotoShake.ShakeConfig
     , getLocationFile
     ) where
 
+import Prelude hiding (readFile)
+
 
 import Development.Shake.Config
 
@@ -23,6 +25,9 @@ import PhotoShake.Shooting
 
 import Control.Exception
 
+import Data.Aeson
+import Data.ByteString.Lazy (readFile)
+
 
 data ShakeConfig = ShakeConfig 
     { _dumpConfig :: FilePath
@@ -30,7 +35,7 @@ data ShakeConfig = ShakeConfig
     , _dagsdatoConfig:: FilePath
     , _locationConfig :: FilePath
 
-    , _shootingType :: Shooting
+    , _shootings :: Shootings
     }
 
 
@@ -73,25 +78,21 @@ getDagsdatoDir x = do
         Just y -> return y
 
 
-getShootingType :: HM.HashMap String String -> IO Shooting
-getShootingType config = case (HM.lookup "shootingConfig" config) of
+getShootings :: HM.HashMap String String -> IO Shootings
+getShootings config = case (HM.lookup "shootingConfig" config) of
     Nothing -> throw ConfigShootingMissing
     Just x -> do
-        shootingConfig <- readConfigFile x `catchAny` (\_ -> throw ShootingConfigFileMissing)
-        case (HM.lookup "shooting" shootingConfig) of
-            Nothing -> throw ShootingConfigFileMissing -- Same error as above
-            Just y -> do
-                case y of
-                    "normal" -> return Normal
-                    "omfoto" -> return Omfoto
-                    _ -> throw ShootingConfigFileMissing
-
+        shootingConfig <- readFile x `catchAny` (\_ -> throw ShootingConfigFileMissing) 
+        let shootings = decode shootingConfig :: Maybe Shootings
+        case shootings of
+            Nothing -> throw ShootingConfigFileMissing
+            Just y -> return y
+            
 
 getLocationConfig :: HM.HashMap String String -> String
 getLocationConfig config = case (HM.lookup "locationConfig" config) of
     Nothing -> throw ConfigLocationMissing
     Just x -> x
-
 
 
 getDumpDir :: FilePath -> IO FilePath
@@ -116,7 +117,6 @@ getLocationFile x = do
         Just y -> return y
 
 
-
 -- could be better
 toShakeConfig :: FilePath -> IO ShakeConfig
 toShakeConfig x = do
@@ -126,11 +126,11 @@ toShakeConfig x = do
     let dagsdatoConfig = getDagsdatoConfig config
     let locationConfig = getLocationConfig config
 
-    shootingType <- getShootingType config
+    shootings <- getShootings config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
                          , _dagsdatoConfig = dagsdatoConfig
                          , _locationConfig = locationConfig
-                         , _shootingType = shootingType
+                         , _shootings = shootings
                          } 
