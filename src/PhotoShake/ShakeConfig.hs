@@ -7,6 +7,7 @@ module PhotoShake.ShakeConfig
     , getDumpConfig
     , getDagsdatoDir
     , getDoneshootingDir
+    , getShootings
     , getLocationFile
     ) where
 
@@ -34,8 +35,7 @@ data ShakeConfig = ShakeConfig
     , _doneshootingConfig :: FilePath
     , _dagsdatoConfig:: FilePath
     , _locationConfig :: FilePath
-
-    , _shootings :: Shootings
+    , _shootingsConfig :: FilePath
     }
 
 
@@ -78,15 +78,19 @@ getDagsdatoDir x = do
         Just y -> return y
 
 
-getShootings :: HM.HashMap String String -> IO Shootings
-getShootings config = case (HM.lookup "shootingConfig" config) of
+getShootingsConfig :: HM.HashMap String String -> FilePath
+getShootingsConfig config = case (HM.lookup "shootingConfig" config) of
     Nothing -> throw ConfigShootingMissing
-    Just x -> do
+    Just x -> x
+
+
+getShootings :: FilePath -> IO Shootings
+getShootings x = do
         shootingConfig <- readFile x `catchAny` (\_ -> throw ShootingConfigFileMissing) 
         let shootings = decode shootingConfig :: Maybe Shootings
         case shootings of
-            Nothing -> throw ShootingConfigFileMissing
-            Just y -> return y
+                Nothing -> throw ShootingConfigFileMissing
+                Just y -> return y
             
 
 getLocationConfig :: HM.HashMap String String -> String
@@ -125,12 +129,11 @@ toShakeConfig x = do
     let doneshootingConfig = getDoneshootingConfig config
     let dagsdatoConfig = getDagsdatoConfig config
     let locationConfig = getLocationConfig config
-
-    shootings <- getShootings config
+    let shootingsConfig = getShootingsConfig config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
                          , _dagsdatoConfig = dagsdatoConfig
                          , _locationConfig = locationConfig
-                         , _shootings = shootings
+                         , _shootingsConfig = shootingsConfig
                          } 
