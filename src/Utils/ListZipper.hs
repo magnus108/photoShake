@@ -11,8 +11,6 @@ module Utils.ListZipper
 import Utils.Comonad
 import Data.Aeson.TH (deriveJSON, defaultOptions)
 
-
-
 data ListZipper a = ListZipper [a] a [a] deriving (Show) 
 
 deriveJSON defaultOptions ''ListZipper
@@ -47,9 +45,11 @@ mapFocus f (ListZipper ls a xs) = ListZipper ls (f a) xs
 instance Functor ListZipper where
     fmap f (ListZipper ls a rs) = ListZipper (fmap f ls) (f a) (fmap f rs)
 
+
 instance Comonad ListZipper where
     extract (ListZipper _ a _) = a
-    duplicate a = ListZipper (shift back) a (shift forward)
-        where shift move = tail $ iterate move a
-
+    duplicate z = ListZipper lefts' z rights'
+        where 
+            lefts' = reverse (iterate back z)
+            rights' = iterate forward z
 
