@@ -7,6 +7,7 @@ module Utils.ListZipper
     , mapFocus
     , back
     , forward
+    , toList
     ) where
 
 import Data.Maybe
@@ -58,6 +59,9 @@ iterate' f x =
             Just x' -> x : (iterate' f x')
             Nothing -> [x]
 
+
+toList :: ListZipper a -> [a]
+toList (ListZipper ls x rs) = ls ++ (x : rs)
 
 instance Functor ListZipper where
     fmap f (ListZipper ls a rs) = ListZipper (fmap f ls) (f a) (fmap f rs)
