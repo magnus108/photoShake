@@ -15,7 +15,7 @@ import Data.Maybe
 import Utils.Comonad
 import Data.Aeson.TH (deriveJSON, defaultOptions)
 
-data ListZipper a = ListZipper [a] a [a] deriving (Show) 
+data ListZipper a = ListZipper [a] a [a] deriving (Show, Eq)
 
 deriveJSON defaultOptions ''ListZipper
 
