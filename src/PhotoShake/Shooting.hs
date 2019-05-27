@@ -14,7 +14,7 @@ import Utils.ListZipper
 data Shooting
     = Omfoto
     | Normal
-    deriving (Show)
+    deriving (Show, Eq)
 
 deriveJSON defaultOptions ''Shooting
 
