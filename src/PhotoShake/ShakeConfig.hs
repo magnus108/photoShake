@@ -8,6 +8,7 @@ module PhotoShake.ShakeConfig
     , getDagsdatoDir
     , getDoneshootingDir
     , getShootings
+    , getSessions
     , getLocationFile
     ) where
 
@@ -23,6 +24,7 @@ import qualified Data.HashMap.Lazy as HM
 
 import PhotoShake.ShakeError
 import PhotoShake.Shooting
+import PhotoShake.Session
 
 import Control.Exception
 
@@ -36,6 +38,7 @@ data ShakeConfig = ShakeConfig
     , _dagsdatoConfig:: FilePath
     , _locationConfig :: FilePath
     , _shootingsConfig :: FilePath
+    , _sessionConfig :: FilePath
     }
 
 
@@ -84,12 +87,27 @@ getShootingsConfig config = case (HM.lookup "shootingConfig" config) of
     Just x -> x
 
 
+getSessionConfig :: HM.HashMap String String -> FilePath
+getSessionConfig config = case (HM.lookup "sessionConfig" config) of
+    Nothing -> throw ConfigSessionMissing
+    Just x -> x
+
+
 getShootings :: FilePath -> IO Shootings
 getShootings x = do
         shootingConfig <- readFile x `catchAny` (\_ -> throw ShootingConfigFileMissing) 
         let shootings = decode shootingConfig :: Maybe Shootings
         case shootings of
                 Nothing -> throw ShootingConfigFileMissing
+                Just y -> return y
+
+
+getSessions:: FilePath -> IO Sessions
+getSessions x = do
+        sessionConfig <- readFile x `catchAny` (\_ -> throw SessionsConfigFileMissing) 
+        let sessions = decode sessionConfig :: Maybe Sessions
+        case sessions of
+                Nothing -> throw SessionsConfigFileMissing
                 Just y -> return y
             
 
@@ -130,10 +148,12 @@ toShakeConfig x = do
     let dagsdatoConfig = getDagsdatoConfig config
     let locationConfig = getLocationConfig config
     let shootingsConfig = getShootingsConfig config
+    let sessionConfig = getSessionConfig config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
                          , _dagsdatoConfig = dagsdatoConfig
                          , _locationConfig = locationConfig
                          , _shootingsConfig = shootingsConfig
+                         , _sessionConfig = sessionConfig
                          } 

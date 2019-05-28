@@ -26,6 +26,8 @@ data ShakeError
     | ShootingConfigFileMissing
     | LocationConfigFileMissing
     | BadCsv
+    | SessionsConfigFileMissing
+    | ConfigSessionMissing
     deriving (Eq)
 
 
@@ -48,6 +50,8 @@ instance Show ShakeError where
     show FindPhotographee = "Kunne ikke finde elev i lokations fil"
     show ShootingConfigFileMissing = "Shooting type mangler"
     show LocationConfigFileMissing = "lokations konfiguration mangler"
+    show SessionsConfigFileMissing = "Session type mangler"
+    show ConfigSessionMissing = "Session mangler konfiguration"
 
 
 instance Exception ShakeError
