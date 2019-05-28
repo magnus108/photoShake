@@ -107,7 +107,7 @@ getSessions x = do
         sessionConfig <- readFile x `catchAny` (\_ -> throw SessionsConfigFileMissing) 
         let sessions = decode sessionConfig :: Maybe Sessions
         case sessions of
-                Nothing -> throw SessionsConfigFileMissing
+                Nothing -> throw SessionsConfigParseError
                 Just y -> return y
             
 

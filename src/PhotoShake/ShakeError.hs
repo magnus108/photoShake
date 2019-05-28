@@ -28,6 +28,7 @@ data ShakeError
     | BadCsv
     | SessionsConfigFileMissing
     | ConfigSessionMissing
+    | SessionsConfigParseError
     deriving (Eq)
 
 
@@ -51,6 +52,7 @@ instance Show ShakeError where
     show ShootingConfigFileMissing = "Shooting type mangler"
     show LocationConfigFileMissing = "lokations konfiguration mangler"
     show SessionsConfigFileMissing = "Session type mangler"
+    show SessionsConfigParseError = "Session file parse fejl"
     show ConfigSessionMissing = "Session mangler konfiguration"
 
 
