@@ -12,7 +12,7 @@ import Utils.ListZipper
 
 
 data Shooting
-    = Omfoto
+    = ReShoot
     | Normal
     deriving (Show, Eq)
 
