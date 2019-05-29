@@ -71,3 +71,10 @@ instance Comonad ListZipper where
     duplicate a = ListZipper (shift back') a (shift forward')
         where shift move = tail $ iterate' move a
 
+instance Foldable ListZipper where
+  foldMap f (ListZipper l x r) =
+    foldMap f l `mappend` f x `mappend` foldMap f r
+
+instance Traversable ListZipper where
+  traverse f (ListZipper l x r) =
+    ListZipper <$> traverse f l <*> f x <*> traverse f r
