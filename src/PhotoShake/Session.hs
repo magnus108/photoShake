@@ -8,8 +8,17 @@ import Data.Aeson.TH (deriveJSON, defaultOptions)
 
 import Utils.ListZipper
 
+data Type 
+    = Group
+    | Single
+    deriving (Show, Eq)
+
+
+deriveJSON defaultOptions ''Type
+
+
 data Session
-    = Kindergarten
+    = Kindergarten Type
     | School
     deriving (Show, Eq)
 
