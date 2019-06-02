@@ -9,6 +9,7 @@ module PhotoShake.ShakeConfig
     , getDoneshootingDir
     , getShootings
     , getSessions
+    , getPhotographers
     , getLocationFile
     ) where
 
@@ -25,6 +26,7 @@ import qualified Data.HashMap.Lazy as HM
 import PhotoShake.ShakeError
 import PhotoShake.Shooting
 import PhotoShake.Session
+import PhotoShake.Photographer
 
 import Control.Exception
 
@@ -39,12 +41,19 @@ data ShakeConfig = ShakeConfig
     , _locationConfig :: FilePath
     , _shootingsConfig :: FilePath
     , _sessionConfig :: FilePath
+    , _photographerConfig :: FilePath
     }
 
 
 -- concider moving this or getting rid of it
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
+
+
+getPhotographerConfig :: HM.HashMap String String -> FilePath
+getPhotographerConfig config = case (HM.lookup "photographerConfig" config) of
+    Nothing -> throw ConfigPhotographerMissing
+    Just x -> x 
 
 
 getDumpConfig :: HM.HashMap String String -> FilePath
@@ -102,12 +111,22 @@ getShootings x = do
                 Just y -> return y
 
 
-getSessions:: FilePath -> IO Sessions
+getSessions :: FilePath -> IO Sessions
 getSessions x = do
         sessionConfig <- readFile x `catchAny` (\_ -> throw SessionsConfigFileMissing) 
         let sessions = decode sessionConfig :: Maybe Sessions
         case sessions of
                 Nothing -> throw SessionsConfigParseError
+                Just y -> return y
+
+
+
+getPhotographers :: FilePath -> IO Photographers
+getPhotographers x = do
+        photographerConfig <- readFile x `catchAny` (\_ -> throw PhotographersConfigFileMissing) 
+        let photographers = decode photographerConfig :: Maybe Photographers
+        case photographers of
+                Nothing -> throw PhotographersConfigFileMissing
                 Just y -> return y
             
 
@@ -149,6 +168,7 @@ toShakeConfig x = do
     let locationConfig = getLocationConfig config
     let shootingsConfig = getShootingsConfig config
     let sessionConfig = getSessionConfig config
+    let photographerConfig = getPhotographerConfig config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
@@ -156,4 +176,5 @@ toShakeConfig x = do
                          , _locationConfig = locationConfig
                          , _shootingsConfig = shootingsConfig
                          , _sessionConfig = sessionConfig
+                         , _photographerConfig = photographerConfig
                          } 

@@ -9,8 +9,10 @@ import Control.Exception
 
 data ShakeError
     = DoneshootingDirectoryMissing
+    | PhotographersConfigFileMissing
     | DagsdatoDirectoryMissing
     | DumpMissing
+    | ConfigPhotographerMissing
     | DumpConfigFileMissing
     | DoneshootingConfigFileMissing
     | DagsdatoConfigFileMissing
@@ -54,6 +56,8 @@ instance Show ShakeError where
     show SessionsConfigFileMissing = "Session type mangler"
     show SessionsConfigParseError = "Session file parse fejl"
     show ConfigSessionMissing = "Session mangler konfiguration"
+    show ConfigPhotographerMissing = "Konfigurations filen mangler photograf konfiguration"
+    show PhotographersConfigFileMissing = "Photograf mangler"
 
 
 instance Exception ShakeError

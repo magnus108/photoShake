@@ -23,6 +23,7 @@ data Session
     | School
     deriving (Show, Eq)
 
+
 deriveJSON defaultOptions ''Session
 
 data Sessions = Sessions { unSessions :: ListZipper Session } deriving (Show)
