@@ -61,7 +61,7 @@ iterate' f x =
 
 
 toList :: ListZipper a -> [a]
-toList (ListZipper ls x rs) = ls ++ (x : rs)
+toList (ListZipper ls x rs) = (reverse ls) ++ (x : rs)
 
 instance Functor ListZipper where
     fmap f (ListZipper ls a rs) = ListZipper (fmap f ls) (f a) (fmap f rs)
