@@ -1,5 +1,1 @@
-{ "unSessions" : [
-        [],
-        "Kindergarten", 
-        ["School"]
-]}
+{"unSessions":[[],{"tag":"Kindergarten","contents":"Group"},[{"tag":"Kindergarten","contents":"Single"}, {"tag":"School"}]]}

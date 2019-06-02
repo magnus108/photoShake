@@ -2,6 +2,7 @@
 module PhotoShake.Session
     ( Session(..)
     , Sessions(..)
+    , Type(..)
     ) where
 
 import Data.Aeson.TH (deriveJSON, defaultOptions)
