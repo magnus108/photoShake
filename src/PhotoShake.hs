@@ -7,13 +7,18 @@ module PhotoShake
     , mkDagsdatoPath
     ) where
 
-import Development.Shake
+import Development.Shake hiding (Normal)
 import Development.Shake.FilePath
 
 import PhotoShake.ShakeConfig
 import PhotoShake.Photographee
 
+import PhotoShake.Shooting
+import PhotoShake.Session
+import qualified PhotoShake.Photographer as PR
+
 import Control.Monad
+
 
 
 entry :: IO ()
@@ -24,7 +29,10 @@ entry = do
 
     photographeeId <- getLine
     photographee <- findPhotographee locationFile photographeeId 
-    myShake config photographee
+
+    -- ehh
+    let location = takeBaseName (locationFile)
+    myShake config photographee location
 
 
 shakeDir :: FilePath
@@ -39,25 +47,35 @@ opts = shakeOptions { shakeFiles = shakeDir
                     }
 
 
-myShake :: ShakeConfig -> Photographee -> IO ()
-myShake config photographee = shake opts $ actions config photographee
+myShake :: ShakeConfig -> Photographee -> String -> IO ()
+myShake config photographee location = shake opts $ actions config photographee location
 
 
-mkDoneshootingPath :: Photographee -> FilePath
-mkDoneshootingPath photographee = grade </> ident
+mkDoneshootingPath :: FilePath -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> FilePath
+mkDoneshootingPath doneshootingDir photographee location photographer session shooting filename = doneshootingDir </> location </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ filename
         where
-            ident = _ident photographee
-            grade = _grade photographee
+            tea = _tea photographee
+            grade = _grade photographee 
+            sessionId = case session of
+                    School -> "8"
+                    _ -> "9"
+            shootingId = case shooting of
+                    Normal -> "1"
+                    ReShoot -> "2"
+                
 
 
-mkDagsdatoPath:: Photographee -> FilePath
-mkDagsdatoPath photographee = grade </> ident
+
+mkDagsdatoPath :: FilePath -> Photographee -> String -> String -> FilePath
+mkDagsdatoPath dagsdatoDir photographee location filename = dagsdatoDir </> location </> grade </> (name ++ " - " ++ tea) </> filename
         where
-            ident = _ident photographee
+            tea = _tea photographee
+            name = _name photographee
             grade = _grade photographee 
 
-actions :: ShakeConfig -> Photographee -> Rules ()
-actions config photographee = do
+
+actions :: ShakeConfig -> Photographee -> String -> Rules ()
+actions config photographee location = do
         -- badIO
         let doneshootingConfig = _doneshootingConfig config
         let dagsdatoConfig = _dagsdatoConfig config
@@ -66,11 +84,17 @@ actions config photographee = do
         dumpFiles <- liftIO $ getDumpFiles dumpDir
         dagsdatoDir <- liftIO $ getDagsdatoDir dagsdatoConfig
         doneshootingDir <- liftIO $ getDoneshootingDir doneshootingConfig
+
+        photographer <- liftIO $ getPhotographer config
+        session <- liftIO $ getSession config
+        shooting <- liftIO $ getShooting config
         -- badIO
 
         forM_ dumpFiles $ \ dumpFile -> do
-            let doneshootingFile = doneshootingDir </> mkDoneshootingPath photographee </> takeFileName dumpFile
-            let dagsdatoFile = dagsdatoDir </> mkDagsdatoPath photographee </> takeFileName dumpFile
+            let doneshootingFile = mkDoneshootingPath doneshootingDir photographee location photographer session shooting (takeFileName dumpFile)
+
+            let dagsdatoFile = mkDagsdatoPath dagsdatoDir photographee location (takeFileName dumpFile)
+
             want [doneshootingFile, dagsdatoFile] 
 
             doneshootingFile %> \f -> do

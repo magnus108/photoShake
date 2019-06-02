@@ -43,10 +43,15 @@ goldenTests = do
     createDirectoryIfMissing False dagsdatoDir
     removeDirectoryRecursive dagsdatoDir 
 
-    myShake config photographee
+    let location = takeBaseName (locationFile)
+    myShake config photographee location
 
-    let doneshootingPath = doneshootingDir </> mkDoneshootingPath photographee
-    let dagsdatoPath = dagsdatoDir </> mkDagsdatoPath photographee
+    -- bads 
+    photographer <- getPhotographer config
+    session <- getSession config
+    shooting <- getShooting config
+    let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshootingDir photographee location photographer session shooting "null"
+    let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdatoDir photographee location "null"
 
     doneShootingFiles <- listDirectory doneshootingPath
     dagsdatoFiles <- listDirectory dagsdatoPath

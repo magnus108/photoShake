@@ -11,6 +11,9 @@ module PhotoShake.ShakeConfig
     , getSessions
     , getPhotographers
     , getLocationFile
+    , getPhotographer 
+    , getShooting
+    , getSession
     ) where
 
 import Prelude hiding (readFile)
@@ -33,6 +36,7 @@ import Control.Exception
 import Data.Aeson
 import Data.ByteString.Lazy (readFile)
 
+import Utils.ListZipper
 
 data ShakeConfig = ShakeConfig 
     { _dumpConfig :: FilePath
@@ -128,7 +132,28 @@ getPhotographers x = do
         case photographers of
                 Nothing -> throw PhotographersConfigFileMissing
                 Just y -> return y
+
+
+getPhotographer :: ShakeConfig -> IO Photographer
+getPhotographer config = do
+        let photographerConfig = _photographerConfig config
+        x <- getPhotographers photographerConfig
+        return (focus (unPhotographers x))
             
+
+getShooting :: ShakeConfig -> IO Shooting
+getShooting config = do
+        let shootingConfig = _shootingsConfig config
+        x <- getShootings shootingConfig
+        return (focus (unShootings x))
+
+
+getSession :: ShakeConfig -> IO Session
+getSession config = do
+        let sessionConfig = _sessionConfig config
+        x <- getSessions sessionConfig
+        return (focus (unSessions x))
+
 
 getLocationConfig :: HM.HashMap String String -> String
 getLocationConfig config = case (HM.lookup "locationConfig" config) of

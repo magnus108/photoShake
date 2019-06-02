@@ -10,7 +10,9 @@ import Utils.ListZipper
 
 
 data Photographer = Photographer 
-    { name :: String }
+    { name :: String 
+    , tid :: String
+    }
     deriving (Show, Eq)
 
 
