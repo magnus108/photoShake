@@ -31,7 +31,7 @@ entry = do
     photographee <- findPhotographee locationFile photographeeId 
 
     -- ehh
-    let location = takeBaseName (locationFile)
+    let location = takeBaseName locationFile
     myShake config photographee location
 
 
