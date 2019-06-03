@@ -184,9 +184,10 @@ getLocationConfig config = case (HM.lookup "locationConfig" config) of
     Just x -> x
 
 
-getDump :: FilePath -> IO Dump
-getDump x = do
-    dumpConfig <- readFile x `catchAny` (\_ -> throw DumpConfigFileMissing)
+getDump :: ShakeConfig -> IO Dump
+getDump config = do
+    let filepath = _dumpConfig config
+    dumpConfig <- readFile filepath `catchAny` (\_ -> throw DumpConfigFileMissing)
     let dumpDir = decode dumpConfig :: Maybe Dump
     case dumpDir of
             Nothing -> throw DumpConfigFileMissing
@@ -201,8 +202,7 @@ setDump config dump = do
 
 getDumpFiles :: ShakeConfig -> IO [FilePath]
 getDumpFiles config = do
-    let dumpConfig = _dumpConfig config
-    dump <- getDump dumpConfig
+    dump <- getDump config
     files <- listDirectory (unDump dump)
     return $ fmap (\x -> (unDump dump) </> x) files -- could be nicer
 
