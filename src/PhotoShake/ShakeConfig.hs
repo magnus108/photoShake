@@ -6,7 +6,7 @@ module PhotoShake.ShakeConfig
     , getDump
     , getDumpConfig
     , getDagsdatoDir
-    , getDoneshootingDir
+    , getDoneshooting
     , getShootings
     , getSessions
     , getPhotographers
@@ -26,6 +26,7 @@ import System.Directory
 
 import qualified Data.HashMap.Lazy as HM
 
+import PhotoShake.Doneshooting
 import PhotoShake.Dump
 import PhotoShake.ShakeError
 import PhotoShake.Shooting
@@ -69,16 +70,18 @@ getDumpConfig config = case (HM.lookup "dumpConfig" config) of
 
 getDoneshootingConfig :: HM.HashMap String String -> FilePath
 getDoneshootingConfig config = case (HM.lookup "doneshootingConfig" config) of
-    Nothing -> error "wtf" --throw ConfigDoneshootingMissing
+    Nothing -> throw ConfigDoneshootingMissing
     Just x -> x
 
 
-getDoneshootingDir :: FilePath -> IO FilePath
-getDoneshootingDir x = do
-    doneshootingConfig <- readConfigFile x `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
-    case (HM.lookup "location" doneshootingConfig) of
-        Nothing -> throw DoneshootingConfigFileMissing -- Same error
-        Just y -> return y
+getDoneshooting :: ShakeConfig -> IO Doneshooting
+getDoneshooting config = do
+    let filepath = _doneshootingConfig config
+    doneshootingConfig <- readFile filepath `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+    let doneshooting = decode doneshootingConfig :: Maybe Doneshooting
+    case doneshooting of
+            Nothing -> throw DoneshootingConfigFileMissing -- Same error
+            Just y -> return y
 
 
 getDagsdatoConfig :: HM.HashMap String String -> FilePath
