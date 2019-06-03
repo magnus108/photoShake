@@ -10,6 +10,7 @@ import qualified Data.ByteString.Lazy as LBS
 import PhotoShake
 import PhotoShake.ShakeConfig
 import PhotoShake.Doneshooting
+import PhotoShake.Dagsdato
 import PhotoShake.Photographee
 
 
@@ -24,9 +25,7 @@ goldenTests = do
     config <- toShakeConfig "test/config.cfg"    
     
     --IO bads
-    let dagsdatoConfig = _dagsdatoConfig config
-    dagsdatoDir <- getDagsdatoDir dagsdatoConfig
-
+    dagsdato <- getDagsdato config
     doneshooting <- getDoneshooting config
     
     let locationConfig = _locationConfig config
@@ -41,8 +40,8 @@ goldenTests = do
     createDirectoryIfMissing False (unDoneshooting doneshooting)
     removeDirectoryRecursive (unDoneshooting doneshooting)
 
-    createDirectoryIfMissing False dagsdatoDir
-    removeDirectoryRecursive dagsdatoDir 
+    createDirectoryIfMissing False (unDagsdato dagsdato)
+    removeDirectoryRecursive (unDagsdato dagsdato)
 
     let location = takeBaseName (locationFile)
     myShake config photographee location
@@ -52,7 +51,7 @@ goldenTests = do
     session <- getSession config
     shooting <- getShooting config
     let doneshootingPath = takeDirectory $ mkDoneshootingPath (unDoneshooting doneshooting) photographee location photographer session shooting "null"
-    let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdatoDir photographee location "null"
+    let dagsdatoPath = takeDirectory $ mkDagsdatoPath (unDagsdato dagsdato) photographee location "null"
 
     doneShootingFiles <- listDirectory doneshootingPath
     dagsdatoFiles <- listDirectory dagsdatoPath

@@ -5,7 +5,7 @@ module PhotoShake.ShakeConfig
     , getDumpFiles
     , getDump
     , getDumpConfig
-    , getDagsdatoDir
+    , getDagsdato
     , getDoneshooting
     , getShootings
     , getSessions
@@ -26,6 +26,7 @@ import System.Directory
 
 import qualified Data.HashMap.Lazy as HM
 
+import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting
 import PhotoShake.Dump
 import PhotoShake.ShakeError
@@ -90,10 +91,12 @@ getDagsdatoConfig config = case (HM.lookup "dagsdatoConfig" config) of
     Just x -> x
 
     
-getDagsdatoDir :: FilePath -> IO FilePath
-getDagsdatoDir x = do
-    dagsdatoConfig <- readConfigFile x `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
-    case (HM.lookup "location" dagsdatoConfig) of
+getDagsdato :: ShakeConfig -> IO Dagsdato
+getDagsdato config = do
+    let filepath = _dagsdatoConfig config
+    dagsdatoConfig <- readFile filepath `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
+    let dagsdato = decode dagsdatoConfig :: Maybe Dagsdato
+    case dagsdato of
         Nothing -> throw DagsdatoConfigFileMissing -- Same error
         Just y -> return y
 

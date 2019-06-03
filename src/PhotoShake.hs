@@ -13,6 +13,7 @@ import Development.Shake.FilePath
 import PhotoShake.ShakeConfig
 import PhotoShake.Photographee
 
+import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting
 import PhotoShake.Shooting
 import PhotoShake.Session
@@ -78,13 +79,9 @@ mkDagsdatoPath dagsdatoDir photographee location filename = dagsdatoDir </> loca
 actions :: ShakeConfig -> Photographee -> String -> Rules ()
 actions config photographee location = do
         -- badIO
-        let dagsdatoConfig = _dagsdatoConfig config
-        dagsdatoDir <- liftIO $ getDagsdatoDir dagsdatoConfig
-
+        dagsdato <- liftIO $ getDagsdato config
         dumpFiles <- liftIO $ getDumpFiles config
-
         doneshooting <- liftIO $ getDoneshooting config
-
         photographer <- liftIO $ getPhotographer config
         session <- liftIO $ getSession config
         shooting <- liftIO $ getShooting config
@@ -93,7 +90,7 @@ actions config photographee location = do
         forM_ dumpFiles $ \ dumpFile -> do
             let doneshootingFile = mkDoneshootingPath (unDoneshooting doneshooting) photographee location photographer session shooting (takeFileName dumpFile)
 
-            let dagsdatoFile = mkDagsdatoPath dagsdatoDir photographee location (takeFileName dumpFile)
+            let dagsdatoFile = mkDagsdatoPath (unDagsdato dagsdato) photographee location (takeFileName dumpFile)
 
             want [doneshootingFile, dagsdatoFile] 
 
