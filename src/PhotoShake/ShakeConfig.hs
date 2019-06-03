@@ -6,7 +6,9 @@ module PhotoShake.ShakeConfig
     , getDump
     , getDumpConfig
     , getDagsdato
+    , setDagsdato
     , getDoneshooting
+    , setDoneshooting
     , getShootings
     , getSessions
     , getPhotographers
@@ -16,7 +18,7 @@ module PhotoShake.ShakeConfig
     , getSession
     ) where
 
-import Prelude hiding (readFile)
+import Prelude hiding (readFile, writeFile)
 
 
 import Development.Shake.Config
@@ -37,7 +39,7 @@ import PhotoShake.Photographer
 import Control.Exception
 
 import Data.Aeson
-import Data.ByteString.Lazy (readFile)
+import Data.ByteString.Lazy (readFile, writeFile)
 
 import Utils.ListZipper
 
@@ -84,6 +86,11 @@ getDoneshooting config = do
             Nothing -> throw DoneshootingConfigFileMissing -- Same error
             Just y -> return y
 
+setDoneshooting :: ShakeConfig -> Doneshooting -> IO ()
+setDoneshooting config doneshooting = do
+    let filepath = _doneshootingConfig config
+    writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+
 
 getDagsdatoConfig :: HM.HashMap String String -> FilePath
 getDagsdatoConfig config = case (HM.lookup "dagsdatoConfig" config) of
@@ -99,6 +106,12 @@ getDagsdato config = do
     case dagsdato of
         Nothing -> throw DagsdatoConfigFileMissing -- Same error
         Just y -> return y
+
+
+setDagsdato :: ShakeConfig -> Dagsdato -> IO ()
+setDagsdato config dagsdato = do
+    let filepath = _dagsdatoConfig config
+    writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
 
 
 getShootingsConfig :: HM.HashMap String String -> FilePath
