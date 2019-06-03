@@ -3,7 +3,7 @@ module PhotoShake.ShakeConfig
     , toShakeConfig
     , catchAny
     , getDumpFiles
-    , getDumpDir
+    , getDump
     , getDumpConfig
     , getDagsdatoDir
     , getDoneshootingDir
@@ -26,6 +26,7 @@ import System.Directory
 
 import qualified Data.HashMap.Lazy as HM
 
+import PhotoShake.Dump
 import PhotoShake.ShakeError
 import PhotoShake.Shooting
 import PhotoShake.Session
@@ -161,18 +162,21 @@ getLocationConfig config = case (HM.lookup "locationConfig" config) of
     Just x -> x
 
 
-getDumpDir :: FilePath -> IO FilePath
-getDumpDir x = do
-    dumpConfig <- readConfigFile x `catchAny` (\_ -> throw DumpConfigFileMissing)
-    case (HM.lookup "location" dumpConfig) of
-        Nothing -> throw DumpConfigFileMissing -- Same error 
-        Just y -> return y
+getDump :: FilePath -> IO Dump
+getDump x = do
+    dumpConfig <- readFile x `catchAny` (\_ -> throw DumpConfigFileMissing)
+    let dumpDir = decode dumpConfig :: Maybe Dump
+    case dumpDir of
+            Nothing -> throw DumpConfigFileMissing
+            Just y -> return y
 
 
-getDumpFiles :: FilePath -> IO [FilePath]
-getDumpFiles dumpDir = do
-     files <- listDirectory dumpDir 
-     return $ fmap (\x -> dumpDir </> x) files -- could be nicer
+getDumpFiles :: ShakeConfig -> IO [FilePath]
+getDumpFiles config = do
+    let dumpConfig = _dumpConfig config
+    dump <- getDump dumpConfig
+    files <- listDirectory (unDump dump)
+    return $ fmap (\x -> (unDump dump) </> x) files -- could be nicer
 
 
 getLocationFile :: FilePath -> IO FilePath

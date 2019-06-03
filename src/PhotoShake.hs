@@ -77,11 +77,11 @@ mkDagsdatoPath dagsdatoDir photographee location filename = dagsdatoDir </> loca
 actions :: ShakeConfig -> Photographee -> String -> Rules ()
 actions config photographee location = do
         -- badIO
+        dumpFiles <- liftIO $ getDumpFiles config
+
+
         let doneshootingConfig = _doneshootingConfig config
         let dagsdatoConfig = _dagsdatoConfig config
-        let dumpConfig = _dumpConfig config
-        dumpDir <- liftIO $ getDumpDir dumpConfig
-        dumpFiles <- liftIO $ getDumpFiles dumpDir
         dagsdatoDir <- liftIO $ getDagsdatoDir dagsdatoConfig
         doneshootingDir <- liftIO $ getDoneshootingDir doneshootingConfig
 
