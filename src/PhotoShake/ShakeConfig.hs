@@ -4,6 +4,7 @@ module PhotoShake.ShakeConfig
     , catchAny
     , getDumpFiles
     , getDump
+    , setDump
     , getDumpConfig
     , getDagsdato
     , setDagsdato
@@ -86,6 +87,8 @@ getDoneshooting config = do
             Nothing -> throw DoneshootingConfigFileMissing -- Same error
             Just y -> return y
 
+
+-- ikke en rigtig setter mere en der skriver
 setDoneshooting :: ShakeConfig -> Doneshooting -> IO ()
 setDoneshooting config doneshooting = do
     let filepath = _doneshootingConfig config
@@ -188,6 +191,12 @@ getDump x = do
     case dumpDir of
             Nothing -> throw DumpConfigFileMissing
             Just y -> return y
+
+
+setDump :: ShakeConfig -> Dump -> IO ()
+setDump config dump = do
+    let filepath = _dumpConfig config
+    writeFile filepath (encode dump) `catchAny` (\_ -> throw DumpConfigFileMissing)
 
 
 getDumpFiles :: ShakeConfig -> IO [FilePath]
