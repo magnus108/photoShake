@@ -8,6 +8,7 @@ module PhotoShake.ShakeConfig
     , getDumpConfig
     , getDagsdato
     , setDagsdato
+    , setPhotographers
     , getDoneshooting
     , setDoneshooting
     , getShootings
@@ -93,6 +94,12 @@ setDoneshooting :: ShakeConfig -> Doneshooting -> IO ()
 setDoneshooting config doneshooting = do
     let filepath = _doneshootingConfig config
     writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+
+-- ikke en rigtig setter mere en der skriver
+setPhotographers :: ShakeConfig -> Photographers -> IO ()
+setPhotographers config photographers = do
+    let filepath = _photographerConfig config
+    writeFile filepath (encode photographers) `catchAny` (\_ -> throw PhotographersConfigFileMissing)
 
 
 getDagsdatoConfig :: HM.HashMap String String -> FilePath
