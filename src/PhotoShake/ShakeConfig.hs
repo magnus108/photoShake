@@ -68,10 +68,12 @@ catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
 
 
-getPhotographerConfig :: HM.HashMap String String -> FilePath
-getPhotographerConfig config = case (HM.lookup "photographerConfig" config) of
+getPhotographerConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getPhotographerConfig root config = case (HM.lookup "photographerConfig" config) of
     Nothing -> throw ConfigPhotographerMissing
-    Just x -> x 
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 
 getDumpConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
@@ -314,7 +316,7 @@ toShakeConfig root cfg = do
     let locationConfig = getLocationConfig root config
     let shootingsConfig = getShootingsConfig root config
     let sessionConfig = getSessionConfig root config
-    let photographerConfig = getPhotographerConfig config
+    let photographerConfig = getPhotographerConfig root config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
