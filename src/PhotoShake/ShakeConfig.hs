@@ -5,6 +5,7 @@ module PhotoShake.ShakeConfig
     , getDumpFiles
     , getDump
     , setDump
+    , setShooting
     , getDumpConfig
     , getDagsdato
     , setDagsdato
@@ -96,6 +97,12 @@ setDoneshooting :: ShakeConfig -> Doneshooting -> IO ()
 setDoneshooting config doneshooting = do
     let filepath = _doneshootingConfig config
     writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+--
+-- ikke en rigtig setter mere en der skriver
+setShooting:: ShakeConfig -> Shootings -> IO ()
+setShooting config shootings = do
+    let filepath = _shootingsConfig config
+    writeFile filepath (encode shootings) `catchAny` (\_ -> throw ShootingConfigFileMissing)
 
 -- ikke en rigtig setter mere en der skriver
 -- does not really belong in this project
