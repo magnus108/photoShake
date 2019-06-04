@@ -13,6 +13,7 @@ import Development.Shake.FilePath
 import PhotoShake.ShakeConfig
 import PhotoShake.Photographee
 
+import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting
 import PhotoShake.Shooting
@@ -26,15 +27,14 @@ import Control.Monad
 entry :: IO ()
 entry = do
     config <- toShakeConfig "config.cfg"
-    let locationConfig = _locationConfig config
-    locationFile <- getLocationFile locationConfig
+    location <- getLocationFile config
 
     photographeeId <- getLine
-    photographee <- findPhotographee locationFile photographeeId 
+    photographee <- findPhotographee (unLocation location) photographeeId 
 
     -- ehh
-    let location = takeBaseName locationFile
-    myShake config photographee location
+    -- can make error
+    myShake config photographee (takeBaseName (unLocation location))
 
 
 shakeDir :: FilePath

@@ -35,6 +35,7 @@ import System.Directory
 
 import qualified Data.HashMap.Lazy as HM
 
+import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting
 import PhotoShake.Dump
@@ -270,10 +271,12 @@ getDumpFiles config = do
     return $ fmap (\x -> (unDump dump) </> x) files -- could be nicer
 
 
-getLocationFile :: FilePath -> IO FilePath
-getLocationFile x = do
-    locationConfig <- readConfigFile x `catchAny` (\_ -> throw LocationConfigFileMissing)
-    case (HM.lookup "location" locationConfig) of
+getLocationFile :: ShakeConfig -> IO Location
+getLocationFile config = do
+    let filepath = _locationConfig config
+    locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
+    let location = decode locationConfig :: Maybe Location
+    case location of
         Nothing -> throw LocationConfigFileMissing -- Same error 
         Just y -> return y
 
