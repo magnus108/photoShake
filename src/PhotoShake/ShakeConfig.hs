@@ -6,6 +6,7 @@ module PhotoShake.ShakeConfig
     , getDump
     , setDump
     , setShooting
+    , setSession
     , getDumpConfig
     , getDagsdato
     , setDagsdato
@@ -17,6 +18,7 @@ module PhotoShake.ShakeConfig
     , getPhotographers
     , importPhotographers
     , importShootings
+    , importSessions
     , getLocationFile
     , getPhotographer 
     , getShooting
@@ -104,6 +106,14 @@ setShooting config shootings = do
     let filepath = _shootingsConfig config
     writeFile filepath (encode shootings) `catchAny` (\_ -> throw ShootingConfigFileMissing)
 
+
+-- ikke en rigtig setter mere en der skriver
+setSession:: ShakeConfig -> Sessions -> IO ()
+setSession config sessions = do
+    let filepath = _sessionConfig config
+    writeFile filepath (encode sessions) `catchAny` (\_ -> throw SessionsConfigFileMissing)
+
+
 -- ikke en rigtig setter mere en der skriver
 -- does not really belong in this project
 setPhotographers :: ShakeConfig -> Photographers -> IO ()
@@ -123,6 +133,17 @@ importPhotographers config fromFilePath = do
             Just y -> do
                 writeFile toFilePath (encode y) `catchAny` (\_ -> throw PhotographersConfigFileMissing)
 
+--
+-- does not really belong in this project
+importSessions :: ShakeConfig -> FilePath -> IO ()
+importSessions config fromFilePath = do
+    let toFilePath = _sessionConfig config
+    newSessions <- readFile fromFilePath `catchAny` (\_ -> throw SessionsConfigFileMissing)
+    let sessions = decode newSessions :: Maybe Sessions
+    case sessions of
+            Nothing -> throw SessionsConfigFileMissing -- Same error
+            Just y -> do
+                writeFile toFilePath (encode y) `catchAny` (\_ -> throw SessionsConfigFileMissing)
 
 importShootings :: ShakeConfig -> FilePath -> IO ()
 importShootings config fromFilePath = do
@@ -181,9 +202,10 @@ getShootings config = do
                 Just y -> return y
 
 
-getSessions :: FilePath -> IO Sessions
-getSessions x = do
-        sessionConfig <- readFile x `catchAny` (\_ -> throw SessionsConfigFileMissing) 
+getSessions :: ShakeConfig -> IO Sessions
+getSessions config = do
+        let filepath = _sessionConfig config
+        sessionConfig <- readFile filepath `catchAny` (\_ -> throw SessionsConfigFileMissing) 
         let sessions = decode sessionConfig :: Maybe Sessions
         case sessions of
                 Nothing -> throw SessionsConfigParseError
@@ -215,8 +237,7 @@ getShooting config = do
 
 getSession :: ShakeConfig -> IO Session
 getSession config = do
-        let sessionConfig = _sessionConfig config
-        x <- getSessions sessionConfig
+        x <- getSessions config
         return (focus (unSessions x))
 
 
