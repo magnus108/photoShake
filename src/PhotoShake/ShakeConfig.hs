@@ -14,6 +14,7 @@ module PhotoShake.ShakeConfig
     , getShootings
     , getSessions
     , getPhotographers
+    , importPhotographers
     , getLocationFile
     , getPhotographer 
     , getShooting
@@ -96,10 +97,25 @@ setDoneshooting config doneshooting = do
     writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
 
 -- ikke en rigtig setter mere en der skriver
+-- does not really belong in this project
 setPhotographers :: ShakeConfig -> Photographers -> IO ()
 setPhotographers config photographers = do
     let filepath = _photographerConfig config
     writeFile filepath (encode photographers) `catchAny` (\_ -> throw PhotographersConfigFileMissing)
+
+--
+-- does not really belong in this project
+importPhotographers :: ShakeConfig -> FilePath -> IO ()
+importPhotographers config fromFilePath = do
+    let toFilePath = _photographerConfig config
+    newPhotographers <- readFile fromFilePath `catchAny` (\_ -> throw PhotographersConfigFileMissing)
+    let photographers = decode newPhotographers :: Maybe Photographers
+    case photographers of
+            Nothing -> throw PhotographersConfigFileMissing -- Same error
+            Just y -> do
+                writeFile toFilePath (encode y) `catchAny` (\_ -> throw PhotographersConfigFileMissing)
+    
+
 
 
 getDagsdatoConfig :: HM.HashMap String String -> FilePath
