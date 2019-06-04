@@ -4,6 +4,7 @@ module PhotoShake.ShakeConfig
     , catchAny
     , getDumpFiles
     , getDump
+    , setLocation
     , setDump
     , setShooting
     , setSession
@@ -179,6 +180,12 @@ setDagsdato :: ShakeConfig -> Dagsdato -> IO ()
 setDagsdato config dagsdato = do
     let filepath = _dagsdatoConfig config
     writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
+
+
+setLocation :: ShakeConfig -> Location -> IO ()
+setLocation config location = do
+    let filepath = _locationConfig config
+    writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing)
 
 
 getShootingsConfig :: HM.HashMap String String -> FilePath
