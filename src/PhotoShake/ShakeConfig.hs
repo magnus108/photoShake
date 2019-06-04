@@ -60,7 +60,6 @@ data ShakeConfig = ShakeConfig
     , _shootingsConfig :: FilePath
     , _sessionConfig :: FilePath
     , _photographerConfig :: FilePath
-    , _root :: Maybe FilePath
     }
 
 
@@ -75,16 +74,20 @@ getPhotographerConfig config = case (HM.lookup "photographerConfig" config) of
     Just x -> x 
 
 
-getDumpConfig :: HM.HashMap String String -> FilePath
-getDumpConfig config = case (HM.lookup "dumpConfig" config) of
+getDumpConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getDumpConfig root config = case (HM.lookup "dumpConfig" config) of
     Nothing -> throw ConfigDumpMissing
-    Just x -> x 
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 
-getDoneshootingConfig :: HM.HashMap String String -> FilePath
-getDoneshootingConfig config = case (HM.lookup "doneshootingConfig" config) of
+getDoneshootingConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getDoneshootingConfig root config = case (HM.lookup "doneshootingConfig" config) of
     Nothing -> throw ConfigDoneshootingMissing
-    Just x -> x
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 
 getDoneshooting :: ShakeConfig -> IO Doneshooting
@@ -159,12 +162,12 @@ importShootings config fromFilePath = do
                 writeFile toFilePath (encode y) `catchAny` (\_ -> throw ShootingConfigFileMissing)
     
 
-
-
-getDagsdatoConfig :: HM.HashMap String String -> FilePath
-getDagsdatoConfig config = case (HM.lookup "dagsdatoConfig" config) of
+getDagsdatoConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getDagsdatoConfig root config = case (HM.lookup "dagsdatoConfig" config) of
     Nothing -> throw ConfigDagsdatoMissing
-    Just x -> x
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
     
 getDagsdato :: ShakeConfig -> IO Dagsdato
@@ -189,16 +192,20 @@ setLocation config location = do
     writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing)
 
 
-getShootingsConfig :: HM.HashMap String String -> FilePath
-getShootingsConfig config = case (HM.lookup "shootingConfig" config) of
+getShootingsConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getShootingsConfig root config = case (HM.lookup "shootingConfig" config) of
     Nothing -> throw ConfigShootingMissing
-    Just x -> x
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 
-getSessionConfig :: HM.HashMap String String -> FilePath
-getSessionConfig config = case (HM.lookup "sessionConfig" config) of
+getSessionConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getSessionConfig root config = case (HM.lookup "sessionConfig" config) of
     Nothing -> throw ConfigSessionMissing
-    Just x -> x
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 
 getShootings :: ShakeConfig -> IO Shootings
@@ -250,23 +257,18 @@ getSession config = do
         return (focus (unSessions x))
 
 
-getLocationConfig :: HM.HashMap String String -> String
-getLocationConfig config = case (HM.lookup "locationConfig" config) of
+getLocationConfig :: Maybe FilePath -> HM.HashMap String String -> String
+getLocationConfig root config = case (HM.lookup "locationConfig" config) of
     Nothing -> throw ConfigLocationMissing
-    Just x -> x
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
-
-mkFilePath :: (ShakeConfig -> FilePath) -> ShakeConfig -> FilePath
-mkFilePath f x = case _root x of
-    Nothing -> path
-    Just root -> root </> path
-    where
-        path = f x
 
 
 getDump :: ShakeConfig -> IO Dump
 getDump config = do
-    let filepath = mkFilePath _dumpConfig config
+    let filepath = _dumpConfig config
     dumpConfig <- readFile filepath `catchAny` (\_ -> throw DumpConfigFileMissing)
     let dumpDir = decode dumpConfig :: Maybe Dump
     case dumpDir of
@@ -306,12 +308,12 @@ toShakeConfig root cfg = do
             Just x -> x </> cfg
     --bads 
     config <- readConfigFile path `catchAny` (\_ -> throw ConfigMissing)
-    let dumpConfig = getDumpConfig config
-    let doneshootingConfig = getDoneshootingConfig config
-    let dagsdatoConfig = getDagsdatoConfig config
-    let locationConfig = getLocationConfig config
-    let shootingsConfig = getShootingsConfig config
-    let sessionConfig = getSessionConfig config
+    let dumpConfig = getDumpConfig root config
+    let doneshootingConfig = getDoneshootingConfig root config
+    let dagsdatoConfig = getDagsdatoConfig root config
+    let locationConfig = getLocationConfig root config
+    let shootingsConfig = getShootingsConfig root config
+    let sessionConfig = getSessionConfig root config
     let photographerConfig = getPhotographerConfig config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
@@ -321,5 +323,4 @@ toShakeConfig root cfg = do
                          , _shootingsConfig = shootingsConfig
                          , _sessionConfig = sessionConfig
                          , _photographerConfig = photographerConfig
-                         , _root = root
                          } 
