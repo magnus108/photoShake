@@ -148,9 +148,10 @@ getSessions x = do
 
 
 
-getPhotographers :: FilePath -> IO Photographers
-getPhotographers x = do
-        photographerConfig <- readFile x `catchAny` (\_ -> throw PhotographersConfigFileMissing) 
+getPhotographers :: ShakeConfig -> IO Photographers
+getPhotographers config = do
+        let filepath = _photographerConfig config
+        photographerConfig <- readFile filepath `catchAny` (\_ -> throw PhotographersConfigFileMissing) 
         let photographers = decode photographerConfig :: Maybe Photographers
         case photographers of
                 Nothing -> throw PhotographersConfigFileMissing
@@ -159,8 +160,7 @@ getPhotographers x = do
 
 getPhotographer :: ShakeConfig -> IO Photographer
 getPhotographer config = do
-        let photographerConfig = _photographerConfig config
-        x <- getPhotographers photographerConfig
+        x <- getPhotographers config
         return (focus (unPhotographers x))
             
 
