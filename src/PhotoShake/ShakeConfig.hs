@@ -15,6 +15,7 @@ module PhotoShake.ShakeConfig
     , getSessions
     , getPhotographers
     , importPhotographers
+    , importShootings
     , getLocationFile
     , getPhotographer 
     , getShooting
@@ -114,6 +115,17 @@ importPhotographers config fromFilePath = do
             Nothing -> throw PhotographersConfigFileMissing -- Same error
             Just y -> do
                 writeFile toFilePath (encode y) `catchAny` (\_ -> throw PhotographersConfigFileMissing)
+
+
+importShootings :: ShakeConfig -> FilePath -> IO ()
+importShootings config fromFilePath = do
+    let toFilePath = _shootingsConfig config
+    newShootings <- readFile fromFilePath `catchAny` (\_ -> throw ShootingConfigFileMissing)
+    let shootings = decode newShootings :: Maybe Shootings
+    case shootings of
+            Nothing -> throw ShootingConfigFileMissing -- Same error
+            Just y -> do
+                writeFile toFilePath (encode y) `catchAny` (\_ -> throw ShootingConfigFileMissing)
     
 
 
@@ -152,9 +164,10 @@ getSessionConfig config = case (HM.lookup "sessionConfig" config) of
     Just x -> x
 
 
-getShootings :: FilePath -> IO Shootings
-getShootings x = do
-        shootingConfig <- readFile x `catchAny` (\_ -> throw ShootingConfigFileMissing) 
+getShootings :: ShakeConfig -> IO Shootings
+getShootings config = do
+        let filepath = _shootingsConfig config
+        shootingConfig <- readFile filepath `catchAny` (\_ -> throw ShootingConfigFileMissing) 
         let shootings = decode shootingConfig :: Maybe Shootings
         case shootings of
                 Nothing -> throw ShootingConfigFileMissing
@@ -189,8 +202,7 @@ getPhotographer config = do
 
 getShooting :: ShakeConfig -> IO Shooting
 getShooting config = do
-        let shootingConfig = _shootingsConfig config
-        x <- getShootings shootingConfig
+        x <- getShootings config
         return (focus (unShootings x))
 
 
