@@ -23,7 +23,7 @@ main = do
 
 goldenTests :: IO TestTree
 goldenTests = do
-    config <- toShakeConfig "test/config.cfg"    
+    config <- toShakeConfig Nothing "test/config.cfg"    
     
     --IO bads
     dagsdato <- getDagsdato config

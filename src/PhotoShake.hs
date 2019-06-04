@@ -26,7 +26,7 @@ import Control.Monad
 
 entry :: IO ()
 entry = do
-    config <- toShakeConfig "config.cfg"
+    config <- toShakeConfig Nothing "config.cfg"
     location <- getLocationFile config
 
     photographeeId <- getLine

@@ -60,6 +60,7 @@ data ShakeConfig = ShakeConfig
     , _shootingsConfig :: FilePath
     , _sessionConfig :: FilePath
     , _photographerConfig :: FilePath
+    , _root :: Maybe FilePath
     }
 
 
@@ -255,9 +256,17 @@ getLocationConfig config = case (HM.lookup "locationConfig" config) of
     Just x -> x
 
 
+mkFilePath :: (ShakeConfig -> FilePath) -> ShakeConfig -> FilePath
+mkFilePath f x = case _root x of
+    Nothing -> path
+    Just root -> root </> path
+    where
+        path = f x
+
+
 getDump :: ShakeConfig -> IO Dump
 getDump config = do
-    let filepath = _dumpConfig config
+    let filepath = mkFilePath _dumpConfig config
     dumpConfig <- readFile filepath `catchAny` (\_ -> throw DumpConfigFileMissing)
     let dumpDir = decode dumpConfig :: Maybe Dump
     case dumpDir of
@@ -289,9 +298,14 @@ getLocationFile config = do
 
 
 -- could be better
-toShakeConfig :: FilePath -> IO ShakeConfig
-toShakeConfig x = do
-    config <- readConfigFile x `catchAny` (\_ -> throw ConfigMissing)
+toShakeConfig :: Maybe FilePath -> FilePath -> IO ShakeConfig
+toShakeConfig root cfg = do 
+    --bads 
+    let path = case root of
+            Nothing -> cfg
+            Just x -> x </> cfg
+    --bads 
+    config <- readConfigFile path `catchAny` (\_ -> throw ConfigMissing)
     let dumpConfig = getDumpConfig config
     let doneshootingConfig = getDoneshootingConfig config
     let dagsdatoConfig = getDagsdatoConfig config
@@ -307,4 +321,5 @@ toShakeConfig x = do
                          , _shootingsConfig = shootingsConfig
                          , _sessionConfig = sessionConfig
                          , _photographerConfig = photographerConfig
+                         , _root = root
                          } 
