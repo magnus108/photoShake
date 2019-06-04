@@ -18,6 +18,10 @@ data Shooting
 
 deriveJSON defaultOptions ''Shooting
 
-data Shootings = Shootings { unShootings :: ListZipper Shooting } deriving (Show)
+data Shootings 
+        = Shootings { unShootings :: ListZipper Shooting } 
+        | NoShootings
+        deriving (Show)
+        
 
 deriveJSON defaultOptions ''Shootings

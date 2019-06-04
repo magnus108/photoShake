@@ -26,6 +26,9 @@ data Session
 
 deriveJSON defaultOptions ''Session
 
-data Sessions = Sessions { unSessions :: ListZipper Session } deriving (Show)
+data Sessions 
+            = Sessions { unSessions :: ListZipper Session }
+            | NoSessions
+            deriving (Show)
 
 deriveJSON defaultOptions ''Sessions

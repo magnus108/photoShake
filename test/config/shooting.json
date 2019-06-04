@@ -1,4 +1,4 @@
-{ "unShootings" : [
+{ "tag" : "Shootings", "unShootings" : [
         [],
         "Normal", 
         ["ReShoot"]
