@@ -19,7 +19,8 @@ data Photographer = Photographer
 deriveJSON defaultOptions ''Photographer
 
 data Photographers
-            = Photographers { unPhotographers :: ListZipper Photographer } 
+            = ApprovedPhotographers (ListZipper Photographer)
+            | UnApprovedPhotographers (ListZipper Photographer)
             | NoPhotographers deriving (Show)
 
 deriveJSON defaultOptions ''Photographers
