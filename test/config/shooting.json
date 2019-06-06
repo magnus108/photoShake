@@ -1,4 +1,4 @@
-{ "tag" : "Shootings", "unShootings" : [
+{ "tag" : "ApprovedShootings", "contents" : [
         [],
         "Normal", 
         ["ReShoot"]

@@ -253,13 +253,19 @@ getPhotographer config = do
 getShooting :: ShakeConfig -> IO Shooting
 getShooting config = do
         x <- getShootings config
-        return (focus (unShootings x))
+        case x of 
+            NoShootings -> throw ShootingConfigFileMissing
+            UnApprovedShootings _ -> throw ShootingConfigFileMissing
+            ApprovedShootings y -> return (focus y)            
 
 
 getSession :: ShakeConfig -> IO Session
 getSession config = do
         x <- getSessions config
-        return (focus (unSessions x))
+        case x of 
+            NoSessions -> throw SessionsConfigFileMissing
+            UnApprovedSessions _ -> throw SessionsConfigFileMissing
+            ApprovedSessions y -> return (focus y)
 
 
 getLocationConfig :: Maybe FilePath -> HM.HashMap String String -> String
