@@ -78,17 +78,17 @@ mkDoneshootingPath doneshootingDir photographee location photographer session sh
 
 
 
-mkDagsdatoPath :: FilePath -> Photographee -> String -> String -> FilePath
-mkDagsdatoPath dagsdatoDir photographee location filename = dagsdatoDir </> location </> grade </> (name ++ " - " ++ tea) </> filename
+mkDagsdatoPath :: FilePath -> Photographee -> String -> String -> UTCTime -> FilePath
+mkDagsdatoPath dagsdatoDir photographee location filename time = dagsdatoDir </>  ( date ++ " - " ++ location )</> grade </> (name ++ " - " ++ tea) </> filename
         where
             tea = _tea photographee
             name = _name photographee
             grade = _grade photographee 
+            date = getDate time
 
 
 actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Rules ()
 actions config photographee location time = do
-        let _  = getDate time
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
         dumpFiles <- liftIO $ getDumpFiles config
@@ -101,7 +101,7 @@ actions config photographee location time = do
         forM_ dumpFiles $ \ dumpFile -> do
             let doneshootingFile = mkDoneshootingPath (unDoneshooting doneshooting) photographee location photographer session shooting (takeFileName dumpFile)
 
-            let dagsdatoFile = mkDagsdatoPath (unDagsdato dagsdato) photographee location (takeFileName dumpFile)
+            let dagsdatoFile = mkDagsdatoPath (unDagsdato dagsdato) photographee location (takeFileName dumpFile) time
 
             want [doneshootingFile, dagsdatoFile] 
 

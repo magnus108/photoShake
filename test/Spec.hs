@@ -7,7 +7,7 @@ import System.Directory
 
 import qualified Data.ByteString.Lazy as LBS
 
-import Data.Time.Clock
+import Data.Time
 
 import PhotoShake
 import PhotoShake.Location
@@ -46,7 +46,8 @@ goldenTests = do
     removeDirectoryRecursive (unDagsdato dagsdato)
 
 
-    time <- getCurrentTime
+    let day = fromGregorian 2009 12 31
+    let time = UTCTime day (secondsToDiffTime 0)
 
     myShake config photographee (takeBaseName (unLocation location)) time
 
@@ -55,7 +56,7 @@ goldenTests = do
     session <- getSession config
     shooting <- getShooting config
     let doneshootingPath = takeDirectory $ mkDoneshootingPath (unDoneshooting doneshooting) photographee (takeBaseName (unLocation location)) photographer session shooting "null"
-    let dagsdatoPath = takeDirectory $ mkDagsdatoPath (unDagsdato dagsdato) photographee (takeBaseName (unLocation location)) "null"
+    let dagsdatoPath = takeDirectory $ mkDagsdatoPath (unDagsdato dagsdato) photographee (takeBaseName (unLocation location)) "null" time
 
     doneShootingFiles <- listDirectory doneshootingPath
     dagsdatoFiles <- listDirectory dagsdatoPath
