@@ -7,6 +7,8 @@ import System.Directory
 
 import qualified Data.ByteString.Lazy as LBS
 
+import Data.Time.Clock
+
 import PhotoShake
 import PhotoShake.Location
 import PhotoShake.ShakeConfig
@@ -43,7 +45,10 @@ goldenTests = do
     createDirectoryIfMissing False (unDagsdato dagsdato)
     removeDirectoryRecursive (unDagsdato dagsdato)
 
-    myShake config photographee (takeBaseName (unLocation location))
+
+    time <- getCurrentTime
+
+    myShake config photographee (takeBaseName (unLocation location)) time
 
     -- bads 
     photographer <- getPhotographer config

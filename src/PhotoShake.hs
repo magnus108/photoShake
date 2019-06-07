@@ -22,6 +22,14 @@ import qualified PhotoShake.Photographer as PR
 
 import Control.Monad
 
+import Data.Time.Format
+import Data.Time.Clock
+
+
+
+getDate :: UTCTime -> String
+getDate = formatTime defaultTimeLocale "%Y - %m%d" 
+
 
 
 entry :: IO ()
@@ -32,9 +40,11 @@ entry = do
     photographeeId <- getLine
     photographee <- findPhotographee (unLocation location) photographeeId 
 
+    ---ehhh2
+    time <- getCurrentTime
     -- ehh
     -- can make error
-    myShake config photographee (takeBaseName (unLocation location))
+    myShake config photographee (takeBaseName (unLocation location)) time
 
 
 shakeDir :: FilePath
@@ -49,8 +59,8 @@ opts = shakeOptions { shakeFiles = shakeDir
                     }
 
 
-myShake :: ShakeConfig -> Photographee -> String -> IO ()
-myShake config photographee location = shake opts $ actions config photographee location
+myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> IO ()
+myShake config photographee location time = shake opts $ actions config photographee location time
 
 
 mkDoneshootingPath :: FilePath -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> FilePath
@@ -76,8 +86,9 @@ mkDagsdatoPath dagsdatoDir photographee location filename = dagsdatoDir </> loca
             grade = _grade photographee 
 
 
-actions :: ShakeConfig -> Photographee -> String -> Rules ()
-actions config photographee location = do
+actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Rules ()
+actions config photographee location time = do
+        let _  = getDate time
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
         dumpFiles <- liftIO $ getDumpFiles config
