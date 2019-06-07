@@ -246,8 +246,7 @@ getPhotographer config = do
         x <- getPhotographers config
         case x of 
             NoPhotographers -> throw PhotographersConfigFileMissing
-            UnApprovedPhotographers _ -> throw PhotographersConfigFileMissing
-            ApprovedPhotographers y -> return (focus y)
+            Photographers y -> return (focus y)
             
 
 getShooting :: ShakeConfig -> IO Shooting
