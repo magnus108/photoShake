@@ -7,7 +7,7 @@ module PhotoShake.Location
 import Data.Aeson.TH (deriveJSON, defaultOptions)
 
 data Location 
-    = Location { unLocation :: FilePath }
+    = Location FilePath
     | NoLocation
     deriving (Show, Eq)
 

@@ -41,15 +41,17 @@ entry :: IO ()
 entry = do
     config <- toShakeConfig Nothing "config.cfg"
     location <- getLocationFile config
-
-    photographeeId <- getLine
-    photographee <- findPhotographee (unLocation location) photographeeId 
-
-    ---ehhh2
-    time <- getCurrentTime
     -- ehh
     -- can make error
-    myShake config photographee (takeBaseName (unLocation location)) time
+    case location of
+        NoLocation -> error "no location given"
+        Location xxx -> do
+            photographeeId <- getLine
+            photographee <- findPhotographee xxx photographeeId 
+
+            ---ehhh2
+            time <- getCurrentTime
+            myShake config photographee (takeBaseName xxx) time
 
 
 shakeDir :: FilePath

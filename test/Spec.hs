@@ -34,52 +34,57 @@ goldenTests = do
     doneshooting <- getDoneshooting config
     
     location <- getLocationFile config
+    --
+    --- ??????
+    case location of
+        NoLocation -> error "no location in test eeee"
+        Location xxx -> do
 
-    let photographeeId = "5678"
-    photographee <- findPhotographee (unLocation location) photographeeId 
+            let photographeeId = "5678"
+            photographee <- findPhotographee xxx photographeeId 
 
-    let ident = _ident photographee
-    let goldenDir = "test" </> ident 
+            let ident = _ident photographee
+            let goldenDir = "test" </> ident 
 
-    createDirectoryIfMissing False (unDoneshooting doneshooting)
-    removeDirectoryRecursive (unDoneshooting doneshooting)
+            createDirectoryIfMissing False (unDoneshooting doneshooting)
+            removeDirectoryRecursive (unDoneshooting doneshooting)
 
-    createDirectoryIfMissing False (unDagsdato dagsdato)
-    removeDirectoryRecursive (unDagsdato dagsdato)
-
-
-    let day = fromGregorian 2009 12 31
-    let time = UTCTime day (secondsToDiffTime 0)
-
-    myShake config photographee (takeBaseName (unLocation location)) time
-
-    -- bads 
-    photographer <- getPhotographer config
-    session <- getSession config
-    shooting <- getShooting config
+            createDirectoryIfMissing False (unDagsdato dagsdato)
+            removeDirectoryRecursive (unDagsdato dagsdato)
 
 
-    -- de lader til at være en fejl at disse paths ligger her. og at null og 0 er med
-    let doneshootingPath = takeDirectory $ mkDoneshootingPath (unDoneshooting doneshooting) photographee (takeBaseName (unLocation location)) photographer session shooting "null" 0
-    let dagsdatoPath = takeDirectory $ mkDagsdatoPath (unDagsdato dagsdato) photographee (takeBaseName (unLocation location)) "null" time
+            let day = fromGregorian 2009 12 31
+            let time = UTCTime day (secondsToDiffTime 0)
 
-    doneShootingFiles <- listDirectory doneshootingPath
-    dagsdatoFiles <- listDirectory dagsdatoPath
+            myShake config photographee (takeBaseName xxx) time
 
-    -- overvej refac
-    -- der er fejl i og med extension ikke er med i output
-    return $ testGroup "all files moved" $ 
-        [ goldenVsString
-            (takeBaseName file)
-            goldenFile
-            (LBS.readFile file)
-        | file <- fmap (\x -> doneshootingPath </> x) doneShootingFiles --could be nicer
-        , let goldenFile = replaceDirectory file goldenDir
-        ] ++    
-        [ goldenVsString
-            (takeBaseName file)
-            goldenFile
-            (LBS.readFile file)
-        | file <- fmap (\x -> dagsdatoPath </> x) dagsdatoFiles --could be nicer
-        , let goldenFile = replaceDirectory file goldenDir
-        ]    
+            -- bads 
+            photographer <- getPhotographer config
+            session <- getSession config
+            shooting <- getShooting config
+
+
+            -- de lader til at være en fejl at disse paths ligger her. og at null og 0 er med
+            let doneshootingPath = takeDirectory $ mkDoneshootingPath (unDoneshooting doneshooting) photographee (takeBaseName xxx) photographer session shooting "null" 0
+            let dagsdatoPath = takeDirectory $ mkDagsdatoPath (unDagsdato dagsdato) photographee (takeBaseName xxx) "null" time
+
+            doneShootingFiles <- listDirectory doneshootingPath
+            dagsdatoFiles <- listDirectory dagsdatoPath
+
+            -- overvej refac
+            -- der er fejl i og med extension ikke er med i output
+            return $ testGroup "all files moved" $ 
+                [ goldenVsString
+                    (takeBaseName file)
+                    goldenFile
+                    (LBS.readFile file)
+                | file <- fmap (\x -> doneshootingPath </> x) doneShootingFiles --could be nicer
+                , let goldenFile = replaceDirectory file goldenDir
+                ] ++    
+                [ goldenVsString
+                    (takeBaseName file)
+                    goldenFile
+                    (LBS.readFile file)
+                | file <- fmap (\x -> dagsdatoPath </> x) dagsdatoFiles --could be nicer
+                , let goldenFile = replaceDirectory file goldenDir
+                ]    
