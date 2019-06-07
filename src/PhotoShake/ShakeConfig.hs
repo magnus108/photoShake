@@ -293,8 +293,11 @@ setDump config dump = do
 getDumpFiles :: ShakeConfig -> IO [FilePath]
 getDumpFiles config = do
     dump <- getDump config
-    files <- listDirectory (unDump dump)
-    return $ fmap (\x -> (unDump dump) </> x) files -- could be nicer
+    case dump of 
+        NoDump -> throw DumpConfigFileMissing
+        Dump x -> do
+            files <- listDirectory x
+            return $ fmap (\y -> x </> y) files -- could be nicer
 
 
 getLocationFile :: ShakeConfig -> IO Location

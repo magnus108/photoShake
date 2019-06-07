@@ -6,7 +6,7 @@ module PhotoShake.Dump
 
 import Data.Aeson.TH (deriveJSON, defaultOptions)
 
-data Dump = Dump { unDump :: FilePath } 
+data Dump = Dump FilePath
           | NoDump
                 deriving (Show, Eq)
 
