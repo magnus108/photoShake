@@ -263,8 +263,7 @@ getSession config = do
         x <- getSessions config
         case x of 
             NoSessions -> throw SessionsConfigFileMissing
-            UnApprovedSessions _ -> throw SessionsConfigFileMissing
-            ApprovedSessions y -> return (focus y)
+            Sessions y -> return (focus y)
 
 
 getLocationConfig :: Maybe FilePath -> HM.HashMap String String -> String
