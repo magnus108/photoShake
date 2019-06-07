@@ -7,6 +7,8 @@ import System.Directory
 
 import qualified Data.ByteString.Lazy as LBS
 
+
+
 import Data.Time
 
 import PhotoShake
@@ -55,13 +57,17 @@ goldenTests = do
     photographer <- getPhotographer config
     session <- getSession config
     shooting <- getShooting config
-    let doneshootingPath = takeDirectory $ mkDoneshootingPath (unDoneshooting doneshooting) photographee (takeBaseName (unLocation location)) photographer session shooting "null"
+
+
+    -- de lader til at være en fejl at disse paths ligger her. og at null og 0 er med
+    let doneshootingPath = takeDirectory $ mkDoneshootingPath (unDoneshooting doneshooting) photographee (takeBaseName (unLocation location)) photographer session shooting "null" 0
     let dagsdatoPath = takeDirectory $ mkDagsdatoPath (unDagsdato dagsdato) photographee (takeBaseName (unLocation location)) "null" time
 
     doneShootingFiles <- listDirectory doneshootingPath
     dagsdatoFiles <- listDirectory dagsdatoPath
 
     -- overvej refac
+    -- der er fejl i og med extension ikke er med i output
     return $ testGroup "all files moved" $ 
         [ goldenVsString
             (takeBaseName file)

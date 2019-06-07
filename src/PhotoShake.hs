@@ -7,6 +7,9 @@ module PhotoShake
     , mkDagsdatoPath
     ) where
 
+import Data.Strings
+
+
 import Development.Shake hiding (Normal)
 import Development.Shake.FilePath
 
@@ -20,10 +23,12 @@ import PhotoShake.Shooting
 import PhotoShake.Session
 import qualified PhotoShake.Photographer as PR
 
-import Control.Monad
 
 import Data.Time.Format
 import Data.Time.Clock
+
+import Data.List
+import Data.List.Index
 
 
 
@@ -63,8 +68,8 @@ myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> IO ()
 myShake config photographee location time = shake opts $ actions config photographee location time
 
 
-mkDoneshootingPath :: FilePath -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> FilePath
-mkDoneshootingPath doneshootingDir photographee location photographer session shooting filename = doneshootingDir </> location </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ filename
+mkDoneshootingPath :: FilePath -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
+mkDoneshootingPath doneshootingDir photographee location photographer session shooting filename index = doneshootingDir </> location </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad index) ++ (takeExtension filename)
         where
             tea = _tea photographee
             grade = _grade photographee 
@@ -74,6 +79,7 @@ mkDoneshootingPath doneshootingDir photographee location photographer session sh
             shootingId = case shooting of
                     Normal -> "1"
                     ReShoot -> "2"
+            pad x = strPadLeft '0' 3 (show x)
                 
 
 
@@ -98,8 +104,12 @@ actions config photographee location time = do
         shooting <- liftIO $ getShooting config
         -- badIO
 
-        forM_ dumpFiles $ \ dumpFile -> do
-            let doneshootingFile = mkDoneshootingPath (unDoneshooting doneshooting) photographee location photographer session shooting (takeFileName dumpFile)
+        -- sortDumpFiles
+        -- zip with 1 2 3 ..
+        -- pad with 000
+
+        ifor_ (sort dumpFiles) $ \ index dumpFile -> do
+            let doneshootingFile = mkDoneshootingPath (unDoneshooting doneshooting) photographee location photographer session shooting (takeFileName dumpFile) index
 
             let dagsdatoFile = mkDagsdatoPath (unDagsdato dagsdato) photographee location (takeFileName dumpFile) time
 
