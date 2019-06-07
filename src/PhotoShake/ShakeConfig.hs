@@ -254,8 +254,7 @@ getShooting config = do
         x <- getShootings config
         case x of 
             NoShootings -> throw ShootingConfigFileMissing
-            UnApprovedShootings _ -> throw ShootingConfigFileMissing
-            ApprovedShootings y -> return (focus y)            
+            Shootings y -> return (focus y)            
 
 
 getSession :: ShakeConfig -> IO Session

@@ -19,8 +19,7 @@ data Shooting
 deriveJSON defaultOptions ''Shooting
 
 data Shootings 
-        = ApprovedShootings (ListZipper Shooting)
-        | UnApprovedShootings (ListZipper Shooting)
+        = Shootings (ListZipper Shooting)
         | NoShootings
         deriving (Show)
         

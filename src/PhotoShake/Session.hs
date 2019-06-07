@@ -27,8 +27,9 @@ data Session
 deriveJSON defaultOptions ''Session
 
 data Sessions 
-            = Sessions (ListZipper Session)
-            | NoSessions
-            deriving (Show)
+    = Sessions (ListZipper Session)
+    | NoSessions
+    deriving (Show)
+
 
 deriveJSON defaultOptions ''Sessions
