@@ -46,11 +46,18 @@ goldenTests = do
             let ident = _ident photographee
             let goldenDir = "test" </> ident 
 
-            createDirectoryIfMissing False (unDoneshooting doneshooting)
-            removeDirectoryRecursive (unDoneshooting doneshooting)
+            -- uglys
+            case doneshooting of
+                NoDoneshooting -> return ()
+                Doneshooting f -> do
+                    createDirectoryIfMissing False f
+                    removeDirectoryRecursive f
 
-            createDirectoryIfMissing False (unDagsdato dagsdato)
-            removeDirectoryRecursive (unDagsdato dagsdato)
+            case dagsdato of
+                NoDagsdato -> return ()
+                Dagsdato f -> do
+                    createDirectoryIfMissing False f
+                    removeDirectoryRecursive f
 
 
             let day = fromGregorian 2009 12 31
@@ -65,8 +72,9 @@ goldenTests = do
 
 
             -- de lader til at være en fejl at disse paths ligger her. og at null og 0 er med
-            let doneshootingPath = takeDirectory $ mkDoneshootingPath (unDoneshooting doneshooting) photographee (takeBaseName xxx) photographer session shooting "null" 0
-            let dagsdatoPath = takeDirectory $ mkDagsdatoPath (unDagsdato dagsdato) photographee (takeBaseName xxx) "null" time
+            -- can throw error fixxxx
+            let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshooting photographee (takeBaseName xxx) photographer session shooting "null" 0
+            let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdato photographee (takeBaseName xxx) "null" time
 
             doneShootingFiles <- listDirectory doneshootingPath
             dagsdatoFiles <- listDirectory dagsdatoPath

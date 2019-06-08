@@ -7,7 +7,7 @@ module PhotoShake.Doneshooting
 import Data.Aeson.TH (deriveJSON, defaultOptions)
 
 data Doneshooting
-    = Doneshooting { unDoneshooting :: FilePath }
+    = Doneshooting FilePath
     | NoDoneshooting
     deriving (Show, Eq)
 

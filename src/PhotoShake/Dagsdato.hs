@@ -7,7 +7,7 @@ module PhotoShake.Dagsdato
 import Data.Aeson.TH (deriveJSON, defaultOptions)
 
 data Dagsdato 
-    = Dagsdato { unDagsdato :: FilePath }
+    = Dagsdato FilePath
     | NoDagsdato
     deriving (Show, Eq)
 

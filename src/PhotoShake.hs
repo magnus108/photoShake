@@ -21,6 +21,8 @@ import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting
 import PhotoShake.Shooting
 import PhotoShake.Session
+import PhotoShake.ShakeError
+
 import qualified PhotoShake.Photographer as PR
 
 
@@ -70,8 +72,9 @@ myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> IO ()
 myShake config photographee location time = shake opts $ actions config photographee location time
 
 
-mkDoneshootingPath :: FilePath -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
-mkDoneshootingPath doneshootingDir photographee location photographer session shooting filename index = doneshootingDir </> location </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad index) ++ (takeExtension filename)
+mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
+mkDoneshootingPath NoDoneshooting _ _ _ _ _ _ _ = throw ConfigDoneshootingMissing
+mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad index) ++ (takeExtension filename)
         where
             tea = _tea photographee
             grade = _grade photographee 
@@ -86,8 +89,9 @@ mkDoneshootingPath doneshootingDir photographee location photographer session sh
 
 
 
-mkDagsdatoPath :: FilePath -> Photographee -> String -> String -> UTCTime -> FilePath
-mkDagsdatoPath dagsdatoDir photographee location filename time = dagsdatoDir </>  ( date ++ " - " ++ location )</> grade </> (name ++ " - " ++ tea) </> filename
+mkDagsdatoPath :: Dagsdato -> Photographee -> String -> String -> UTCTime -> FilePath
+mkDagsdatoPath NoDagsdato _ _ _ _ = throw ConfigDagsdatoMissing
+mkDagsdatoPath (Dagsdato dagsdatoDir) photographee location filename time = dagsdatoDir </>  ( date ++ " - " ++ location )</> grade </> (name ++ " - " ++ tea) </> filename
         where
             tea = _tea photographee
             name = _name photographee
@@ -111,9 +115,9 @@ actions config photographee location time = do
         -- pad with 000
 
         ifor_ (sort dumpFiles) $ \ index dumpFile -> do
-            let doneshootingFile = mkDoneshootingPath (unDoneshooting doneshooting) photographee location photographer session shooting (takeFileName dumpFile) index
+            let doneshootingFile = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName dumpFile) index
 
-            let dagsdatoFile = mkDagsdatoPath (unDagsdato dagsdato) photographee location (takeFileName dumpFile) time
+            let dagsdatoFile = mkDagsdatoPath dagsdato photographee location (takeFileName dumpFile) time
 
             want [doneshootingFile, dagsdatoFile] 
 
