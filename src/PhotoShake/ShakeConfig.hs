@@ -24,6 +24,8 @@ module PhotoShake.ShakeConfig
     , getPhotographer 
     , getShooting
     , getSession
+    , getBuilt
+    , setBuilt
     ) where
 
 import Prelude hiding (readFile, writeFile)
@@ -36,6 +38,8 @@ import System.Directory
 
 import qualified Data.HashMap.Lazy as HM
 
+
+import PhotoShake.Built
 import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting
@@ -60,12 +64,21 @@ data ShakeConfig = ShakeConfig
     , _shootingsConfig :: FilePath
     , _sessionConfig :: FilePath
     , _photographerConfig :: FilePath
+    , _builtConfig :: FilePath
     }
 
 
 -- concider moving this or getting rid of it
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
+
+
+getBuiltConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getBuiltConfig root config = case (HM.lookup "builtConfig" config) of
+    Nothing -> throw ConfigDumpMissing
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 
 getPhotographerConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
@@ -100,6 +113,12 @@ getDoneshooting config = do
     case doneshooting of
             Nothing -> throw DoneshootingConfigFileMissing -- Same error
             Just y -> return y
+
+-- ikke en rigtig setter mere en der skriver
+setBuilt:: ShakeConfig -> Built -> IO ()
+setBuilt config built = do
+    let filepath = _builtConfig config
+    writeFile filepath (encode built) `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
 
 
 -- ikke en rigtig setter mere en der skriver
@@ -284,6 +303,16 @@ getDump config = do
             Just y -> return y
 
 
+getBuilt :: ShakeConfig -> IO Built
+getBuilt config = do
+    let filepath = _builtConfig config
+    builtConfig <- readFile filepath `catchAny` (\_ -> throw DumpConfigFileMissing)
+    let built = decode builtConfig :: Maybe Built
+    case built of
+            Nothing -> throw DumpConfigFileMissing
+            Just y -> return y
+
+
 setDump :: ShakeConfig -> Dump -> IO ()
 setDump config dump = do
     let filepath = _dumpConfig config
@@ -326,6 +355,7 @@ toShakeConfig root cfg = do
     let shootingsConfig = getShootingsConfig root config
     let sessionConfig = getSessionConfig root config
     let photographerConfig = getPhotographerConfig root config
+    let builtConfig = getBuiltConfig root config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
@@ -334,4 +364,5 @@ toShakeConfig root cfg = do
                          , _shootingsConfig = shootingsConfig
                          , _sessionConfig = sessionConfig
                          , _photographerConfig = photographerConfig
+                         , _builtConfig = builtConfig
                          } 

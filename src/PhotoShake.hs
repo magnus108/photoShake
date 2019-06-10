@@ -16,6 +16,7 @@ import Development.Shake.FilePath
 import PhotoShake.ShakeConfig
 import PhotoShake.Photographee
 
+import PhotoShake.Built
 import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting
@@ -60,16 +61,24 @@ shakeDir :: FilePath
 shakeDir = "._build"
 
 
-opts :: ShakeOptions
-opts = shakeOptions { shakeFiles = shakeDir
-                    , shakeProgress = progressSimple -- should change
+opts :: ShakeConfig -> ShakeOptions
+opts config = shakeOptions { shakeFiles = shakeDir
+                    , shakeProgress = progress -- should change
                     , shakeThreads = 0
                     , shakeColor = True
                     }
+  where
+    progress p = do
+      program <- progressProgram
+      progressDisplay 0.1 (\s -> do
+            setBuilt config (Built s)
+            program s
+            ) p
 
 
 myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> IO ()
-myShake config photographee location time = shake opts $ actions config photographee location time
+myShake config photographee location time = do
+    shake (opts config) $ actions config photographee location time
 
 
 mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
