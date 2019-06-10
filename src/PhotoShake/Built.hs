@@ -10,6 +10,7 @@ import Data.Aeson.TH (deriveJSON, defaultOptions)
 
 data Built 
     = Built Photographee String
+    | NoFind String
     | NoBuilt
     deriving (Show, Eq)
 
