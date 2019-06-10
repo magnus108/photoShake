@@ -4,10 +4,12 @@ module PhotoShake.Built
     ( Built(..)
     ) where
 
+import PhotoShake.Photographee
+
 import Data.Aeson.TH (deriveJSON, defaultOptions)
 
 data Built 
-    = Built String
+    = Built Photographee String
     | NoBuilt
     deriving (Show, Eq)
 

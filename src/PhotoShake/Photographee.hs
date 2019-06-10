@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE OverloadedStrings #-}
 module PhotoShake.Photographee
     ( Photographee(..)
@@ -13,8 +14,13 @@ import Data.ByteString.Lazy.UTF8 (fromString)
 
 import System.FilePath
 
-import PhotoShake.ShakeConfig
 import PhotoShake.ShakeError
+import Control.Exception
+
+import Data.Aeson.TH as DA (deriveJSON, defaultOptions)
+--delete me
+catchAny :: IO a -> (SomeException -> IO a) -> IO a
+catchAny = catch
 
 type FullName = String
 type Ident = String
@@ -25,10 +31,13 @@ data Photographee = Photographee
     , _grade :: String  -- this is not good
     , _name :: FullName
     , _ident :: Ident 
-    } deriving (Generic, Show)
+    } deriving (Generic, Show, Eq)
 
+deriveJSON DA.defaultOptions ''Photographee
 
 instance FromRecord Photographee
+
+
 
 
 myOptions :: DecodeOptions
