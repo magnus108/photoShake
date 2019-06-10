@@ -325,7 +325,7 @@ getDumpFiles config = do
     case dump of 
         NoDump -> throw DumpConfigFileMissing
         Dump x -> do
-            files <- listDirectory x
+            files <- listDirectory x `catchAny` (\_ -> throw DumpMissing)
             return $ fmap (\y -> x </> y) files -- could be nicer
 
 
