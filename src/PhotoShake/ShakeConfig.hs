@@ -75,7 +75,7 @@ catchAny = catch
 
 getBuiltConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
 getBuiltConfig root config = case (HM.lookup "builtConfig" config) of
-    Nothing -> throw ConfigDumpMissing
+    Nothing -> throw ConfigBuiltMissing
     Just x -> case root of 
         Nothing -> x 
         Just y -> y </> x
@@ -118,7 +118,7 @@ getDoneshooting config = do
 setBuilt:: ShakeConfig -> Built -> IO ()
 setBuilt config built = do
     let filepath = _builtConfig config
-    writeFile filepath (encode built) `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+    writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing)
 
 
 -- ikke en rigtig setter mere en der skriver
@@ -306,10 +306,10 @@ getDump config = do
 getBuilt :: ShakeConfig -> IO Built
 getBuilt config = do
     let filepath = _builtConfig config
-    builtConfig <- readFile filepath `catchAny` (\_ -> throw DumpConfigFileMissing)
+    builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     let built = decode builtConfig :: Maybe Built
     case built of
-            Nothing -> throw DumpConfigFileMissing
+            Nothing -> throw BuiltConfigFileMissing
             Just y -> return y
 
 
