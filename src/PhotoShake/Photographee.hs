@@ -36,6 +36,7 @@ data Photographee = Photographee
 deriveJSON DA.defaultOptions ''Photographee
 
 instance FromRecord Photographee
+instance ToRecord Photographee
 
 
 
