@@ -119,19 +119,25 @@ actions config photographee location time = do
         shooting <- liftIO $ getShooting config
         -- badIO
 
-        -- sortDumpFiles
-        -- zip with 1 2 3 ..
-        -- pad with 000
+        liftIO $ putStrLn $ show  dumpFiles
 
-        ifor_ (sort dumpFiles) $ \ index dumpFile -> do
-            let doneshootingFile = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName dumpFile) index
+        ifor_ (sort dumpFiles) $ \ index (cr2, jpg) -> do
+            let doneshootingCr2 = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
+            let doneshootingJpg = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
-            let dagsdatoFile = mkDagsdatoPath dagsdato photographee location (takeFileName dumpFile) time
+            let dagsdatoCr2 = mkDagsdatoPath dagsdato photographee location (takeFileName cr2) time -<.> "cr2"
+            let dagsdatoJpg = mkDagsdatoPath dagsdato photographee location (takeFileName jpg) time -<.> "jpg"
 
-            want [doneshootingFile, dagsdatoFile] 
+            want [doneshootingCr2, doneshootingJpg, dagsdatoCr2, dagsdatoJpg] 
 
-            doneshootingFile %> \f -> do
-                copyFile' dumpFile f
+            doneshootingCr2 %> \f -> do
+                copyFile' cr2 f
 
-            dagsdatoFile %> \f -> do
-                copyFile' dumpFile f
+            doneshootingJpg %> \f -> do
+                copyFile' jpg f
+
+            dagsdatoCr2 %> \f -> do
+                copyFile' cr2 f
+
+            dagsdatoJpg %> \f -> do
+                copyFile' jpg f

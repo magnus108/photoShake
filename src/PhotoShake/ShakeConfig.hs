@@ -319,14 +319,15 @@ setDump config dump = do
     writeFile filepath (encode dump) `catchAny` (\_ -> throw DumpConfigFileMissing)
 
 
-getDumpFiles :: ShakeConfig -> IO [FilePath]
+getDumpFiles :: ShakeConfig -> IO [(FilePath, FilePath)]
 getDumpFiles config = do
     dump <- getDump config
     case dump of 
         NoDump -> throw DumpConfigFileMissing
         Dump x -> do
             files <- listDirectory x `catchAny` (\_ -> throw DumpMissing)
-            return $ fmap (\y -> x </> y) files -- could be nicer
+            let files' = filter (isExtensionOf "CR2") files -- bad use
+            return $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files' -- could be nicer
 
 
 getLocationFile :: ShakeConfig -> IO Location
