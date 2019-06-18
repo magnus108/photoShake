@@ -118,6 +118,8 @@ getDoneshooting config = do
 setBuilt:: ShakeConfig -> Built -> IO ()
 setBuilt config built = do
     let filepath = _builtConfig config
+    builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    seq (length builtConfig) (return ())
     writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing)
 
 
