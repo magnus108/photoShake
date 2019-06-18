@@ -119,8 +119,6 @@ actions config photographee location time = do
         shooting <- liftIO $ getShooting config
         -- badIO
 
-        liftIO $ putStrLn $ show  dumpFiles
-
         ifor_ (sort dumpFiles) $ \ index (cr2, jpg) -> do
             let doneshootingCr2 = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
             let doneshootingJpg = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
