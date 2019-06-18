@@ -28,7 +28,7 @@ module PhotoShake.ShakeConfig
     , setBuilt
     ) where
 
-import Prelude hiding (readFile, writeFile)
+import Prelude hiding (readFile, writeFile, length)
 
 
 import Development.Shake.Config
@@ -52,7 +52,7 @@ import PhotoShake.Photographer
 import Control.Exception
 
 import Data.Aeson
-import Data.ByteString.Lazy (readFile, writeFile)
+import Data.ByteString.Lazy (readFile, writeFile,  length)
 
 import Utils.ListZipper
 
@@ -119,6 +119,7 @@ setBuilt:: ShakeConfig -> Built -> IO ()
 setBuilt config built = do
     let filepath = _builtConfig config
     writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing)
+
 
 
 -- ikke en rigtig setter mere en der skriver
@@ -307,6 +308,7 @@ getBuilt :: ShakeConfig -> IO Built
 getBuilt config = do
     let filepath = _builtConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    seq (length builtConfig) (return ())
     let built = decode builtConfig :: Maybe Built
     case built of
             Nothing -> throw BuiltConfigFileMissing
