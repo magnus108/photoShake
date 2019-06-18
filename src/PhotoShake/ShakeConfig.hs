@@ -42,6 +42,7 @@ import qualified Data.HashMap.Lazy as HM
 import PhotoShake.Built
 import PhotoShake.Location
 import PhotoShake.Dagsdato
+import PhotoShake.Photographee
 import PhotoShake.Doneshooting
 import PhotoShake.Dump
 import PhotoShake.ShakeError
@@ -115,12 +116,19 @@ getDoneshooting config = do
             Just y -> return y
 
 -- ikke en rigtig setter mere en der skriver
-setBuilt:: ShakeConfig -> Built -> IO ()
-setBuilt config built = do
+setBuilt:: ShakeConfig -> String -> Photographee -> IO ()
+setBuilt config s photographee = do
+    -- there is a smarter way of doing this
+    let b = case s of
+            "" -> NoBuilt
+            x -> case words x of
+                "Finished":xs -> Built photographee x
+                _ -> Building photographee x
+
     let filepath = _builtConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length builtConfig) (return ())
-    writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing)
 
 
 

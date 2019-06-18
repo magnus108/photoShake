@@ -71,7 +71,7 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
     progress p = do
       program <- progressProgram
       progressDisplay 0.1 (\s -> do
-            setBuilt config (Built photographee s)
+            setBuilt config s photographee
             program s
             ) p
 
