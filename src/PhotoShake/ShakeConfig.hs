@@ -26,6 +26,7 @@ module PhotoShake.ShakeConfig
     , getSession
     , getBuilt
     , setBuilt
+    , setBuilt'
     ) where
 
 import Prelude hiding (readFile, writeFile, length)
@@ -129,6 +130,15 @@ setBuilt config s photographee = do
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length builtConfig) (return ())
     writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing)
+
+
+--dont use
+setBuilt' :: ShakeConfig -> Built -> IO ()
+setBuilt' config built = do
+    let filepath = _builtConfig config
+    builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    seq (length builtConfig) (return ())
+    writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing)
 
 
 
