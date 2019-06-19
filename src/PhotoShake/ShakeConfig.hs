@@ -35,6 +35,7 @@ import Prelude hiding (readFile, writeFile, length)
 
 
 import Development.Shake.Config
+import Data.List hiding (length)
 
 import System.FilePath
 import System.Directory
@@ -149,7 +150,7 @@ setGrades config grades = do
     let filepath = _gradeConfig config
     gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
     seq (length gradeConfig) (return ())
-    writeFile filepath (encode grades) `catchAny` (\_ -> throw GradeConfigFileMissing)
+    writeFile filepath (encode (Grades ( nub $ unGrade grades))) `catchAny` (\_ -> throw GradeConfigFileMissing)
 
 
 getGrades :: ShakeConfig -> IO Grades
