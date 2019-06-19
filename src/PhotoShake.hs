@@ -16,7 +16,6 @@ import Development.Shake.FilePath
 import PhotoShake.ShakeConfig
 import PhotoShake.Photographee
 
-import PhotoShake.Built
 import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting

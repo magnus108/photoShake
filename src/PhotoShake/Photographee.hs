@@ -5,6 +5,7 @@ module PhotoShake.Photographee
     ( Photographee(..)
     , findPhotographee
     , insertPhotographee
+    , Grades(..)
     ) where
 
 
@@ -29,11 +30,16 @@ catchAny = catch
 
 type FullName = String
 type Ident = String
+type Grade = String
+
+data Grades = Grades { unGrade :: [Grade] }
+
+deriveJSON DA.defaultOptions ''Grades
 
 
 data Photographee = Photographee 
     { _tea :: String 
-    , _grade :: String  -- this is not good
+    , _grade :: Grade
     , _name :: FullName
     , _ident :: Ident 
     } deriving (Generic, Show, Eq)

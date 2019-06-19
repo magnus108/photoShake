@@ -123,7 +123,7 @@ setBuilt config s photographee = do
     let b = case s of
             "" -> NoBuilt
             x -> case words x of
-                "Finished":xs -> Built photographee x
+                "Finished":_ -> Built photographee x
                 _ -> Building photographee x
 
     let filepath = _builtConfig config
