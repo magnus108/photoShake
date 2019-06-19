@@ -28,6 +28,7 @@ module PhotoShake.ShakeConfig
     , setBuilt
     , setGrades
     , setBuilt'
+    , getGrades
     ) where
 
 import Prelude hiding (readFile, writeFile, length)
@@ -149,6 +150,16 @@ setGrades config grades = do
     gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
     seq (length gradeConfig) (return ())
     writeFile filepath (encode grades) `catchAny` (\_ -> throw GradeConfigFileMissing)
+
+
+getGrades :: ShakeConfig -> IO Grades
+getGrades config = do
+        let filepath = _gradeConfig config
+        gradesConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing) 
+        let grades = decode gradesConfig :: Maybe Grades
+        case grades of
+                Nothing -> throw GradeConfigFileMissing
+                Just y -> return y
 
 
 
