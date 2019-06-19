@@ -4,6 +4,7 @@
 module PhotoShake.Photographee
     ( Photographee(..)
     , findPhotographee
+    , insertPhotographee
     ) where
 
 import GHC.Generics (Generic)
@@ -44,6 +45,10 @@ instance ToRecord Photographee
 myOptions :: DecodeOptions
 myOptions = defaultDecodeOptions { decDelimiter = fromIntegral (ord ';') }
 
+
+insertPhotographee :: FilePath -> Ident -> String -> FullName -> IO ()
+insertPhotographee location photographeeId grade name =
+    return ()
 
 findPhotographee :: FilePath -> Ident -> IO Photographee
 findPhotographee location photographeeId = do
