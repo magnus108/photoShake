@@ -9,6 +9,7 @@ import Control.Exception
 
 data ShakeError
     = DoneshootingDirectoryMissing
+    | ConfigGradeMissing
     | PhotographersConfigFileMissing
     | BuiltConfigFileMissing
     | DagsdatoDirectoryMissing
@@ -33,6 +34,7 @@ data ShakeError
     | SessionsConfigFileMissing
     | ConfigSessionMissing
     | SessionsConfigParseError
+    | GradeConfigFileMissing 
     deriving (Eq)
 
 
@@ -61,6 +63,9 @@ instance Show ShakeError where
     show ConfigPhotographerMissing = "Konfigurations filen mangler photograf konfiguration"
     show PhotographersConfigFileMissing = "Photograf mangler"
     show BuiltConfigFileMissing = "Built mangler"
+    show ConfigGradeMissing = "Klasser mangler"
+    show ConfigBuiltMissing = "Built mangler"
+    show GradeConfigFileMissing = "Klasser mangler"
 
 
 instance Exception ShakeError

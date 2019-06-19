@@ -26,6 +26,7 @@ module PhotoShake.ShakeConfig
     , getSession
     , getBuilt
     , setBuilt
+    , setGrades
     , setBuilt'
     ) where
 
@@ -67,6 +68,7 @@ data ShakeConfig = ShakeConfig
     , _sessionConfig :: FilePath
     , _photographerConfig :: FilePath
     , _builtConfig :: FilePath
+    , _gradeConfig :: FilePath
     }
 
 
@@ -139,6 +141,14 @@ setBuilt' config built = do
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length builtConfig) (return ())
     writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing)
+
+
+setGrades :: ShakeConfig -> Grades -> IO ()
+setGrades config grades = do
+    let filepath = _gradeConfig config
+    gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
+    seq (length gradeConfig) (return ())
+    writeFile filepath (encode grades) `catchAny` (\_ -> throw GradeConfigFileMissing)
 
 
 
@@ -237,6 +247,13 @@ setLocation config location = do
 getShootingsConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
 getShootingsConfig root config = case (HM.lookup "shootingConfig" config) of
     Nothing -> throw ConfigShootingMissing
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
+
+getGradeConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getGradeConfig root config = case (HM.lookup "gradeConfig" config) of
+    Nothing -> throw ConfigGradeMissing
     Just x -> case root of 
         Nothing -> x 
         Just y -> y </> x
@@ -379,6 +396,7 @@ toShakeConfig root cfg = do
     let sessionConfig = getSessionConfig root config
     let photographerConfig = getPhotographerConfig root config
     let builtConfig = getBuiltConfig root config
+    let gradeConfig = getGradeConfig root config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
@@ -388,4 +406,5 @@ toShakeConfig root cfg = do
                          , _sessionConfig = sessionConfig
                          , _photographerConfig = photographerConfig
                          , _builtConfig = builtConfig
+                         , _gradeConfig = gradeConfig
                          } 
