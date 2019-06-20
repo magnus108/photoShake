@@ -23,6 +23,8 @@ import System.FilePath
 import PhotoShake.ShakeError
 import Control.Exception
 
+import Utils.ListZipper hiding (toList)
+
 import Data.Aeson.TH as DA (deriveJSON, defaultOptions)
 --delete me
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
@@ -32,7 +34,8 @@ type FullName = String
 type Ident = String
 type Grade = String
 
-data Grades = Grades { unGrade :: [Grade] }
+data Grades = Grades (ListZipper Grade)
+            | NoGrades 
 
 deriveJSON DA.defaultOptions ''Grades
 

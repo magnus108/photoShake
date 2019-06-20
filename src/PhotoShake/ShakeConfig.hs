@@ -150,7 +150,12 @@ setGrades config grades = do
     let filepath = _gradeConfig config
     gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
     seq (length gradeConfig) (return ())
-    writeFile filepath (encode (Grades ( nub $ unGrade grades))) `catchAny` (\_ -> throw GradeConfigFileMissing)
+
+    let grades' = case grades of
+            NoGrades -> NoGrades
+            Grades (ListZipper ls x rs) -> Grades $ 
+                ListZipper (filter (\zz -> zz /= x) $ filter (\zz -> zz `notElem` rs) $ nub ls) x (filter (\zz -> zz /= x) $ nub rs)
+    writeFile filepath (encode grades') `catchAny` (\_ -> throw GradeConfigFileMissing)
 
 
 getGrades :: ShakeConfig -> IO Grades
