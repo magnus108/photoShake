@@ -151,6 +151,8 @@ setGrades config grades = do
     gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
     seq (length gradeConfig) (return ())
 
+    -- jeg kan faktisk slippe for at have grades ved at have en default zipper
+    -- med [] "ingenvalgt" [] måske?
     let grades' = case grades of
             NoGrades -> NoGrades
             Grades (ListZipper ls x rs) -> Grades $ 
