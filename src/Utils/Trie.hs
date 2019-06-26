@@ -13,48 +13,43 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 
 
-data Data a = Data (Map a (Trie a)) Bool deriving Show
+data Trie a = Trie (Map a (Trie a)) Bool deriving Show
 
-data Trie a = Trie (Data a) deriving Show
-
-
-data Context a = Context (Data a, Map a (Trie a)) deriving Show
+data Context a = Context ((a, Bool), Map a (Trie a)) deriving Show
 
 data TrieZipper a = TrieZipper (Trie a, [Context a] ) deriving Show
 
+empty :: Ord a => Trie a
+empty = Trie Map.empty False
 
-up :: TrieZipper a -> TrieZipper a  
---up (TreeZipper (item, Context ls x rs:bs)) = TreeZipper (Tree x (ls ++ [item] ++ rs), bs)  
-up (TrieZipper (_, Context (h, _):tl)) = TrieZipper (Trie h, tl)  
+insert :: Ord a => [a] -> Trie a -> Trie a
+insert [] (Trie tries _) = Trie tries True
+insert word@(firstChar : rest) (Trie tries wordEnd) =
+    case Map.lookup firstChar tries of
+        Nothing ->
+            insert word (Trie (Map.insert firstChar empty tries) wordEnd)
+        Just trie ->
+            Trie (Map.insert firstChar (insert rest trie) tries) wordEnd
+
+
+up :: Ord a => TrieZipper a -> TrieZipper a  
+up (TrieZipper (Trie item b', Context ((x, b), xs):tl)) = TrieZipper (Trie (Map.singleton x (Trie (Map.union item xs) b')) b,  tl)
 up root = root 
 
 
 tryTo :: Ord a => [a] -> TrieZipper a -> TrieZipper a 
 tryTo [] xs = xs
-tryTo (firstChar : rest) this@(TrieZipper (Trie (Data tries b), context)) =
+tryTo (firstChar : rest) this@(TrieZipper (Trie tries b, bs)) =
     case Map.lookup firstChar tries of
         Nothing -> this
-        Just trie -> 
-            tryTo rest (TrieZipper (trie, (Context (Data tries b, Map.delete firstChar tries )):context))
-
-
-empty :: Ord a => Trie a
-empty = Trie (Data Map.empty False)
-
-
-insert :: Ord a => [a] -> Trie a -> Trie a
-insert [] (Trie (Data tries _)) = Trie (Data tries True)
-insert word@(firstChar : rest) (Trie (Data tries wordEnd)) =
-    case Map.lookup firstChar tries of
-        Nothing ->
-            insert word (Trie (Data (Map.insert firstChar empty tries) wordEnd))
-        Just trie ->
-            Trie (Data (Map.insert firstChar (insert rest trie) tries) wordEnd)
+        Just r -> 
+            -- b in this is strange
+            tryTo rest (TrieZipper (r, (Context ((firstChar, b), Map.delete firstChar tries)):bs))
 
 
 complete :: Ord a => [a] -> Trie a -> [[a]]
-complete [] (Trie (Data tries wordEnd)) =
+complete [] (Trie tries wordEnd) =
     (if wordEnd then [[]] else []) ++
     concat [map (char :) (complete [] trie) | (char, trie) <- Map.toList tries]
-complete (firstChar : rest) (Trie (Data tries _)) =
+complete (firstChar : rest) (Trie tries _) =
     maybe [] (map (firstChar :) . complete rest) (Map.lookup firstChar tries)
