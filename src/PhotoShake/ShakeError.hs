@@ -64,7 +64,7 @@ instance Show ShakeError where
     show PhotographersConfigFileMissing = "Photograf mangler"
     show BuiltConfigFileMissing = "Built mangler"
     show ConfigGradeMissing = "Klasser mangler"
-    show ConfigBuiltMissing = "Built mangler"
+    show ConfigBuiltMissing = "Built mangler1"
     show GradeConfigFileMissing = "Klasser mangler"
 
 
