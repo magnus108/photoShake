@@ -133,8 +133,7 @@ setBuilt config s photographee = do
 
     let filepath = _builtConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
-    seq (length builtConfig) (return ())
-    writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    seq (length builtConfig) (writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing))
 
 
 --dont use
@@ -142,23 +141,18 @@ setBuilt' :: ShakeConfig -> Built -> IO ()
 setBuilt' config built = do
     let filepath = _builtConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
-    seq (length builtConfig) (return ())
-    writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    seq (length builtConfig) (writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing))
 
 
 setGrades :: ShakeConfig -> Grades -> IO ()
 setGrades config grades = do
     let filepath = _gradeConfig config
     gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
-    seq (length gradeConfig) (return ())
-
-    -- jeg kan faktisk slippe for at have grades ved at have en default zipper
-    -- med [] "ingenvalgt" [] måske?
     let grades' = case grades of
             NoGrades -> NoGrades
             Grades (ListZipper ls x rs) -> Grades $ 
                 ListZipper (filter (\zz -> zz /= x) $ filter (\zz -> zz `notElem` rs) $ nub ls) x (filter (\zz -> zz /= x) $ nub rs)
-    writeFile filepath (encode grades') `catchAny` (\_ -> throw GradeConfigFileMissing)
+    seq (length gradeConfig) (writeFile filepath (encode grades') `catchAny` (\_ -> throw GradeConfigFileMissing))
 
 
 getGrades :: ShakeConfig -> IO Grades
@@ -178,16 +172,14 @@ setDoneshooting :: ShakeConfig -> Doneshooting -> IO ()
 setDoneshooting config doneshooting = do
     let filepath = _doneshootingConfig config
     doneshootings <- readFile filepath `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
-    seq (length doneshootings) (return ())
-    writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+    seq (length doneshootings) (writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing))
 --
 -- ikke en rigtig setter mere en der skriver
 setShooting:: ShakeConfig -> Shootings -> IO ()
 setShooting config shootings = do
     let filepath = _shootingsConfig config
     shooting <- readFile filepath `catchAny` (\_ -> throw ShootingConfigFileMissing)
-    seq (length shooting) (return ())
-    writeFile filepath (encode shootings) `catchAny` (\_ -> throw ShootingConfigFileMissing)
+    seq (length shooting) (writeFile filepath (encode shootings) `catchAny` (\_ -> throw ShootingConfigFileMissing))
 
 
 -- ikke en rigtig setter mere en der skriver
@@ -195,8 +187,7 @@ setSession:: ShakeConfig -> Sessions -> IO ()
 setSession config sessions = do
     let filepath = _sessionConfig config
     session <- readFile filepath `catchAny` (\_ -> throw SessionsConfigFileMissing)
-    seq (length session) (return ())
-    writeFile filepath (encode sessions) `catchAny` (\_ -> throw SessionsConfigFileMissing)
+    seq (length session) (writeFile filepath (encode sessions) `catchAny` (\_ -> throw SessionsConfigFileMissing))
 
 
 -- ikke en rigtig setter mere en der skriver
@@ -205,8 +196,7 @@ setPhotographers :: ShakeConfig -> Photographers -> IO ()
 setPhotographers config photographers = do
     let filepath = _photographerConfig config
     photographers' <- readFile filepath `catchAny` (\_ -> throw PhotographersConfigFileMissing)
-    seq (length photographers') (return ())
-    writeFile filepath (encode photographers) `catchAny` (\_ -> throw PhotographersConfigFileMissing)
+    seq (length photographers') (writeFile filepath (encode photographers) `catchAny` (\_ -> throw PhotographersConfigFileMissing))
 
 --
 -- does not really belong in this project
@@ -214,12 +204,11 @@ importPhotographers :: ShakeConfig -> FilePath -> IO ()
 importPhotographers config fromFilePath = do
     let toFilePath = _photographerConfig config
     newPhotographers <- readFile fromFilePath `catchAny` (\_ -> throw PhotographersConfigFileMissing)
-    seq (length newPhotographers) (return ())
     let photographers = decode newPhotographers :: Maybe Photographers
-    case photographers of
+    seq (length newPhotographers) (case photographers of
             Nothing -> throw PhotographersConfigFileMissing -- Same error
             Just y -> do
-                writeFile toFilePath (encode y) `catchAny` (\_ -> throw PhotographersConfigFileMissing)
+                writeFile toFilePath (encode y) `catchAny` (\_ -> throw PhotographersConfigFileMissing))
 
 --
 -- does not really belong in this project
@@ -227,23 +216,21 @@ importSessions :: ShakeConfig -> FilePath -> IO ()
 importSessions config fromFilePath = do
     let toFilePath = _sessionConfig config
     newSessions <- readFile fromFilePath `catchAny` (\_ -> throw SessionsConfigFileMissing)
-    seq (length newSessions) (return ())
     let sessions = decode newSessions :: Maybe Sessions
-    case sessions of
+    seq (length newSessions) (case sessions of
             Nothing -> throw SessionsConfigFileMissing -- Same error
             Just y -> do
-                writeFile toFilePath (encode y) `catchAny` (\_ -> throw SessionsConfigFileMissing)
+                writeFile toFilePath (encode y) `catchAny` (\_ -> throw SessionsConfigFileMissing))
 
 importShootings :: ShakeConfig -> FilePath -> IO ()
 importShootings config fromFilePath = do
     let toFilePath = _shootingsConfig config
     newShootings <- readFile fromFilePath `catchAny` (\_ -> throw ShootingConfigFileMissing)
-    seq (length newShootings) (return ())
     let shootings = decode newShootings :: Maybe Shootings
-    case shootings of
+    seq (length newShootings) (case shootings of
             Nothing -> throw ShootingConfigFileMissing -- Same error
             Just y -> do
-                writeFile toFilePath (encode y) `catchAny` (\_ -> throw ShootingConfigFileMissing)
+                writeFile toFilePath (encode y) `catchAny` (\_ -> throw ShootingConfigFileMissing))
     
 
 getDagsdatoConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
@@ -258,27 +245,24 @@ getDagsdato :: ShakeConfig -> IO Dagsdato
 getDagsdato config = do
     let filepath = _dagsdatoConfig config
     dagsdatoConfig <- readFile filepath `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
-    seq (length dagsdatoConfig) (return ())
     let dagsdato = decode dagsdatoConfig :: Maybe Dagsdato
-    case dagsdato of
+    seq (length dagsdatoConfig) (case dagsdato of
         Nothing -> throw DagsdatoConfigFileMissing -- Same error
-        Just y -> return y
+        Just y -> return y)
 
 
 setDagsdato :: ShakeConfig -> Dagsdato -> IO ()
 setDagsdato config dagsdato = do
     let filepath = _dagsdatoConfig config
     dagsdatoConfig <- readFile filepath `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
-    seq (length dagsdatoConfig) (return ())
-    writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
+    seq (length dagsdatoConfig) (writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing))
 
 
 setLocation :: ShakeConfig -> Location -> IO ()
 setLocation config location = do
     let filepath = _locationConfig config
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
-    seq (length locationConfig) (return ())
-    writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing)
+    seq (length locationConfig) (writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing))
 
 
 getShootingsConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
@@ -308,8 +292,8 @@ getShootings :: ShakeConfig -> IO Shootings
 getShootings config = do
         let filepath = _shootingsConfig config
         shootingConfig <- readFile filepath `catchAny` (\_ -> throw ShootingConfigFileMissing) 
-        seq (length shootingConfig) (return ())
         let shootings = decode shootingConfig :: Maybe Shootings
+        seq (length shootingConfig) (return ())
         case shootings of
                 Nothing -> throw ShootingConfigFileMissing
                 Just y -> return y
@@ -397,8 +381,7 @@ setDump :: ShakeConfig -> Dump -> IO ()
 setDump config dump = do
     let filepath = _dumpConfig config
     dumps <- readFile filepath `catchAny` (\_ -> throw DumpConfigFileMissing)
-    seq (length dumps) (return ())
-    writeFile filepath (encode dump) `catchAny` (\_ -> throw DumpConfigFileMissing)
+    seq (length dumps) (writeFile filepath (encode dump) `catchAny` (\_ -> throw DumpConfigFileMissing))
 
 
 getDumpFiles :: ShakeConfig -> IO [(FilePath, FilePath)]
