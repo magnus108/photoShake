@@ -1,22 +1,22 @@
 {-# LANGUAGE DeriveFunctor #-}
 module Utils.Trie
-    ( Trie(..)
-    , TrieZipperF(..)
-    , empty
-    , insert
-    , fromTrie
-    , fromTrieF
-    , Mu(..)
+    ( --Trie(..)
+    --, TrieZipperF(..)
+   -- , empty
+   -- , insert
+   --- , fromTrie
+  --  , fromTrieF
+   -- , Mu(..)
 --    , MyTrie
-    , ContextF(..)
-    , TrieZipper(..)
-    , fromTrieZipper
-    , fromTrieZipperF
+    --, ContextF(..)
+   -- , TrieZipper(..)
+    --, fromTrieZipper
+--    , fromTrieZipperF
 --    , complete
 --    , tryTo
  --   , up
     ) where
-
+{-
 
 import Data.Map (Map)
 import qualified Data.Map as Map
@@ -106,6 +106,8 @@ tryTo (firstChar : rest) this@(TrieZipper (Trie tries b, bs)) =
         Nothing -> this
         Just r -> 
             tryTo rest (TrieZipper (r, (Context ((firstChar, b), Map.delete firstChar tries))<:>bs))
+
+-}
 
 {-
 complete :: Ord a => [a] -> Trie a -> [[a]]
