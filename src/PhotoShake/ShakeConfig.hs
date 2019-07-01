@@ -381,7 +381,7 @@ getDumpFiles :: ShakeConfig -> IO [(FilePath, FilePath)]
 getDumpFiles config = do
     dump <- getDump config
     case dump of 
-        NoDump -> throw DumpConfigFileMissing
+        NoDump -> return []
         Dump x -> do
             files <- listDirectory x `catchAny` (\_ -> throw DumpMissing)
             let files' = filter (isExtensionOf "CR2") files -- bad use
