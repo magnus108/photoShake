@@ -62,14 +62,14 @@ shakeDir = "._build"
 
 opts :: Photographee -> ShakeConfig -> ShakeOptions
 opts photographee config = shakeOptions { shakeFiles = shakeDir
-                    , shakeProgress = progress -- should change
+                    --, shakeProgress = progress -- should change
                     , shakeThreads = 0
                     , shakeColor = True
                     }
   where
     progress p = do
       program <- progressProgram
-      progressDisplay 0.1 (\s -> do
+      progressDisplay 0.5 (\s -> do
             setBuilt config s photographee
             program s
             ) p
