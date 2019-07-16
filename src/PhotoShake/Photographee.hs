@@ -6,6 +6,7 @@ module PhotoShake.Photographee
     , findPhotographee
     , insertPhotographee
     , Grades(..)
+    , myOptionsDecode 
     ) where
 
 
@@ -29,6 +30,7 @@ import Data.Aeson.TH as DA (deriveJSON, defaultOptions)
 --delete me
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
+
 
 type FullName = String
 type Ident = String
@@ -62,7 +64,6 @@ myOptionsEncode :: EncodeOptions
 myOptionsEncode = defaultEncodeOptions { encDelimiter = fromIntegral (ord ';') }
 
 
-
 insertPhotographee :: FilePath -> Ident -> String -> FullName -> IO ()
 insertPhotographee location photographeeId grade name = do
     -- badness
@@ -83,6 +84,9 @@ insertPhotographee location photographeeId grade name = do
     let moreData = encodeWith myOptionsEncode $ toList studentData --can throw error
 
     BL.writeFile location moreData
+
+
+
 
 findPhotographee :: FilePath -> Ident -> IO Photographee
 findPhotographee location photographeeId = do

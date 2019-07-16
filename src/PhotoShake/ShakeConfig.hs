@@ -1,6 +1,8 @@
 module PhotoShake.ShakeConfig
     ( ShakeConfig(..)
     , toShakeConfig
+    , parseGrades
+    , setGrades
     , catchAny
     , getDumpFiles
     , getDump
@@ -26,16 +28,17 @@ module PhotoShake.ShakeConfig
     , getSession
     , getBuilt
     , setBuilt
-    , setGrades
     , setBuilt'
     , getGrades
     ) where
 
 import Prelude hiding (readFile, writeFile, length)
 
+import Data.Vector (Vector, find, (++), fromList, toList)
 
 import Development.Shake.Config
 import Data.List hiding (length)
+import Data.Csv hiding (decode, encode)
 
 import System.FilePath
 import System.Directory
@@ -59,7 +62,9 @@ import Control.Exception
 import Data.Aeson
 import Data.ByteString.Lazy (readFile, writeFile,  length)
 
-import Utils.ListZipper
+import Utils.ListZipper hiding (toList)
+import qualified Data.ByteString.Lazy as BL
+import Data.ByteString.Lazy.UTF8 (fromString)
 
 data ShakeConfig = ShakeConfig 
     { _dumpConfig :: FilePath
@@ -110,6 +115,39 @@ getDoneshootingConfig root config = case (HM.lookup "doneshootingConfig" config)
         Nothing -> x 
         Just y -> y </> x
 
+setGrades :: ShakeConfig -> Grades -> IO ()
+setGrades config grades = do
+    let filepath = _gradeConfig config
+    gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
+    let grades' = case grades of
+            NoGrades -> NoGrades
+            Grades (ListZipper ls x rs) -> Grades $ 
+                ListZipper (filter (\zz -> zz /= x) $ filter (\zz -> zz `notElem` rs) $ nub ls) x (filter (\zz -> zz /= x) $ nub rs)
+    seq (length gradeConfig) (writeFile filepath (encode grades') `catchAny` (\_ -> throw GradeConfigFileMissing))
+
+parseGrades :: FilePath -> IO Grades
+parseGrades location = do
+    -- badness
+    let ext = takeExtension location
+    _ <- case ext of
+            ".csv" -> return ()
+            _ -> throw BadCsv
+
+    locationData' <- readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
+    seq (length locationData') (return ())
+
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
+
+    let studentData = case locationData of
+            Left _ -> throw ParseLocationFile
+            Right locData -> locData
+
+    let grades = nub $ toList $ fmap _grade studentData
+
+    case grades of 
+        [] -> return NoGrades
+        x:xs -> return $ Grades $ ListZipper [] x xs
+
 
 getDoneshooting :: ShakeConfig -> IO Doneshooting
 getDoneshooting config = do
@@ -143,16 +181,6 @@ setBuilt' config built = do
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length builtConfig) (writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing))
 
-
-setGrades :: ShakeConfig -> Grades -> IO ()
-setGrades config grades = do
-    let filepath = _gradeConfig config
-    gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
-    let grades' = case grades of
-            NoGrades -> NoGrades
-            Grades (ListZipper ls x rs) -> Grades $ 
-                ListZipper (filter (\zz -> zz /= x) $ filter (\zz -> zz `notElem` rs) $ nub ls) x (filter (\zz -> zz /= x) $ nub rs)
-    seq (length gradeConfig) (writeFile filepath (encode grades') `catchAny` (\_ -> throw GradeConfigFileMissing))
 
 
 getGrades :: ShakeConfig -> IO Grades
@@ -263,6 +291,8 @@ setLocation config location = do
     let filepath = _locationConfig config
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
     seq (length locationConfig) (writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing))
+    grades <- parseGrades filepath
+    setGrades config grades
 
 
 getShootingsConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
