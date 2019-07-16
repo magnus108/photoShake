@@ -6,9 +6,12 @@ module PhotoShake.Photographee
     , findPhotographee
     , insertPhotographee
     , Grades(..)
+    , parseGrades
     , myOptionsDecode 
     ) where
 
+
+import Data.List (nub)
 
 import Prelude hiding ((++))
 
@@ -86,6 +89,29 @@ insertPhotographee location photographeeId grade name = do
     BL.writeFile location moreData
 
 
+
+parseGrades :: FilePath -> IO Grades
+parseGrades location = do
+    -- badness
+    let ext = takeExtension location
+    _ <- case ext of
+            ".csv" -> return ()
+            _ -> throw BadCsv
+
+    locationData' <- readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
+    seq (length locationData') (return ())
+
+    let locationData = decodeWith myOptionsDecode NoHeader $ fromString locationData' :: Either String (Vector Photographee)
+
+    let studentData = case locationData of
+            Left _ -> throw ParseLocationFile
+            Right locData -> locData
+
+    let grades = nub $ toList $ fmap _grade studentData
+
+    case grades of 
+        [] -> return NoGrades
+        x:xs -> return $ Grades $ ListZipper [] x xs
 
 
 findPhotographee :: FilePath -> Ident -> IO Photographee

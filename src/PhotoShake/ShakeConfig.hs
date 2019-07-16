@@ -1,7 +1,6 @@
 module PhotoShake.ShakeConfig
     ( ShakeConfig(..)
     , toShakeConfig
-    , parseGrades
     , setGrades
     , catchAny
     , getDumpFiles
@@ -64,7 +63,7 @@ import Data.ByteString.Lazy (readFile, writeFile,  length)
 
 import Utils.ListZipper hiding (toList)
 import qualified Data.ByteString.Lazy as BL
-import Data.ByteString.Lazy.UTF8 (fromString)
+import Data.ByteString.Lazy.UTF8 (fromString, toString)
 
 data ShakeConfig = ShakeConfig 
     { _dumpConfig :: FilePath
@@ -124,30 +123,6 @@ setGrades config grades = do
             Grades (ListZipper ls x rs) -> Grades $ 
                 ListZipper (filter (\zz -> zz /= x) $ filter (\zz -> zz `notElem` rs) $ nub ls) x (filter (\zz -> zz /= x) $ nub rs)
     seq (length gradeConfig) (writeFile filepath (encode grades') `catchAny` (\_ -> throw GradeConfigFileMissing))
-
-parseGrades :: FilePath -> IO Grades
-parseGrades location = do
-    -- badness
-    let ext = takeExtension location
-    _ <- case ext of
-            ".csv" -> return ()
-            _ -> throw BadCsv
-
-    locationData' <- readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
-    seq (length locationData') (return ())
-
-    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
-
-    let studentData = case locationData of
-            Left _ -> throw ParseLocationFile
-            Right locData -> locData
-
-    let grades = nub $ toList $ fmap _grade studentData
-
-    case grades of 
-        [] -> return NoGrades
-        x:xs -> return $ Grades $ ListZipper [] x xs
-
 
 getDoneshooting :: ShakeConfig -> IO Doneshooting
 getDoneshooting config = do
@@ -291,7 +266,7 @@ setLocation config location = do
     let filepath = _locationConfig config
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
     seq (length locationConfig) (writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing))
-    grades <- parseGrades locationConfig
+    grades <- parseGrades $ toString locationConfig
     setGrades config grades
 
 
