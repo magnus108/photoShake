@@ -266,6 +266,7 @@ setLocation config location = do
     let filepath = _locationConfig config
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
     seq (length locationConfig) (writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing))
+    error $ show locationConfig
     grades <- parseGrades $ toString locationConfig
     setGrades config grades
 
