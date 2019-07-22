@@ -2,9 +2,7 @@
 dump/
 doneshooting/
 dagsdato/
-test/dump/
 test/doneshooting/
 test/dagsdato/
 ._build/
 photoShake.cabal
-*~

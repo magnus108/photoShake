@@ -14,6 +14,7 @@ import Development.Shake hiding (Normal)
 import Development.Shake.FilePath
 
 import PhotoShake.ShakeConfig
+import PhotoShake.Dump
 import PhotoShake.Photographee
 
 import PhotoShake.Location
@@ -138,3 +139,10 @@ actions config photographee location time = do
 
             dagsdatoJpg %> \f -> do
                 copyFile' jpg f
+
+        dump <- liftIO $ getDump config
+
+        case dump of
+            NoDump -> action $ return ()            
+            Dump x -> action $ removeFilesAfter x ["//*"]
+        
