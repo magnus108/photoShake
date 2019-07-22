@@ -54,7 +54,7 @@ entry = do
 
             ---ehhh2
             time <- getCurrentTime
-            myShake config photographee (takeBaseName xxx) time
+            myShake config photographee (takeBaseName xxx) time False
 
 
 shakeDir :: FilePath
@@ -76,9 +76,9 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
             ) p
 
 
-myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> IO ()
-myShake config photographee location time = do
-    shake (opts photographee config) $ actions config photographee location time
+myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> IO ()
+myShake config photographee location time removeIt = do
+    shake (opts photographee config) $ actions config photographee location time removeIt
 
 
 mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
@@ -96,6 +96,19 @@ mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photogra
             pad x = strPadLeft '0' 3 (show x)
                 
 
+mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
+mkDoneshootingPathJpg NoDoneshooting _ _ _ _ _ _ _ = throw ConfigDoneshootingMissing
+mkDoneshootingPathJpg (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad index) ++ (takeExtension filename)
+        where
+            tea = _tea photographee
+            grade = _grade photographee 
+            sessionId = case session of
+                    School -> "8"
+                    _ -> "9"
+            shootingId = case shooting of
+                    Normal -> "1"
+                    ReShoot -> "2"
+            pad x = strPadLeft '0' 3 (show x)
 
 
 mkDagsdatoPath :: Dagsdato -> Photographee -> String -> String -> UTCTime -> FilePath
@@ -108,8 +121,8 @@ mkDagsdatoPath (Dagsdato dagsdatoDir) photographee location filename time = dags
             date = getDate time
 
 
-actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Rules ()
-actions config photographee location time = do
+actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> Rules ()
+actions config photographee location time removeIt = do
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
         dumpFiles <- liftIO $ getDumpFiles config
@@ -122,6 +135,8 @@ actions config photographee location time = do
         ifor_ (sort dumpFiles) $ \ index (cr2, jpg) -> do
             let doneshootingCr2 = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
             let doneshootingJpg = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
+
+            let doneshootingJpg = mkDoneshootingPathJpg doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
             let dagsdatoCr2 = mkDagsdatoPath dagsdato photographee location (takeFileName cr2) time -<.> "cr2"
             let dagsdatoJpg = mkDagsdatoPath dagsdato photographee location (takeFileName jpg) time -<.> "jpg"
@@ -141,4 +156,12 @@ actions config photographee location time = do
                 copyFile' jpg f
 
 
-        
+        dump <- liftIO $ getDump config
+
+        case dump of
+            NoDump -> action $ return ()            
+            Dump x -> do
+                if removeIt then
+                    action $ removeFilesAfter x ["//*"]
+                else
+                    return () 

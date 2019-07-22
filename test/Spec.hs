@@ -63,7 +63,7 @@ goldenTests = do
             let day = fromGregorian 2009 12 31
             let time = UTCTime day (secondsToDiffTime 0)
 
-            myShake config photographee (takeBaseName xxx) time
+            myShake config photographee (takeBaseName xxx) time False
 
             -- bads 
             photographer <- getPhotographer config
