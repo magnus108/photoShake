@@ -119,6 +119,9 @@ actions config photographee location time = do
         shooting <- liftIO $ getShooting config
         -- badIO
 
+        liftIO $ putStrLn "HDAHDAHDA"
+        liftIO $ putStrLn $ show (dumpFiles) 
+
         ifor_ (sort dumpFiles) $ \ index (cr2, jpg) -> do
             let doneshootingCr2 = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
             let doneshootingJpg = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
@@ -127,6 +130,8 @@ actions config photographee location time = do
             let dagsdatoJpg = mkDagsdatoPath dagsdato photographee location (takeFileName jpg) time -<.> "jpg"
 
             want [doneshootingCr2, doneshootingJpg, dagsdatoCr2, dagsdatoJpg] 
+
+            liftIO $ putStrLn "gggggGGGGGGGGGGGGGGGGGGGGGGGG"
 
             doneshootingCr2 %> \f -> do
                 copyFile' cr2 f
@@ -140,9 +145,5 @@ actions config photographee location time = do
             dagsdatoJpg %> \f -> do
                 copyFile' jpg f
 
-        dump <- liftIO $ getDump config
 
-        case dump of
-            NoDump -> action $ return ()            
-            Dump x -> action $ removeFilesAfter x ["//*"]
         
