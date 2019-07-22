@@ -46,14 +46,11 @@ goldenTests = do
             let ident = _ident photographee
             let goldenDir = "test" </> ident 
 
-            putStrLn "LoL"
             -- uglys
             case doneshooting of
                 NoDoneshooting -> return ()
                 Doneshooting f -> do
-                    putStrLn (show f)
                     createDirectoryIfMissing False f
-                    putStrLn (show f)
                     removeDirectoryRecursive f
 
             case dagsdato of
@@ -63,7 +60,6 @@ goldenTests = do
                     removeDirectoryRecursive f
 
 
-            putStrLn "LoL"
             let day = fromGregorian 2009 12 31
             let time = UTCTime day (secondsToDiffTime 0)
 
@@ -80,10 +76,7 @@ goldenTests = do
             let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshooting photographee (takeBaseName xxx) photographer session shooting "null" 0
             let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdato photographee (takeBaseName xxx) "null" time
 
-            putStrLn "LoL"
-            putStrLn (show doneshootingPath)
             doneShootingFiles <- listDirectory doneshootingPath
-            putStrLn "LoL"
             dagsdatoFiles <- listDirectory dagsdatoPath
 
             -- overvej refac
