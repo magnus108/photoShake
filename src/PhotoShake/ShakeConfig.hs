@@ -399,10 +399,11 @@ getDumpFiles config = do
         NoDump -> return []
         Dump x -> do
             files <- listDirectory x `catchAny` (\_ -> throw DumpMissing)
-            let files' = filter (isExtensionOf "CR2") files -- bad use
+            let files' = filter (\z -> isExtensionOf "CR2" z || (isExtensionOf "cr2" z)) files -- bad use
             files'' <- mapM (\file -> do 
                     b <- (doesFileExist (x </> file -<.> "JPG")) 
-                    if b then return file else throw JPGMissing ) files'
+                    b1 <- (doesFileExist (x </> file -<.> "jpg")) 
+                    if b || b1 then return file else throw JPGMissing ) files'
             return $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
 
 
