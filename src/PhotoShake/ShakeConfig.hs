@@ -400,7 +400,10 @@ getDumpFiles config = do
         Dump x -> do
             files <- listDirectory x `catchAny` (\_ -> throw DumpMissing)
             let files' = filter (isExtensionOf "CR2") files -- bad use
-            return $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files' -- could be nicer
+            files'' <- mapM (\file -> do 
+                    b <- (doesFileExist (x </> file -<.> "JPG")) 
+                    if b then return file else throw JPGMissing ) files'
+            return $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
 
 
 getLocationFile :: ShakeConfig -> IO Location

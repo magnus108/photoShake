@@ -31,6 +31,7 @@ data ShakeError
     | ShootingConfigFileMissing
     | LocationConfigFileMissing
     | BadCsv
+    | JPGMissing
     | SessionsConfigFileMissing
     | ConfigSessionMissing
     | SessionsConfigParseError
@@ -40,6 +41,7 @@ data ShakeError
 
 instance Show ShakeError where
     show BadCsv = "lokationsfil er ikke en csv"
+    show JPGMissing = "CR2 og JPG stemmer ikke overens"
     show DumpMissing = "Kunne ikke finde dumpmappe"
     show DoneshootingDirectoryMissing = "Kunne ikke finde doneshootingmappe"
     show DagsdatoDirectoryMissing = "Kunne ikke finde dagsdatomappe"
