@@ -162,6 +162,6 @@ actions config photographee location time removeIt = do
             NoDump -> action $ return ()            
             Dump x -> do
                 if removeIt then
-                    action $ removeFilesAfter x ["//*"]
+                    action $ removeFilesAfter (show x) ["//*.CR2", "//*.JPG"]
                 else
                     return () 
