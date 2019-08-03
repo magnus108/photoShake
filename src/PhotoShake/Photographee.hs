@@ -13,7 +13,7 @@ module PhotoShake.Photographee
 
 import Data.List (nub)
 
-import Prelude hiding ((++))
+import Prelude hiding ((++), readFile)
 
 import GHC.Generics (Generic)
 import Data.Csv
@@ -75,10 +75,9 @@ insertPhotographee location photographeeId grade name = do
             ".csv" -> return ()
             _ -> throw BadCsv
 
-    locationData' <- readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
-    seq (length locationData') (return ())
+    locationData' <- BL.readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
 
-    let locationData = decodeWith myOptionsDecode NoHeader $ fromString locationData' :: Either String (Vector Photographee)
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
 
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
@@ -98,10 +97,9 @@ parseGrades location = do
             ".csv" -> return ()
             _ -> throw BadCsv
 
-    locationData' <- readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
-    seq (length locationData') (return ())
+    locationData' <-  BL.readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
 
-    let locationData = decodeWith myOptionsDecode NoHeader $ fromString locationData' :: Either String (Vector Photographee)
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
 
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
@@ -123,9 +121,9 @@ findPhotographee location photographeeId = do
             ".csv" -> return ()
             _ -> throw BadCsv
 
-    locationData' <- readFile location `catchAny` (\_ -> throw ReadLocationFile)
+    locationData' <- BL.readFile location `catchAny` (\_ -> throw ReadLocationFile)
 
-    let locationData = decodeWith myOptionsDecode NoHeader $ fromString locationData'
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData'
     --could use some case of here and error handling
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
