@@ -265,7 +265,7 @@ setDagsdato config dagsdato = do
     seq (length dagsdatoConfig) (writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing))
 
 
-setGradeSelection :: ShakeConfig -> String -> IO ()
+setGradeSelection :: ShakeConfig -> GradeSelection -> IO ()
 setGradeSelection config grade = do
     let filepath = _gradeSelectionConfig config
     config <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
@@ -312,7 +312,6 @@ getGradeSelection config = do
         let filepath = _gradeSelectionConfig config
         config <- readFile filepath `catchAny` (\_ -> error "lol") 
         let grade = decode $ config :: Maybe GradeSelection
-        putStrLn $ show grade
         seq (length config) (return ())
         case grade of
                 Nothing -> throw ConfigGradeMissing
@@ -341,8 +340,6 @@ getShootings config = do
 getSessions :: ShakeConfig -> IO Sessions
 getSessions config = do
         let filepath = _sessionConfig config
-        putStrLn "gg"
-        putStrLn (filepath)
         sessionConfig <- readFile filepath `catchAny` (\_ -> throw SessionsConfigFileMissing) 
         seq (length sessionConfig) (return ())
         let sessions = decode sessionConfig :: Maybe Sessions

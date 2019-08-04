@@ -83,7 +83,7 @@ myShake config photographee location time removeIt = do
 
 mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
 mkDoneshootingPath NoDoneshooting _ _ _ _ _ _ _ = throw ConfigDoneshootingMissing
-mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad index) ++ (takeExtension filename)
+mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> "cr2" </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad index) ++ (takeExtension filename)
         where
             tea = _tea photographee
             grade = _grade photographee 

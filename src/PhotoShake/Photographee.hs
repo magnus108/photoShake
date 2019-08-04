@@ -50,7 +50,7 @@ deriveJSON DA.defaultOptions ''Grades
 
 data GradeSelection = GradeSelection String
                     | NoSelection
-                    deriving (Show)
+                    deriving (Show, Eq)
 
 deriveJSON DA.defaultOptions ''GradeSelection
 
@@ -126,8 +126,8 @@ parseGrades location = do
 
 
 
-parsePhotographees :: FilePath -> Grade -> IO [Photographee]
-parsePhotographees location grade = do
+parsePhotographees :: FilePath -> GradeSelection -> IO [Photographee]
+parsePhotographees location gradeSelection = do
     -- badness
     let ext = takeExtension location
     _ <- case ext of
@@ -142,7 +142,9 @@ parsePhotographees location grade = do
 
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
-            Right locData -> filter ((grade ==). _grade) locData
+            Right locData -> case gradeSelection of
+                NoSelection -> mempty
+                GradeSelection grade -> filter ((grade ==). _grade) locData
 
     return $ toList $ studentData
 

@@ -40,6 +40,8 @@ dependencies:
 - ilist >= 0.3 && < 0.4
 - strings >= 1.1 && < 1.2
 - containers >= 0.6 && < 0.7
+- split >= 0.2 && < 0.3
+- extra >= 1.6 && < 1.7
 
 library:
   source-dirs: src
