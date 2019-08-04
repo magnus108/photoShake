@@ -6,18 +6,22 @@ module PhotoShake.Photographee
     , findPhotographee
     , insertPhotographee
     , Grades(..)
+    , GradeSelection(..)
     , parseGrades
+    , findPhotographee2
     , myOptionsDecode 
+    ,parsePhotographees 
     ) where
 
 
 import Data.List (nub)
 
-import Prelude hiding ((++), readFile)
+import Prelude hiding ((++), readFile, filter)
+import qualified Prelude as PP ((++))
 
 import GHC.Generics (Generic)
 import Data.Csv
-import Data.Vector (Vector, find, (++), fromList, toList)
+import Data.Vector (Vector, find, (++), fromList, toList, filter)
 import Data.Char
 import qualified Data.ByteString.Lazy as BL
 import Data.ByteString.Lazy.UTF8 (fromString)
@@ -44,6 +48,11 @@ data Grades = Grades (ListZipper Grade)
 
 deriveJSON DA.defaultOptions ''Grades
 
+data GradeSelection = GradeSelection String
+                    | NoSelection
+                    deriving (Show)
+
+deriveJSON DA.defaultOptions ''GradeSelection
 
 data Photographee = Photographee 
     { _tea :: String 
@@ -77,11 +86,13 @@ insertPhotographee location photographeeId grade name = do
 
     locationData' <- BL.readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
 
+    putStrLn $ show locationData'
+
     let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
 
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
-            Right locData -> locData ++ (fromList [Photographee "xxx" grade name photographeeId])
+            Right locData -> locData ++ (fromList [Photographee ("SYS_" PP.++ photographeeId) grade name "missing"])
 
     let moreData = encodeWith myOptionsEncode $ toList studentData --can throw error
 
@@ -99,6 +110,8 @@ parseGrades location = do
 
     locationData' <-  BL.readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
 
+    putStrLn $ show locationData'
+
     let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
 
     let studentData = case locationData of
@@ -112,9 +125,41 @@ parseGrades location = do
         x:xs -> return $ Grades $ ListZipper [] x xs
 
 
+
+parsePhotographees :: FilePath -> Grade -> IO [Photographee]
+parsePhotographees location grade = do
+    -- badness
+    let ext = takeExtension location
+    _ <- case ext of
+            ".csv" -> return ()
+            _ -> throw BadCsv
+
+    locationData' <-  BL.readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
+
+    putStrLn $ show locationData'
+
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
+
+    let studentData = case locationData of
+            Left _ -> throw ParseLocationFile
+            Right locData -> filter ((grade ==). _grade) locData
+
+    return $ toList $ studentData
+
+    
+
+
+
+
+
+
+
+
 findPhotographee :: FilePath -> Ident -> IO Photographee
 findPhotographee location photographeeId = do
     -- badness
+
+    putStrLn photographeeId
     let ext = takeExtension location
 
     _ <- case ext of
@@ -123,11 +168,41 @@ findPhotographee location photographeeId = do
 
     locationData' <- BL.readFile location `catchAny` (\_ -> throw ReadLocationFile)
 
+    putStrLn $ show locationData'
+
     let locationData = decodeWith myOptionsDecode NoHeader $ locationData'
     --could use some case of here and error handling
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
             Right locData -> find ((photographeeId ==) . _ident ) locData
+
+    let student = case studentData of
+            Nothing -> throw FindPhotographee
+            Just x -> x 
+
+    return student 
+
+
+findPhotographee2 :: FilePath -> Ident -> IO Photographee
+findPhotographee2 location photographeeId = do
+    -- badness
+
+    putStrLn photographeeId
+    let ext = takeExtension location
+
+    _ <- case ext of
+            ".csv" -> return ()
+            _ -> throw BadCsv
+
+    locationData' <- BL.readFile location `catchAny` (\_ -> throw ReadLocationFile)
+
+    putStrLn $ show locationData'
+
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData'
+    --could use some case of here and error handling
+    let studentData = case locationData of
+            Left _ -> throw ParseLocationFile
+            Right locData -> find ((photographeeId ==) . _tea ) locData
 
     let student = case studentData of
             Nothing -> throw FindPhotographee

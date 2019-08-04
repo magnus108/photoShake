@@ -29,6 +29,9 @@ module PhotoShake.ShakeConfig
     , setBuilt
     , setBuilt'
     , getGrades
+    , getGradeSelectionConfig
+    , setGradeSelection
+    , getGradeSelection
     ) where
 
 import Prelude hiding (readFile, writeFile, length)
@@ -75,6 +78,7 @@ data ShakeConfig = ShakeConfig
     , _photographerConfig :: FilePath
     , _builtConfig :: FilePath
     , _gradeConfig :: FilePath
+    , _gradeSelectionConfig :: FilePath
     }
 
 
@@ -261,6 +265,14 @@ setDagsdato config dagsdato = do
     seq (length dagsdatoConfig) (writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing))
 
 
+setGradeSelection :: ShakeConfig -> String -> IO ()
+setGradeSelection config grade = do
+    let filepath = _gradeSelectionConfig config
+    config <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
+    seq (length config) (writeFile filepath (encode grade) `catchAny` (\_ -> throw GradeConfigFileMissing))
+
+
+
 setLocation :: ShakeConfig -> Location -> IO ()
 setLocation config location = do
     let filepath = _locationConfig config
@@ -288,6 +300,25 @@ getGradeConfig root config = case (HM.lookup "gradeConfig" config) of
         Just y -> y </> x
 
 
+getGradeSelectionConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getGradeSelectionConfig root config = case (HM.lookup "gradeSelectionConfig" config) of
+    Nothing -> throw ConfigGradeMissing
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
+
+getGradeSelection :: ShakeConfig -> IO GradeSelection
+getGradeSelection config = do
+        let filepath = _gradeSelectionConfig config
+        config <- readFile filepath `catchAny` (\_ -> error "lol") 
+        let grade = decode $ config :: Maybe GradeSelection
+        putStrLn $ show grade
+        seq (length config) (return ())
+        case grade of
+                Nothing -> throw ConfigGradeMissing
+                Just y -> return $ y
+
+
 getSessionConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
 getSessionConfig root config = case (HM.lookup "sessionConfig" config) of
     Nothing -> throw ConfigSessionMissing
@@ -310,6 +341,8 @@ getShootings config = do
 getSessions :: ShakeConfig -> IO Sessions
 getSessions config = do
         let filepath = _sessionConfig config
+        putStrLn "gg"
+        putStrLn (filepath)
         sessionConfig <- readFile filepath `catchAny` (\_ -> throw SessionsConfigFileMissing) 
         seq (length sessionConfig) (return ())
         let sessions = decode sessionConfig :: Maybe Sessions
@@ -437,6 +470,8 @@ toShakeConfig root cfg = do
     let builtConfig = getBuiltConfig root config
     let gradeConfig = getGradeConfig root config
 
+    let gradeSelectionConfig = getGradeSelectionConfig root config
+
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
                          , _dagsdatoConfig = dagsdatoConfig
@@ -446,4 +481,5 @@ toShakeConfig root cfg = do
                          , _photographerConfig = photographerConfig
                          , _builtConfig = builtConfig
                          , _gradeConfig = gradeConfig
+                         , _gradeSelectionConfig = gradeSelectionConfig
                          } 
