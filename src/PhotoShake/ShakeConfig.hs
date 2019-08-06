@@ -435,7 +435,7 @@ getDumpFiles config = do
                     b <- (doesFileExist (x </> file -<.> "JPG")) 
                     b1 <- (doesFileExist (x </> file -<.> "jpg")) 
                     let b3 = all id $ fmap (\z -> elem (z -<.> "CR2") files' || (elem (z -<.> "cr2") files')) files2'
-                    if ( b || b1 ) && b3 then return file else throw JPGMissing ) files'
+                    if ( b || b1 ) && b3 then return file else throw JPGMissing ) files' -- this is error
             return $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
 
 
