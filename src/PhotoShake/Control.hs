@@ -25,6 +25,7 @@ import Data.ByteString.Lazy.UTF8 (fromString, toString)
 
 data Result = Errors [(String, Bool, Bool, Bool)]
             | NoErrors
+            | Empty
     deriving (Show, Eq)
 
 
@@ -74,6 +75,7 @@ controlXMP config grade = do
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
                     case files of
                         Left z -> return NoErrors
+                        Right [] -> return Empty
                         Right z -> do
                             let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f) z 
 
