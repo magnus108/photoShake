@@ -75,7 +75,7 @@ controlXMP config grade = do
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
                     putStrLn $ show files
                     case files of
-                        Left z -> return NoErrors
+                        Left z -> return Empty
                         Right [] -> return Empty
                         Right z -> do
                             let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f) z 
