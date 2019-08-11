@@ -1,5 +1,7 @@
 module PhotoShake.ShakeConfig
     ( ShakeConfig(..)
+    , getIdSelection
+    , setIdSelection
     , toShakeConfig
     , setGrades
     , catchAny
@@ -79,6 +81,8 @@ data ShakeConfig = ShakeConfig
     , _builtConfig :: FilePath
     , _gradeConfig :: FilePath
     , _gradeSelectionConfig :: FilePath
+
+    , _idConfig :: FilePath
     }
 
 
@@ -98,6 +102,14 @@ getBuiltConfig root config = case (HM.lookup "builtConfig" config) of
 getPhotographerConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
 getPhotographerConfig root config = case (HM.lookup "photographerConfig" config) of
     Nothing -> throw ConfigPhotographerMissing
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
+
+
+getIdConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getIdConfig root config = case (HM.lookup "idConfig" config) of
+    Nothing -> throw IdConfigFileMissing 
     Just x -> case root of 
         Nothing -> x 
         Just y -> y </> x
@@ -272,6 +284,13 @@ setGradeSelection config grade = do
     seq (length config) (writeFile filepath (encode grade) `catchAny` (\_ -> throw GradeConfigFileMissing))
 
 
+setIdSelection :: ShakeConfig -> Idd -> IO ()
+setIdSelection config idd = do
+    let filepath = _idConfig config
+    config <- readFile filepath `catchAny` (\_ -> throw IdConfigFileMissing)
+    seq (length config) (writeFile filepath (encode idd) `catchAny` (\_ -> throw IdConfigFileMissing))
+
+
 
 setLocation :: ShakeConfig -> Location -> IO ()
 setLocation config location = do
@@ -317,6 +336,15 @@ getGradeSelection config = do
                 Nothing -> throw ConfigGradeMissing
                 Just y -> return $ y
 
+getIdSelection :: ShakeConfig -> IO Idd
+getIdSelection config = do
+        let filepath = _idConfig config
+        config <- readFile filepath `catchAny` (\_ -> error "lol") 
+        let idd = decode $ config :: Maybe Idd
+        seq (length config) (return ())
+        case idd of
+                Nothing -> throw ConfigIdMissing
+                Just y -> return $ y
 
 getSessionConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
 getSessionConfig root config = case (HM.lookup "sessionConfig" config) of
@@ -469,6 +497,8 @@ toShakeConfig root cfg = do
     let builtConfig = getBuiltConfig root config
     let gradeConfig = getGradeConfig root config
 
+    let idConfig = getIdConfig root config
+
     let gradeSelectionConfig = getGradeSelectionConfig root config
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
@@ -481,4 +511,6 @@ toShakeConfig root cfg = do
                          , _builtConfig = builtConfig
                          , _gradeConfig = gradeConfig
                          , _gradeSelectionConfig = gradeSelectionConfig
+
+                         , _idConfig =idConfig
                          } 

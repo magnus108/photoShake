@@ -5,12 +5,13 @@ module PhotoShake.Photographee
     ( Photographee(..)
     , findPhotographee
     , insertPhotographee
+    , Idd(..)
     , Grades(..)
     , GradeSelection(..)
     , parseGrades
     , findPhotographee2
     , myOptionsDecode 
-    ,parsePhotographees 
+    , parsePhotographees 
     ) where
 
 
@@ -51,6 +52,10 @@ deriveJSON DA.defaultOptions ''Grades
 data GradeSelection = GradeSelection String
                     | NoSelection
                     deriving (Show, Eq)
+
+
+data Idd = Idd String deriving (Show, Eq)
+deriveJSON DA.defaultOptions ''Idd
 
 deriveJSON DA.defaultOptions ''GradeSelection
 
