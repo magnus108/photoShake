@@ -73,6 +73,7 @@ controlXMP config grade = do
                 Location loc -> do
                     let path = doneshootingDir </> (takeBaseName loc) </> "cr2" </> grade
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
+                    putStrLn $ show files
                     case files of
                         Left z -> return NoErrors
                         Right [] -> return Empty
