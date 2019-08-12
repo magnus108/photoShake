@@ -10,6 +10,7 @@ module PhotoShake.Photographee
     , GradeSelection(..)
     , parseGrades
     , findPhotographee2
+    , findPhotographee3
     , myOptionsDecode 
     , parsePhotographees 
     ) where
@@ -216,3 +217,26 @@ findPhotographee2 location photographeeId = do
             Just x -> x 
 
     return student 
+
+
+findPhotographee3 :: FilePath -> Ident -> IO (Maybe Photographee)
+findPhotographee3 location photographeeId = do
+    -- badness
+
+    let ext = takeExtension location
+
+    _ <- case ext of
+            ".csv" -> return ()
+            _ -> throw BadCsv
+
+    locationData' <- BL.readFile location `catchAny` (\_ -> throw ReadLocationFile)
+
+    putStrLn $ show locationData'
+
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData'
+    --could use some case of here and error handling
+    let studentData = case locationData of
+            Left _ -> throw ParseLocationFile
+            Right locData -> find ((photographeeId ==) . _ident ) locData
+
+    return studentData
