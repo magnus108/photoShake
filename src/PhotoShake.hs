@@ -161,6 +161,7 @@ actions config photographee location time removeIt = do
         case dump of
             NoDump -> action $ return ()            
             Dump x -> do
+                liftIO $ setIdSelection config (Idd "")
                 if removeIt then
                     action $ removeFilesAfter x ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg"]
                 else
