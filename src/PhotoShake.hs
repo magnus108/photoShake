@@ -98,7 +98,7 @@ mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photogra
 
 mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
 mkDoneshootingPathJpg NoDoneshooting _ _ _ _ _ _ _ = throw ConfigDoneshootingMissing
-mkDoneshootingPathJpg (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)
+mkDoneshootingPathJpg (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> "cr2" </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)
         where
             tea = _tea photographee
             grade = _grade photographee 
