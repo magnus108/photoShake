@@ -88,8 +88,8 @@ mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photogra
             tea = _tea photographee
             grade = _grade photographee 
             sessionId = case session of
-                    School -> "8"
-                    _ -> "9"
+                    School -> "9"
+                    _ -> "10"
             shootingId = case shooting of
                     Normal -> "1"
                     ReShoot -> "2"
@@ -103,8 +103,8 @@ mkDoneshootingPathJpg (Doneshooting doneshootingDir) photographee location photo
             tea = _tea photographee
             grade = _grade photographee 
             sessionId = case session of
-                    School -> "8"
-                    _ -> "9"
+                    School -> "9"
+                    _ -> "10"
             shootingId = case shooting of
                     Normal -> "1"
                     ReShoot -> "2"
