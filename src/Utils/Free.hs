@@ -1,6 +1,9 @@
+{-# LANGUAGE RankNTypes #-}
+
 module Utils.Free
     ( Free(..)
     , liftF
+    , foldFree
     ) where
 
 data Free f a
@@ -24,3 +27,8 @@ instance Functor f => Monad (Free f) where
 
 liftF :: (Functor f) => f r -> Free f r
 liftF command = Free (fmap Pure command)
+
+
+foldFree :: Monad m => (forall x . f x -> m x) -> Free f a -> m a
+foldFree _ (Pure a)  = return a
+foldFree f (Free as) = f as >>= foldFree f

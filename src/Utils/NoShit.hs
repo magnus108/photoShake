@@ -7,9 +7,9 @@ import qualified Utils.Actions as A
 
 myProgram :: A.TerminalM ()
 myProgram = do
-  a <- A.getLine
-  b <- A.getLine
-  A.printLine (a ++ b)
+  m <- A.getLine 
+  f <- A.readFile m 
+  A.writeFile "bob.txt" f
 
 noShit :: IO ()
 noShit = A.interpret myProgram
