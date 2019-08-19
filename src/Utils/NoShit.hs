@@ -5,11 +5,11 @@ module Utils.NoShit
 import Utils.Free
 import qualified Utils.Actions as A
 
+import Data.ByteString.Lazy.UTF8 as BLU 
+
 myProgram :: A.TerminalM ()
 myProgram = do
-  m <- A.getLine 
-  f <- A.readFile m 
-  A.writeFile "bob.txt" f
+  A.writeFile "bob.txt" $ BLU.fromString "what"
 
 noShit :: IO ()
 noShit = A.interpret myProgram
