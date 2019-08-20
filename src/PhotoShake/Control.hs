@@ -73,14 +73,12 @@ controlXMP config grade = do
                 Location loc -> do
                     let path = doneshootingDir </> (takeBaseName loc) </> "cr2" </> grade
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
-                    putStrLn $ show files
                     case files of
                         Left z -> return Empty
                         Right [] -> return Empty
                         Right z -> do
-                            let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f) z 
+                            let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f) (sort z)
 
-             
                             let cr2s = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) what  
 
                             putStrLn $ show cr2s
