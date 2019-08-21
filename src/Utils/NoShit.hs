@@ -13,8 +13,9 @@ import PhotoShake.Photographer
 
 myProgram :: A.TerminalM Photographers Photographers
 myProgram = do
-  A.writeFile "config/photographer.json" NoPhotographers
-  A.readFile "config/photographer.json"
+  z <- A.readFile "config/photographer.json"
+  A.writeFile "config/photographer.json" z
+  return z
 
 noShit :: IO ()
 noShit = do 

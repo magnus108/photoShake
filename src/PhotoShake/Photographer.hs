@@ -1,10 +1,12 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module PhotoShake.Photographer
     ( Photographer(..)
     , Photographers(..)
     ) where
 
-import Data.Aeson.TH (deriveJSON, defaultOptions)
+import GHC.Generics
+import Data.Aeson
 
 import Utils.ListZipper
 
@@ -12,14 +14,11 @@ import Utils.ListZipper
 data Photographer = Photographer 
     { name :: String 
     , tid :: String
-    }
-    deriving (Show, Eq)
+    } deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
-
-deriveJSON defaultOptions ''Photographer
 
 data Photographers
             = Photographers (ListZipper Photographer)
-            | NoPhotographers deriving (Show)
+            | NoPhotographers 
+                deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
-deriveJSON defaultOptions ''Photographers
