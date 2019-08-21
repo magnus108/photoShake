@@ -1,15 +1,22 @@
 module Utils.NoShit
-    ( noShit
-    ) where
+  --  ( noShit
+  --  )
+  where
 
 import Utils.Free
 import qualified Utils.Actions as A
 
-import Data.ByteString.Lazy.UTF8 as BLU 
+import Data.ByteString.UTF8 as BU 
 
-myProgram :: A.TerminalM ()
+
+import PhotoShake.Photographer
+
+myProgram :: A.TerminalM Photographers Photographers
 myProgram = do
-  A.writeFile "bob.txt" $ BLU.fromString "what"
+  A.writeFile "config/photographer.json" NoPhotographers
+  A.readFile "config/photographer.json"
 
 noShit :: IO ()
-noShit = A.interpret myProgram
+noShit = do 
+    x <- A.interpret myProgram
+    putStrLn $ show x
