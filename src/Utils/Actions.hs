@@ -17,7 +17,7 @@ import Prelude (Functor, return, IO, ($), (<$))
 import Data.ByteString (ByteString)
 
 import Utils.Free
-import System.FilePath
+import Utils.FP
 
 import Prelude (error)
 import Conduit
@@ -27,9 +27,10 @@ import Data.Aeson (FromJSON, fromJSON, ToJSON, json, Result(Error, Success), toE
 
 
 
+
 data Terminal x a where
-  WriteFile :: (FromJSON x, ToJSON x) => FilePath -> x -> a -> Terminal x a
-  ReadFile :: (FromJSON x, ToJSON x) => FilePath -> (x -> a) -> Terminal x a
+  WriteFile :: (FromJSON x, ToJSON x) => FP -> x -> a -> Terminal x a
+  ReadFile :: (FromJSON x, ToJSON x) => FP -> (x -> a) -> Terminal x a
 
 deriving instance Functor (Terminal x)
 
@@ -44,11 +45,11 @@ sinkFromJSON = do
         Success x -> return x
 
 
-writeFile :: (ToJSON x, FromJSON x) => FilePath -> x -> TerminalM x ()
+writeFile :: (ToJSON x, FromJSON x) => FP -> x -> TerminalM x ()
 writeFile fp str = liftF (WriteFile fp str ())
 
 
-readFile :: (FromJSON x, ToJSON x) => FilePath -> TerminalM x x
+readFile :: (FromJSON x, ToJSON x) => FP -> TerminalM x x
 readFile fp = Free (ReadFile fp return)
 
 
@@ -59,9 +60,9 @@ interpret = foldFree $ \case
         where
             x = runConduitRes $ yield (fromEncoding $ toEncoding j)
                              .| builderToByteString
-                             .| sinkFileBS fp
+                             .| sinkFileBS (toFilePath fp)
   ReadFile fp next ->
     fmap next x
         where
-            x = runConduitRes $ sourceFileBS fp
+            x = runConduitRes $ sourceFileBS (toFilePath fp)
                              .| sinkFromJSON 

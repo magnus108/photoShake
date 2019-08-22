@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveFunctor #-}  
 module Utils.Env
     ( env
+    , Env
     )
   where
 
