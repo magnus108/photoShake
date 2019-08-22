@@ -1,7 +1,10 @@
-{-# LANGUAGE DatatypeContexts #-} --https://stackoverflow.com/questions/22622399/how-to-fix-illegal-datatype-context-use-xdatatypecontexts/22622591#22622591
+--{-# LANGUAGE DatatypeContexts #-} --https://stackoverflow.com/questions/22622399/how-to-fix-illegal-datatype-context-use-xdatatypecontexts/22622591#22622591
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE DeriveFunctor #-}
+{-# Language GADTs #-}
+
 
 module Utils.Actions
     ( interpret
@@ -10,26 +13,25 @@ module Utils.Actions
     , TerminalM
     ) where
 
-import Prelude (String, Functor, return, IO, ($), (<$), (.))
-import Data.Functor ((<&>))
+import Prelude (Functor, return, IO, ($), (<$))
 import Data.ByteString (ByteString)
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.ByteString as B
 
 import Utils.Free
 import System.FilePath
 
 import Prelude (error)
 import Conduit
-import Data.Conduit.Combinators
 import Control.Monad
 import Data.Conduit.Attoparsec
-import Data.Aeson (FromJSON, fromJSON, ToJSON, toJSON, encode, json, Value, Result(Error, Success), toEncoding, fromEncoding)
+import Data.Aeson (FromJSON, fromJSON, ToJSON, json, Result(Error, Success), toEncoding, fromEncoding)
 
-data (FromJSON x, ToJSON x) => Terminal x a
-  = WriteFile FilePath x a
-  | ReadFile FilePath (x -> a)
-  deriving Functor
+
+
+data Terminal x a where
+  WriteFile :: (FromJSON x, ToJSON x) => FilePath -> x -> a -> Terminal x a
+  ReadFile :: (FromJSON x, ToJSON x) => FilePath -> (x -> a) -> Terminal x a
+
+deriving instance Functor (Terminal x)
 
 type TerminalM x = Free (Terminal x) 
 
@@ -41,8 +43,10 @@ sinkFromJSON = do
         Error e -> error e
         Success x -> return x
 
+
 writeFile :: (ToJSON x, FromJSON x) => FilePath -> x -> TerminalM x ()
 writeFile fp str = liftF (WriteFile fp str ())
+
 
 readFile :: (FromJSON x, ToJSON x) => FilePath -> TerminalM x x
 readFile fp = Free (ReadFile fp return)

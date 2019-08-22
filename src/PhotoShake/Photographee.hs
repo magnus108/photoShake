@@ -26,7 +26,6 @@ import Data.Csv
 import Data.Vector (Vector, find, (++), fromList, toList, filter)
 import Data.Char
 import qualified Data.ByteString.Lazy as BL
-import Data.ByteString.Lazy.UTF8 (fromString)
 
 import System.FilePath
 

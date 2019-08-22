@@ -1,4 +1,6 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Utils.ListZipper
     ( ListZipper(..)
     , focus
@@ -10,14 +12,15 @@ module Utils.ListZipper
     , toList
     ) where
 
+import GHC.Generics
+import Data.Aeson
+
 import Data.Maybe
 
 import Utils.Comonad
-import Data.Aeson.TH (deriveJSON, defaultOptions)
 
-data ListZipper a = ListZipper [a] a [a] deriving (Show, Eq)
-
-deriveJSON defaultOptions ''ListZipper
+data ListZipper a = ListZipper [a] a [a] 
+    deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 
 back :: ListZipper a -> ListZipper a

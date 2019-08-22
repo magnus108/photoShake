@@ -6,8 +6,6 @@ module Utils.NoShit
 import Utils.Free
 import qualified Utils.Actions as A
 
-import Data.ByteString.UTF8 as BU 
-
 
 import PhotoShake.Photographer
 
