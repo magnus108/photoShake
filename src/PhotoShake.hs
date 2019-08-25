@@ -67,13 +67,13 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
                     , shakeThreads = 0
                     , shakeColor = True
                     }
-  where
-    progress p = do
-      program <- progressProgram
-      progressDisplay 0.5 (\s -> do
-            setBuilt config s photographee
-            program s
-            ) p
+  --where
+   -- progress p = do
+    --  program <- progressProgram
+     -- progressDisplay 0.5 (\s -> do
+       --     setBuilt config s photographee
+        --    program s
+         --   ) p
 
 
 myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> IO ()
