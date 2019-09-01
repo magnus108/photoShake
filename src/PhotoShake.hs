@@ -138,14 +138,20 @@ actions config photographee location time removeIt = do
 
         ifor_ (sort dumpFiles) $ \ index (cr2, jpg) -> do
             let doneshootingCr2 = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
-            let doneshootingJpg = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
-
             let doneshootingJpg = mkDoneshootingPathJpg doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
+
+
+            let doneshootingBackupCr2 = mkDoneshootingPath doneshootingBackup photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
+            let doneshootingBackupJpg = mkDoneshootingPathJpg doneshootingBackup photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
             let dagsdatoCr2 = mkDagsdatoPath dagsdato photographee location (takeFileName cr2) time -<.> "cr2"
             let dagsdatoJpg = mkDagsdatoPath dagsdato photographee location (takeFileName jpg) time -<.> "jpg"
 
-            want [doneshootingCr2, doneshootingJpg, dagsdatoCr2, dagsdatoJpg] 
+            let dagsdatoBackupCr2 = mkDagsdatoPath dagsdatoBackup photographee location (takeFileName cr2) time -<.> "cr2"
+            let dagsdatoBackupJpg = mkDagsdatoPath dagsdatoBackup photographee location (takeFileName jpg) time -<.> "jpg"
+
+            want [doneshootingCr2, doneshootingJpg, dagsdatoCr2, dagsdatoJpg
+                 , doneshootingBackupCr2, doneshootingBackupJpg, dagsdatoBackupCr2, dagsdatoBackupJpg] 
 
             doneshootingCr2 %> \f -> do
                 copyFile' cr2 f
@@ -153,10 +159,22 @@ actions config photographee location time removeIt = do
             doneshootingJpg %> \f -> do
                 copyFile' jpg f
 
+            doneshootingBackupCr2 %> \f -> do
+                copyFile' cr2 f
+
+            doneshootingBackupJpg %> \f -> do
+                copyFile' jpg f
+
             dagsdatoCr2 %> \f -> do
                 copyFile' cr2 f
 
             dagsdatoJpg %> \f -> do
+                copyFile' jpg f
+
+            dagsdatoBackupCr2 %> \f -> do
+                copyFile' cr2 f
+
+            dagsdatoBackupJpg %> \f -> do
                 copyFile' jpg f
 
 
