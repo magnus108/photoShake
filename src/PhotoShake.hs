@@ -151,7 +151,7 @@ actions config photographee location time removeIt = do
             let dagsdatoBackupJpg = mkDagsdatoPath dagsdatoBackup photographee location (takeFileName jpg) time -<.> "jpg"
 
             want [doneshootingCr2, doneshootingJpg, dagsdatoCr2, dagsdatoJpg
-                 , doneshootingBackupCr2, doneshootingBackupJpg, dagsdatoBackupCr2, dagsdatoBackupJpg] 
+                 ,  dagsdatoBackupCr2, dagsdatoBackupJpg] 
 
             doneshootingCr2 %> \f -> do
                 copyFile' cr2 f
