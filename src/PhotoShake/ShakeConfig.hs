@@ -13,10 +13,14 @@ module PhotoShake.ShakeConfig
     , setSession
     , getDumpConfig
     , getDagsdato
+    , getDagsdatoBackup
     , setDagsdato
+    , setDagsdatoBackup
     , setPhotographers
     , getDoneshooting
+    , getDoneshootingBackup
     , setDoneshooting
+    , setDoneshootingBackup
     , getShootings
     , getSessions
     , getPhotographers
@@ -73,7 +77,9 @@ import Data.ByteString.Lazy.UTF8 (fromString, toString)
 data ShakeConfig = ShakeConfig 
     { _dumpConfig :: FilePath
     , _doneshootingConfig :: FilePath
+    , _doneshootingBackupConfig :: FilePath
     , _dagsdatoConfig:: FilePath
+    , _dagsdatoBackupConfig:: FilePath
     , _locationConfig :: FilePath
     , _shootingsConfig :: FilePath
     , _sessionConfig :: FilePath
@@ -130,6 +136,13 @@ getDoneshootingConfig root config = case (HM.lookup "doneshootingConfig" config)
         Nothing -> x 
         Just y -> y </> x
 
+getDoneshootingBackupConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getDoneshootingBackupConfig root config = case (HM.lookup "doneshootingBackupConfig" config) of
+    Nothing -> throw ConfigDoneshootingMissing
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
+
 setGrades :: ShakeConfig -> Grades -> IO ()
 setGrades config grades = do
     let filepath = _gradeConfig config
@@ -148,6 +161,17 @@ getDoneshooting config = do
     let doneshooting = decode doneshootingConfig :: Maybe Doneshooting
     case doneshooting of
             Nothing -> throw DoneshootingConfigFileMissing -- Same error
+            Just y -> return y
+
+
+getDoneshootingBackup :: ShakeConfig -> IO Doneshooting
+getDoneshootingBackup config = do
+    let filepath = _doneshootingBackupConfig config
+    doneshootingConfig <- readFile filepath `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+    seq (length doneshootingConfig) (return ())
+    let doneshooting = decode doneshootingConfig :: Maybe Doneshooting
+    case doneshooting of
+            Nothing -> error "fuck"-- DoneshootingConfigFileMissing -- Same error
             Just y -> return y
 
 -- ikke en rigtig setter mere en der skriver
@@ -190,6 +214,13 @@ getGrades config = do
 setDoneshooting :: ShakeConfig -> Doneshooting -> IO ()
 setDoneshooting config doneshooting = do
     let filepath = _doneshootingConfig config
+    doneshootings <- readFile filepath `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
+    seq (length doneshootings) (writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing))
+
+
+setDoneshootingBackup :: ShakeConfig -> Doneshooting -> IO ()
+setDoneshootingBackup config doneshooting = do
+    let filepath = _doneshootingBackupConfig config
     doneshootings <- readFile filepath `catchAny` (\_ -> throw DoneshootingConfigFileMissing)
     seq (length doneshootings) (writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing))
 --
@@ -259,6 +290,13 @@ getDagsdatoConfig root config = case (HM.lookup "dagsdatoConfig" config) of
         Nothing -> x 
         Just y -> y </> x
 
+getDagsdatoBackupConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getDagsdatoBackupConfig root config = case (HM.lookup "dagsdatoBackupConfig" config) of
+    Nothing -> error "what" --ConfigDagsdatoMissing
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
+
     
 getDagsdato :: ShakeConfig -> IO Dagsdato
 getDagsdato config = do
@@ -269,10 +307,24 @@ getDagsdato config = do
         Nothing -> throw DagsdatoConfigFileMissing -- Same error
         Just y -> return y)
 
+getDagsdatoBackup :: ShakeConfig -> IO Dagsdato
+getDagsdatoBackup config = do
+    let filepath = _dagsdatoBackupConfig config
+    dagsdatoConfig <- readFile filepath `catchAny` (\_ -> error "fuck")
+    let dagsdato = decode dagsdatoConfig :: Maybe Dagsdato
+    seq (length dagsdatoConfig) (case dagsdato of
+        Nothing -> error "damit" --DagsdatoConfigFileMissing -- Same error
+        Just y -> return y)
 
 setDagsdato :: ShakeConfig -> Dagsdato -> IO ()
 setDagsdato config dagsdato = do
     let filepath = _dagsdatoConfig config
+    dagsdatoConfig <- readFile filepath `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
+    seq (length dagsdatoConfig) (writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing))
+
+setDagsdatoBackup :: ShakeConfig -> Dagsdato -> IO ()
+setDagsdatoBackup config dagsdato = do
+    let filepath = _dagsdatoBackupConfig config
     dagsdatoConfig <- readFile filepath `catchAny` (\_ -> throw DagsdatoConfigFileMissing)
     seq (length dagsdatoConfig) (writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing))
 
@@ -489,7 +541,11 @@ toShakeConfig root cfg = do
     config <- readConfigFile path `catchAny` (\_ -> throw ConfigMissing)
     let dumpConfig = getDumpConfig root config
     let doneshootingConfig = getDoneshootingConfig root config
+    let doneshootingBackupConfig = getDoneshootingBackupConfig root config
+
     let dagsdatoConfig = getDagsdatoConfig root config
+    let dagsdatoBackupConfig = getDagsdatoBackupConfig root config
+
     let locationConfig = getLocationConfig root config
     let shootingsConfig = getShootingsConfig root config
     let sessionConfig = getSessionConfig root config
@@ -503,7 +559,9 @@ toShakeConfig root cfg = do
 
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
+                         , _doneshootingBackupConfig = doneshootingBackupConfig
                          , _dagsdatoConfig = dagsdatoConfig
+                         , _dagsdatoBackupConfig = dagsdatoBackupConfig
                          , _locationConfig = locationConfig
                          , _shootingsConfig = shootingsConfig
                          , _sessionConfig = sessionConfig
