@@ -160,6 +160,7 @@ actions config photographee location time removeIt = do
                 copyFile' jpg f
 
             doneshootingBackupCr2 %> \f -> do
+                liftIO $ putStrLn f
                 copyFile' cr2 f
 
             doneshootingBackupJpg %> \f -> do
