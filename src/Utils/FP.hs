@@ -1,6 +1,7 @@
 module Utils.FP
     ( start
     , FP
+    , fp
     , toFilePath
     , unFP
     , combine
