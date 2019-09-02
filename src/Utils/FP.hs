@@ -15,6 +15,10 @@ import System.FilePath ((</>))
 
 newtype FP = FP { unFP :: Env FilePath FilePath }
 
+fp :: Env FilePath FilePath -> FP
+fp = FP
+
+
 start :: FilePath -> Env FilePath FilePath
 start x = env x x
 
