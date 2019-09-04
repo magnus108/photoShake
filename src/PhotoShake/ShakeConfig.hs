@@ -48,6 +48,8 @@ import Development.Shake.Config
 import Data.List hiding (length)
 import Data.Csv hiding (decode, encode)
 
+import qualified PhotoShake.State as S
+
 import System.FilePath
 import System.Directory
 
@@ -88,6 +90,7 @@ data ShakeConfig = ShakeConfig
     , _gradeConfig :: FilePath
     , _gradeSelectionConfig :: FilePath
 
+    , _stateConfig :: FilePath
     , _idConfig :: FilePath
     }
 
@@ -370,6 +373,12 @@ getGradeConfig root config = case (HM.lookup "gradeConfig" config) of
         Nothing -> x 
         Just y -> y </> x
 
+getStateConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getStateConfig root config = case (HM.lookup "stateConfig" config) of
+    Nothing -> throw ConfigGradeMissing
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 getGradeSelectionConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
 getGradeSelectionConfig root config = case (HM.lookup "gradeSelectionConfig" config) of
@@ -557,6 +566,8 @@ toShakeConfig root cfg = do
 
     let gradeSelectionConfig = getGradeSelectionConfig root config
 
+    let stateConfig = getStateConfig root config
+
     return $ ShakeConfig { _dumpConfig = dumpConfig
                          , _doneshootingConfig = doneshootingConfig
                          , _doneshootingBackupConfig = doneshootingBackupConfig
@@ -569,6 +580,6 @@ toShakeConfig root cfg = do
                          , _builtConfig = builtConfig
                          , _gradeConfig = gradeConfig
                          , _gradeSelectionConfig = gradeSelectionConfig
-
-                         , _idConfig =idConfig
+                         , _stateConfig = stateConfig
+                         , _idConfig = idConfig
                          } 
