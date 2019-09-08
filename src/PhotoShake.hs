@@ -90,9 +90,12 @@ mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photogra
             sessionId = case session of
                     School -> "9"
                     _ -> "10"
-            shootingId = case shooting of
-                    Normal -> "1"
-                    ReShoot -> "2"
+            shootingId = 
+                case session of
+                    Kindergarten Group -> "3"
+                    _ -> case shooting of
+                            Normal -> "1"
+                            ReShoot -> "2"
             pad x = strPadLeft '0' 3 (show x)
                 
 
@@ -105,9 +108,12 @@ mkDoneshootingPathJpg (Doneshooting doneshootingDir) photographee location photo
             sessionId = case session of
                     School -> "9"
                     _ -> "10"
-            shootingId = case shooting of
-                    Normal -> "1"
-                    ReShoot -> "2"
+            shootingId = 
+                case session of
+                    Kindergarten Group -> "3"
+                    _ -> case shooting of
+                            Normal -> "1"
+                            ReShoot -> "2"
             pad x = strPadLeft '0' 3 (show x)
 
 
