@@ -141,8 +141,8 @@ actions config photographee location time removeIt = do
             let doneshootingJpg = mkDoneshootingPathJpg doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
 
-            let doneshootingBackupCr2 = mkDoneshootingPath doneshootingBackup photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
-            let doneshootingBackupJpg = mkDoneshootingPathJpg doneshootingBackup photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
+            --let doneshootingBackupCr2 = mkDoneshootingPath doneshootingBackup photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
+            --let doneshootingBackupJpg = mkDoneshootingPathJpg doneshootingBackup photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
             let dagsdatoCr2 = mkDagsdatoPath dagsdato photographee location (takeFileName cr2) time -<.> "cr2"
             let dagsdatoJpg = mkDagsdatoPath dagsdato photographee location (takeFileName jpg) time -<.> "jpg"
@@ -151,7 +151,8 @@ actions config photographee location time removeIt = do
             let dagsdatoBackupJpg = mkDagsdatoPath dagsdatoBackup photographee location (takeFileName jpg) time -<.> "jpg"
 
             want [doneshootingCr2, doneshootingJpg, dagsdatoCr2, dagsdatoJpg
-                 , doneshootingBackupCr2, doneshootingBackupJpg, dagsdatoBackupCr2, dagsdatoBackupJpg] 
+                -- , doneshootingBackupCr2, doneshootingBackupJpg, 
+                 , dagsdatoBackupCr2, dagsdatoBackupJpg] 
 
             doneshootingCr2 %> \f -> do
                 copyFile' cr2 f
@@ -159,11 +160,13 @@ actions config photographee location time removeIt = do
             doneshootingJpg %> \f -> do
                 copyFile' jpg f
 
+            {-
             doneshootingBackupCr2 %> \f -> do
                 copyFile' cr2 f
 
             doneshootingBackupJpg %> \f -> do
                 copyFile' jpg f
+            -}
 
             dagsdatoCr2 %> \f -> do
                 copyFile' cr2 f
