@@ -132,8 +132,7 @@ actions config photographee location time removeIt = do
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
 
-        dump <- liftIO $ getDump config
-        dumpFiles <- liftIO $ getDumpFiles dump
+        dumpFiles <- liftIO $ getDumpFiles =<< getDump config
 
         dagsdatoBackup <- liftIO $ getDagsdatoBackup config
         doneshootingBackup <- liftIO $ getDoneshootingBackup config
@@ -189,11 +188,10 @@ actions config photographee location time removeIt = do
                 copyFile' jpg f
 
 
-        dump <- liftIO $ getDump config
-
-        dumpCase (action $ return ()) (\fp -> do
+        x <- liftIO $ getDump config
+        dump (action $ return ()) (\fp -> do
                     liftIO $ setIdSelection config (Idd "")
                     if removeIt then
                         action $ removeFilesAfter fp ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg"]
                     else
-                        return () ) dump
+                        return () ) x
