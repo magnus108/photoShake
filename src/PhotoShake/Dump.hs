@@ -16,7 +16,8 @@ import Text.Show
 import GHC.Generics
 import System.FilePath
 import Data.Aeson
-import System.IO
+import Utils.Actions
+import Utils.FP
 
 
 data Dump 
@@ -37,3 +38,11 @@ dump :: a -> (FilePath -> a) -> Dump -> a
 dump f g = \case
     NoDump -> f
     YesDump x -> g x
+
+
+getDump :: FP -> TerminalM Dump Dump
+getDump = readFile 
+
+
+setDump:: FP -> Dump -> TerminalM Dump ()
+setDump = writeFile 
