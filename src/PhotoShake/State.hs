@@ -1,9 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE NoImplicitPrelude #-}                                                                                                                                                                              
-{-# LANGUAGE LambdaCase #-}                                                      
-{-# LANGUAGE DeriveFunctor #-}  
+{-# LANGUAGE DeriveAnyClass #-}
 
 module PhotoShake.State
     ( State(..)
@@ -12,23 +10,16 @@ module PhotoShake.State
     , setStates
     ) where
 
-import Text.Show
-import Data.Function (($))
-import Data.Maybe
 import Data.Eq
+import Text.Show
 import GHC.Generics
-import Control.Monad
     
 import System.FilePath
 
-import Conduit
-import Data.Conduit.Combinators
 
 import Data.Aeson
 
-import Utils.Comonad
 import Utils.ListZipper
-import Utils.Env
 import Utils.Actions
 
 import Utils.FP

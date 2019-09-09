@@ -5,7 +5,6 @@ module PhotoShake.ShakeConfig
     , toShakeConfig
     , setGrades
     , catchAny
-    , getDumpFiles
     , getDump
     , setLocation
     , setDump
@@ -511,21 +510,6 @@ setDump config dump = do
     seq (length dumps) (writeFile filepath (encode dump) `catchAny` (\_ -> throw DumpConfigFileMissing))
 
 
-getDumpFiles :: ShakeConfig -> IO [(FilePath, FilePath)]
-getDumpFiles config = do
-    dump <- getDump config
-    case dump of 
-        NoDump -> return []
-        Dump x -> do
-            files <- listDirectory x `catchAny` (\_ -> throw DumpMissing)
-            let files' = filter (\z -> isExtensionOf "CR2" z || (isExtensionOf "cr2" z)) files -- bad use
-            let files2' = filter (\z -> isExtensionOf "JPG" z || (isExtensionOf "jpg" z)) files -- bad use
-            files'' <- mapM (\file -> do 
-                    b <- (doesFileExist (x </> file -<.> "JPG")) 
-                    b1 <- (doesFileExist (x </> file -<.> "jpg")) 
-                    let b3 = all id $ fmap (\z -> elem (z -<.> "CR2") files' || (elem (z -<.> "cr2") files')) files2'
-                    if ( b || b1 ) && b3 then return file else throw JPGMissing ) files' -- this is error
-            return $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
 
 
 getLocationFile :: ShakeConfig -> IO Location

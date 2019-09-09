@@ -131,7 +131,9 @@ actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> Rules ()
 actions config photographee location time removeIt = do
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
-        dumpFiles <- liftIO $ getDumpFiles config
+
+        dump <- liftIO $ getDump config
+        dumpFiles <- liftIO $ getDumpFiles dump
 
         dagsdatoBackup <- liftIO $ getDagsdatoBackup config
         doneshootingBackup <- liftIO $ getDoneshootingBackup config
@@ -189,11 +191,9 @@ actions config photographee location time removeIt = do
 
         dump <- liftIO $ getDump config
 
-        case dump of
-            NoDump -> action $ return ()            
-            Dump x -> do
-                liftIO $ setIdSelection config (Idd "")
-                if removeIt then
-                    action $ removeFilesAfter x ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg"]
-                else
-                    return () 
+        dumpCase (action $ return ()) (\fp -> do
+                    liftIO $ setIdSelection config (Idd "")
+                    if removeIt then
+                        action $ removeFilesAfter fp ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg"]
+                    else
+                        return () ) dump
