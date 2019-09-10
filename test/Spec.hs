@@ -31,7 +31,7 @@ goldenTests = do
     
     --IO bads
     dagsdato <- getDagsdato config
-    doneshooting <- getDoneshooting config
+    doneshootingX <- getDoneshooting config
     
     location <- getLocationFile config
     --
@@ -47,11 +47,9 @@ goldenTests = do
             let goldenDir = "test" </> ident 
 
             -- uglys
-            case doneshooting of
-                NoDoneshooting -> return ()
-                Doneshooting f -> do
+            doneshooting (return ()) (\f -> do
                     createDirectoryIfMissing False f
-                    removeDirectoryRecursive f
+                    removeDirectoryRecursive f) doneshootingX
 
             case dagsdato of
                 NoDagsdato -> return ()
@@ -73,7 +71,7 @@ goldenTests = do
 
             -- de lader til at være en fejl at disse paths ligger her. og at null og 0 er med
             -- can throw error fixxxx
-            let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshooting photographee (takeBaseName xxx) photographer session shooting "null" 0
+            let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshootingX photographee (takeBaseName xxx) photographer session shooting "null" 0
             let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdato photographee (takeBaseName xxx) "null" time
 
             doneShootingFiles <- listDirectory doneshootingPath

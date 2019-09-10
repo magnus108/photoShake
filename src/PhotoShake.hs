@@ -82,8 +82,8 @@ myShake config photographee location time removeIt = do
 
 
 mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
-mkDoneshootingPath NoDoneshooting _ _ _ _ _ _ _ = throw ConfigDoneshootingMissing
-mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> "cr2" </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)
+mkDoneshootingPath xxx photographee location photographer session shooting filename index = 
+    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
             tea = _tea photographee
             grade = _grade photographee 
@@ -100,8 +100,8 @@ mkDoneshootingPath (Doneshooting doneshootingDir) photographee location photogra
                 
 
 mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
-mkDoneshootingPathJpg NoDoneshooting _ _ _ _ _ _ _ = throw ConfigDoneshootingMissing
-mkDoneshootingPathJpg (Doneshooting doneshootingDir) photographee location photographer session shooting filename index = doneshootingDir </> location </> "cr2" </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)
+mkDoneshootingPathJpg xxx photographee location photographer session shooting filename index = 
+    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
             tea = _tea photographee
             grade = _grade photographee 

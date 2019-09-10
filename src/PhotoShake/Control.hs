@@ -63,10 +63,8 @@ atleast5With1 root filepath = do
 
 controlXMP :: ShakeConfig -> Grade -> IO Result
 controlXMP config grade = do 
-    doneShooting <- getDoneshooting config
-    case doneShooting of
-        NoDoneshooting -> return NoErrors
-        Doneshooting doneshootingDir -> do
+    xxx <- getDoneshooting config
+    doneshooting (return NoErrors) (\doneshootingDir -> do
             locationFile <- getLocationFile config
             case locationFile of 
                 NoLocation -> return NoErrors
@@ -104,3 +102,4 @@ controlXMP config grade = do
                             case yy of
                                 [] -> return NoErrors
                                 xx -> return $ Errors yy
+                                ) xxx
