@@ -44,5 +44,5 @@ getDoneshooting :: FP -> TerminalM Doneshooting Doneshooting
 getDoneshooting = readFile 
 
 
-setDoneshooting:: FP -> Doneshooting -> TerminalM Doneshooting ()
+setDoneshooting :: FP -> Doneshooting -> TerminalM Doneshooting ()
 setDoneshooting = writeFile 

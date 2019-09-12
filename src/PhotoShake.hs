@@ -118,8 +118,8 @@ mkDoneshootingPathJpg xxx photographee location photographer session shooting fi
 
 
 mkDagsdatoPath :: Dagsdato -> Photographee -> String -> String -> UTCTime -> FilePath
-mkDagsdatoPath NoDagsdato _ _ _ _ = throw ConfigDagsdatoMissing
-mkDagsdatoPath (Dagsdato dagsdatoDir) photographee location filename time = dagsdatoDir </>  ( date ++ " - " ++ location )</> grade </> (name ++ " - " ++ tea) </> filename
+mkDagsdatoPath xxx photographee location filename time =
+    dagsdato (throw ConfigDagsdatoMissing) (\dagsdatoDir -> dagsdatoDir </>  ( date ++ " - " ++ location )</> grade </> (name ++ " - " ++ tea) </> filename) xxx
         where
             tea = _tea photographee
             name = _name photographee
