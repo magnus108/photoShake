@@ -83,7 +83,7 @@ myShake config photographee location time removeIt = do
 
 mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
 mkDoneshootingPath xxx photographee location photographer session shooting filename index = 
-    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
+    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
             tea = _tea photographee
             grade = _grade photographee 
@@ -101,7 +101,7 @@ mkDoneshootingPath xxx photographee location photographer session shooting filen
 
 mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
 mkDoneshootingPathJpg xxx photographee location photographer session shooting filename index = 
-    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR.tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
+    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
             tea = _tea photographee
             grade = _grade photographee 

@@ -452,9 +452,8 @@ getPhotographers config = do
 getPhotographer :: ShakeConfig -> IO Photographer
 getPhotographer config = do
         x <- getPhotographers config
-        case x of 
-            NoPhotographers -> throw PhotographersConfigFileMissing
-            Photographers y -> return (focus y)
+        photographers (throw PhotographersConfigFileMissing)
+            (\y -> return (focus y)) x
             
 
 getShooting :: ShakeConfig -> IO Shooting
