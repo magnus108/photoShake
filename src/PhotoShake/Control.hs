@@ -6,7 +6,7 @@ module PhotoShake.Control
 
 import PhotoShake.ShakeConfig
 import PhotoShake.Location
-import PhotoShake.Doneshooting
+import PhotoShake.Doneshooting hiding (getDoneshooting)
 import PhotoShake.Photographee
 
 import System.FilePath

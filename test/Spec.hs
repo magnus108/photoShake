@@ -14,7 +14,7 @@ import Data.Time
 import PhotoShake
 import PhotoShake.Location
 import PhotoShake.ShakeConfig
-import PhotoShake.Doneshooting
+import PhotoShake.Doneshooting hiding (getDoneshooting)
 import PhotoShake.Dagsdato
 import PhotoShake.Photographee
 

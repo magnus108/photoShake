@@ -19,7 +19,7 @@ import PhotoShake.Photographee
 
 import PhotoShake.Location
 import PhotoShake.Dagsdato
-import PhotoShake.Doneshooting
+import PhotoShake.Doneshooting hiding (getDoneshooting)
 import PhotoShake.Shooting
 import PhotoShake.Session
 import PhotoShake.ShakeError

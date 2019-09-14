@@ -60,12 +60,12 @@ import PhotoShake.Built
 import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Photographee
-import PhotoShake.Doneshooting
+import PhotoShake.Doneshooting hiding (getDoneshooting, setDoneshooting)
 import PhotoShake.Dump
 import PhotoShake.ShakeError
 import PhotoShake.Shooting
 import PhotoShake.Session
-import PhotoShake.Photographer
+import PhotoShake.Photographer hiding (getPhotographers, setPhotographers)
 
 import Control.Exception
 

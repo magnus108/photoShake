@@ -9,6 +9,8 @@ module PhotoShake.Doneshooting
     , yesDoneshooting
     , noDoneshooting
     , Doneshooting
+    , getDoneshooting
+    , setDoneshooting
     ) where
 
 import Data.Eq

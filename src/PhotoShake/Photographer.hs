@@ -7,6 +7,8 @@ module PhotoShake.Photographer
     ( photographers
     , yesPhotographers
     , noPhotographers
+    , getPhotographers
+    , setPhotographers
     , Photographers
     , Photographer
     , _name
