@@ -64,7 +64,7 @@ import PhotoShake.Doneshooting hiding (getDoneshooting, setDoneshooting)
 import PhotoShake.Dump
 import PhotoShake.ShakeError
 import PhotoShake.Shooting
-import PhotoShake.Session
+import qualified PhotoShake.Session as Session
 import PhotoShake.Photographer hiding (getPhotographers, setPhotographers)
 
 import Control.Exception
@@ -236,7 +236,7 @@ setShooting config shootings = do
 
 
 -- ikke en rigtig setter mere en der skriver
-setSession:: ShakeConfig -> Sessions -> IO ()
+setSession:: ShakeConfig -> Session.Sessions -> IO ()
 setSession config sessions = do
     let filepath = _sessionConfig config
     session <- readFile filepath `catchAny` (\_ -> throw SessionsConfigFileMissing)
@@ -269,7 +269,7 @@ importSessions :: ShakeConfig -> FilePath -> IO ()
 importSessions config fromFilePath = do
     let toFilePath = _sessionConfig config
     newSessions <- readFile fromFilePath `catchAny` (\_ -> throw SessionsConfigFileMissing)
-    let sessions = decode newSessions :: Maybe Sessions
+    let sessions = decode newSessions :: Maybe Session.Sessions
     seq (length newSessions) (case sessions of
             Nothing -> throw SessionsConfigFileMissing -- Same error
             Just y -> do
@@ -426,12 +426,12 @@ getShootings config = do
                 Just y -> return y
 
 
-getSessions :: ShakeConfig -> IO Sessions
+getSessions :: ShakeConfig -> IO Session.Sessions
 getSessions config = do
         let filepath = _sessionConfig config
         sessionConfig <- readFile filepath `catchAny` (\_ -> throw SessionsConfigFileMissing) 
         seq (length sessionConfig) (return ())
-        let sessions = decode sessionConfig :: Maybe Sessions
+        let sessions = decode sessionConfig :: Maybe Session.Sessions
         case sessions of
                 Nothing -> throw SessionsConfigParseError
                 Just y -> return y
@@ -462,10 +462,10 @@ getShooting config = do
         shootings (throw ShootingConfigFileMissing) (\y -> return (focus y)) x
 
 
-getSession :: ShakeConfig -> IO Session
+getSession :: ShakeConfig -> IO Session.Session
 getSession config = do
         x <- getSessions config
-        sessions (throw SessionsConfigFileMissing)
+        Session.sessions (throw SessionsConfigFileMissing)
                 (\y -> return (focus y)) x
 
 

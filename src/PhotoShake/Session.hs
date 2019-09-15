@@ -7,6 +7,9 @@
 module PhotoShake.Session
     ( sessions
     , yesSessions
+    , setSessions
+    , getSessions
+    , getSessions
     , noSessions
     , school
     , kindergarten
