@@ -7,6 +7,7 @@ module PhotoShake
     , mkDagsdatoPath
     ) where
 
+import Prelude hiding (toInteger)
 import Data.Strings
 
 
@@ -20,7 +21,7 @@ import PhotoShake.Photographee
 import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting hiding (getDoneshooting)
-import PhotoShake.Shooting
+import PhotoShake.Shooting 
 import PhotoShake.Session
 import PhotoShake.ShakeError
 
@@ -93,9 +94,7 @@ mkDoneshootingPath xxx photographee location photographer session shooting filen
             shootingId = 
                 case session of
                     Kindergarten Group -> "3"
-                    _ -> case shooting of
-                            Normal -> "1"
-                            ReShoot -> "2"
+                    _ -> show $ toInteger shooting
             pad x = strPadLeft '0' 3 (show x)
                 
 
@@ -111,9 +110,7 @@ mkDoneshootingPathJpg xxx photographee location photographer session shooting fi
             shootingId = 
                 case session of
                     Kindergarten Group -> "3"
-                    _ -> case shooting of
-                            Normal -> "1"
-                            ReShoot -> "2"
+                    _ -> show $ toInteger shooting
             pad x = strPadLeft '0' 3 (show x)
 
 
