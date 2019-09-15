@@ -22,7 +22,7 @@ import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting hiding (getDoneshooting)
 import PhotoShake.Shooting 
-import PhotoShake.Session
+import qualified PhotoShake.Session as Session
 import PhotoShake.ShakeError
 
 import qualified PhotoShake.Photographer as PR
@@ -82,35 +82,29 @@ myShake config photographee location time removeIt = do
     shake (opts photographee config) $ actions config photographee location time removeIt
 
 
-mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
+mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session.Session -> Shooting -> String -> Int -> FilePath
 mkDoneshootingPath xxx photographee location photographer session shooting filename index = 
     doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
             tea = _tea photographee
             grade = _grade photographee 
-            sessionId = case session of
-                    School -> "9"
-                    _ -> "10"
-            shootingId = 
-                case session of
-                    Kindergarten Group -> "3"
-                    _ -> show $ toInteger shooting
+            sessionId = show $ Session.toInteger session 
+            shootingId = Session.session  --- this wrongs
+                    (Session.type_ (show $ toInteger shooting) ("3"))
+                    (show $ toInteger shooting) session
             pad x = strPadLeft '0' 3 (show x)
                 
 
-mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session -> Shooting -> String -> Int -> FilePath
+mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session.Session -> Shooting -> String -> Int -> FilePath
 mkDoneshootingPathJpg xxx photographee location photographer session shooting filename index = 
     doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
             tea = _tea photographee
             grade = _grade photographee 
-            sessionId = case session of
-                    School -> "9"
-                    _ -> "10"
-            shootingId = 
-                case session of
-                    Kindergarten Group -> "3"
-                    _ -> show $ toInteger shooting
+            sessionId = show $ Session.toInteger session 
+            shootingId = Session.session  --- this wrongs
+                    (Session.type_ (show $ toInteger shooting) ("3"))
+                    (show $ toInteger shooting) session
             pad x = strPadLeft '0' 3 (show x)
 
 

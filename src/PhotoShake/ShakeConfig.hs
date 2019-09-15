@@ -465,9 +465,8 @@ getShooting config = do
 getSession :: ShakeConfig -> IO Session
 getSession config = do
         x <- getSessions config
-        case x of 
-            NoSessions -> throw SessionsConfigFileMissing
-            Sessions y -> return (focus y)
+        sessions (throw SessionsConfigFileMissing)
+                (\y -> return (focus y)) x
 
 
 getLocationConfig :: Maybe FilePath -> HM.HashMap String String -> String
