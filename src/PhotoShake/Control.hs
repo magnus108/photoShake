@@ -66,9 +66,7 @@ controlXMP config grade = do
     xxx <- getDoneshooting config
     doneshooting (return NoErrors) (\doneshootingDir -> do
             locationFile <- getLocationFile config
-            case locationFile of 
-                NoLocation -> return NoErrors
-                Location loc -> do
+            location ( return NoErrors) (\ loc -> do
                     let path = doneshootingDir </> (takeBaseName loc) </> "cr2" </> grade
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
                     case files of
@@ -102,4 +100,4 @@ controlXMP config grade = do
                             case yy of
                                 [] -> return NoErrors
                                 xx -> return $ Errors yy
-                                ) xxx
+                                ) locationFile ) xxx

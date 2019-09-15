@@ -44,18 +44,16 @@ getDate = formatTime defaultTimeLocale "%Y - %m%d"
 entry :: IO ()
 entry = do
     config <- toShakeConfig Nothing "config.cfg"
-    location <- getLocationFile config
+    xxxx <- getLocationFile config
     -- ehh
     -- can make error
-    case location of
-        NoLocation -> error "no location given"
-        Location xxx -> do
+    location (error "no location given") (\xxx -> do
             photographeeId <- getLine
             photographee <- findPhotographee xxx photographeeId 
 
             ---ehhh2
             time <- getCurrentTime
-            myShake config photographee (takeBaseName xxx) time False
+            myShake config photographee (takeBaseName xxx) time False) xxxx
 
 
 shakeDir :: FilePath

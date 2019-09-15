@@ -33,13 +33,10 @@ goldenTests = do
     dagsdatoX <- getDagsdato config
     doneshootingX <- getDoneshooting config
     
-    location <- getLocationFile config
+    xxxx <- getLocationFile config
     --
     --- ??????
-    case location of
-        NoLocation -> error "no location in test eeee"
-        Location xxx -> do
-
+    location (error "no location in test eeee") (\xxx -> do
             let photographeeId = "5678"
             photographee <- findPhotographee xxx photographeeId 
 
@@ -91,4 +88,4 @@ goldenTests = do
                     (LBS.readFile file)
                 | file <- fmap (\x -> dagsdatoPath </> x) dagsdatoFiles --could be nicer
                 , let goldenFile = replaceDirectory file goldenDir
-                ]    
+                ]) xxxx    

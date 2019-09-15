@@ -57,7 +57,7 @@ import qualified Data.HashMap.Lazy as HM
 
 
 import PhotoShake.Built
-import PhotoShake.Location
+import qualified PhotoShake.Location as Location
 import PhotoShake.Dagsdato
 import PhotoShake.Photographee
 import PhotoShake.Doneshooting hiding (getDoneshooting, setDoneshooting)
@@ -347,16 +347,14 @@ setIdSelection config idd = do
 
 
 
-setLocation :: ShakeConfig -> Location -> IO ()
-setLocation config location = do
+setLocation :: ShakeConfig -> Location.Location -> IO ()
+setLocation config xxx = do
     let filepath = _locationConfig config
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
-    seq (length locationConfig) (writeFile filepath (encode location) `catchAny` (\_ -> throw LocationConfigFileMissing))
-    case location of
-        NoLocation -> setGrades config $ NoGrades
-        (Location f) -> do
+    seq (length locationConfig) (writeFile filepath (encode xxx) `catchAny` (\_ -> throw LocationConfigFileMissing))
+    Location.location (setGrades config $ NoGrades) (\ f -> do
             grades <- parseGrades f
-            setGrades config grades
+            setGrades config grades) xxx 
 
 
 getShootingsConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
@@ -522,12 +520,12 @@ getDumpFiles x = do
             ) x
 
 
-getLocationFile :: ShakeConfig -> IO Location
+getLocationFile :: ShakeConfig -> IO Location.Location
 getLocationFile config = do
     let filepath = _locationConfig config
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
     seq (length locationConfig) (return ())
-    let location = decode locationConfig :: Maybe Location
+    let location = decode locationConfig :: Maybe Location.Location
     case location of
         Nothing -> throw LocationConfigFileMissing -- Same error 
         Just y -> return y
