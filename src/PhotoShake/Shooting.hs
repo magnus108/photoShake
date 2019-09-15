@@ -9,6 +9,8 @@ module PhotoShake.Shooting
     , shootings
     , yesShootings
     , noShootings
+    , getShootings
+    , setShootings
     , Shooting
     , Shootings
     , reShoot

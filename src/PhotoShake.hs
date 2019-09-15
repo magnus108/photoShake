@@ -21,7 +21,7 @@ import PhotoShake.Photographee
 import PhotoShake.Location
 import PhotoShake.Dagsdato
 import PhotoShake.Doneshooting hiding (getDoneshooting)
-import PhotoShake.Shooting 
+import PhotoShake.Shooting hiding (getShootings)
 import qualified PhotoShake.Session as Session
 import PhotoShake.ShakeError
 

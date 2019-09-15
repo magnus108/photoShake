@@ -63,7 +63,7 @@ import PhotoShake.Photographee
 import PhotoShake.Doneshooting hiding (getDoneshooting, setDoneshooting)
 import PhotoShake.Dump
 import PhotoShake.ShakeError
-import PhotoShake.Shooting
+import qualified PhotoShake.Shooting as Shooting
 import qualified PhotoShake.Session as Session
 import PhotoShake.Photographer hiding (getPhotographers, setPhotographers)
 
@@ -228,7 +228,7 @@ setDoneshootingBackup config doneshooting = do
     seq (length doneshootings) (writeFile filepath (encode doneshooting) `catchAny` (\_ -> throw DoneshootingConfigFileMissing))
 --
 -- ikke en rigtig setter mere en der skriver
-setShooting:: ShakeConfig -> Shootings -> IO ()
+setShooting:: ShakeConfig -> Shooting.Shootings -> IO ()
 setShooting config shootings = do
     let filepath = _shootingsConfig config
     shooting <- readFile filepath `catchAny` (\_ -> throw ShootingConfigFileMissing)
@@ -279,7 +279,7 @@ importShootings :: ShakeConfig -> FilePath -> IO ()
 importShootings config fromFilePath = do
     let toFilePath = _shootingsConfig config
     newShootings <- readFile fromFilePath `catchAny` (\_ -> throw ShootingConfigFileMissing)
-    let shootings = decode newShootings :: Maybe Shootings
+    let shootings = decode newShootings :: Maybe Shooting.Shootings
     seq (length newShootings) (case shootings of
             Nothing -> throw ShootingConfigFileMissing -- Same error
             Just y -> do
@@ -415,11 +415,11 @@ getSessionConfig root config = case (HM.lookup "sessionConfig" config) of
         Just y -> y </> x
 
 
-getShootings :: ShakeConfig -> IO Shootings
+getShootings :: ShakeConfig -> IO Shooting.Shootings
 getShootings config = do
         let filepath = _shootingsConfig config
         shootingConfig <- readFile filepath `catchAny` (\_ -> throw ShootingConfigFileMissing) 
-        let shootings = decode shootingConfig :: Maybe Shootings
+        let shootings = decode shootingConfig :: Maybe Shooting.Shootings
         seq (length shootingConfig) (return ())
         case shootings of
                 Nothing -> throw ShootingConfigFileMissing
@@ -456,10 +456,10 @@ getPhotographer config = do
             (\y -> return (focus y)) x
             
 
-getShooting :: ShakeConfig -> IO Shooting
+getShooting :: ShakeConfig -> IO Shooting.Shooting
 getShooting config = do
         x <- getShootings config
-        shootings (throw ShootingConfigFileMissing) (\y -> return (focus y)) x
+        Shooting.shootings (throw ShootingConfigFileMissing) (\y -> return (focus y)) x
 
 
 getSession :: ShakeConfig -> IO Session.Session
