@@ -8,6 +8,8 @@ module PhotoShake.Session
     ( sessions
     , yesSessions
     , noSessions
+    , school
+    , kindergarten
     , Session
     , Sessions
     , toInteger
@@ -42,6 +44,13 @@ data Session
     = Kindergarten Type
     | School
     deriving (Show, Eq, Generic, ToJSON, FromJSON)
+
+
+school :: Session
+school = School
+
+kindergarten :: Type -> Session
+kindergarten = Kindergarten
 
 
 session :: (Type -> a) -> a -> Session -> a
