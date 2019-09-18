@@ -30,6 +30,7 @@ import qualified Data.ByteString.Lazy as BL
 import System.FilePath
 
 import PhotoShake.ShakeError
+import PhotoShake.Grade
 import Control.Exception
 
 import Utils.ListZipper hiding (toList)
@@ -42,22 +43,9 @@ catchAny = catch
 
 type FullName = String
 type Ident = String
-type Grade = String
-
-data Grades = Grades (ListZipper Grade)
-            | NoGrades 
-
-deriveJSON DA.defaultOptions ''Grades
-
-data GradeSelection = GradeSelection String
-                    | NoSelection
-                    deriving (Show, Eq)
-
 
 data Idd = Idd String deriving (Show, Eq)
 deriveJSON DA.defaultOptions ''Idd
-
-deriveJSON DA.defaultOptions ''GradeSelection
 
 data Photographee = Photographee 
     { _tea :: String 
@@ -126,13 +114,13 @@ parseGrades location = do
     let grades = nub $ toList $ fmap _grade studentData
 
     case grades of 
-        [] -> return NoGrades
-        x:xs -> return $ Grades $ ListZipper [] x xs
+        [] -> return noGrades
+        x:xs -> return $ yesGrades $ ListZipper [] x xs
 
 
 
 parsePhotographees :: FilePath -> GradeSelection -> IO [Photographee]
-parsePhotographees location gradeSelection = do
+parsePhotographees location gradeSelection_ = do
     -- badness
     let ext = takeExtension location
     _ <- case ext of
@@ -147,9 +135,7 @@ parsePhotographees location gradeSelection = do
 
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
-            Right locData -> case gradeSelection of
-                NoSelection -> mempty
-                GradeSelection grade -> filter ((grade ==). _grade) locData
+            Right locData ->  gradeSelection mempty (\grade -> filter ((grade ==). _grade) locData) gradeSelection_
 
     return $ toList $ studentData
 

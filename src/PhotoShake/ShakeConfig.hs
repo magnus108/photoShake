@@ -65,6 +65,7 @@ import PhotoShake.Dump
 import PhotoShake.ShakeError
 import qualified PhotoShake.Shooting as Shooting
 import qualified PhotoShake.Session as Session
+import qualified PhotoShake.Grade as Grade
 import PhotoShake.Photographer hiding (getPhotographers, setPhotographers)
 
 import Control.Exception
@@ -146,14 +147,12 @@ getDoneshootingBackupConfig root config = case (HM.lookup "doneshootingBackupCon
         Nothing -> x 
         Just y -> y </> x
 
-setGrades :: ShakeConfig -> Grades -> IO ()
-setGrades config grades = do
+setGrades :: ShakeConfig -> Grade.Grades -> IO ()
+setGrades config grades_ = do
     let filepath = _gradeConfig config
     gradeConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
-    let grades' = case grades of
-            NoGrades -> NoGrades
-            Grades (ListZipper ls x rs) -> Grades $ 
-                ListZipper (filter (\zz -> zz /= x) $ filter (\zz -> zz `notElem` rs) $ nub ls) x (filter (\zz -> zz /= x) $ nub rs)
+    let grades' = Grade.grades Grade.noGrades (\(ListZipper ls x rs) -> Grade.yesGrades $ ListZipper (filter (\zz -> zz /= x) $ filter (\zz -> zz `notElem` rs) $ nub ls) x (filter (\zz -> zz /= x) $ nub rs)) grades_
+
     seq (length gradeConfig) (writeFile filepath (encode grades') `catchAny` (\_ -> throw GradeConfigFileMissing))
 
 getDoneshooting :: ShakeConfig -> IO Doneshooting
@@ -352,7 +351,7 @@ setLocation config xxx = do
     let filepath = _locationConfig config
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
     seq (length locationConfig) (writeFile filepath (encode xxx) `catchAny` (\_ -> throw LocationConfigFileMissing))
-    Location.location (setGrades config $ NoGrades) (\ f -> do
+    Location.location (setGrades config $ Grade.noGrades) (\ f -> do
             grades <- parseGrades f
             setGrades config grades) xxx 
 
