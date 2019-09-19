@@ -10,7 +10,6 @@ module Utils.ListZipper
     , back
     , forward
     , toList
-    , toList'
     , iextend
     ) where
 
@@ -67,10 +66,6 @@ iterate' f x =
 
 toList :: ListZipper a -> [a]
 toList (ListZipper ls x rs) = (reverse ls) ++ (x : rs)
-
-
-toList' :: ListZipper a -> [a]
-toList' (ListZipper ls x rs) = ls ++ (x : rs)
 
 
 iextend :: (Int -> ListZipper a -> b) -> ListZipper a -> ListZipper b 
