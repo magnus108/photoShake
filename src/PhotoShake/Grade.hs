@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NoImplicitPrelude #-}                                                                                                                                                                              
 {-# LANGUAGE OverloadedStrings #-}
@@ -27,12 +30,20 @@ import Utils.FP
 
 import Utils.ListZipper
 
+import Data.Functor
+import Data.Traversable
+import Data.Foldable
+
+
 type Grade = String
 
-data Grades 
-    = YesGrades (ListZipper Grade)
+data GradesF a
+    = YesGrades a
     | NoGrades 
-    deriving (Show, Eq, Generic, ToJSON, FromJSON)
+    deriving (Show, Eq, Generic, ToJSON, FromJSON, Functor, Foldable, Traversable)
+
+
+type Grades = GradesF (ListZipper Grade)
 
 
 data GradeSelection
