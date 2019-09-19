@@ -11,6 +11,7 @@ module Utils.ListZipper
     , forward
     , toList
     , toList'
+    , iextend
     ) where
 
 import GHC.Generics
@@ -70,6 +71,10 @@ toList (ListZipper ls x rs) = (reverse ls) ++ (x : rs)
 
 toList' :: ListZipper a -> [a]
 toList' (ListZipper ls x rs) = ls ++ (x : rs)
+
+
+iextend :: (Int -> ListZipper a -> b) -> ListZipper a -> ListZipper b 
+iextend f = fmap (\xs@(ListZipper ls _ _) -> f (length ls) xs) . duplicate
 
 
 instance Functor ListZipper where

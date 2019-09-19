@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NoImplicitPrelude #-}                                                                                                                                                                              
 {-# LANGUAGE OverloadedStrings #-}
@@ -22,10 +25,17 @@ import Utils.Actions
 import Utils.FP
 import Utils.ListZipper
 
-data Location 
-    = YesLocation FilePath
+import Data.Functor
+import Data.Traversable
+import Data.Foldable
+
+data LocationF a
+    = YesLocation a
     | NoLocation
-    deriving (Show, Eq, Generic, ToJSON, FromJSON)
+    deriving (Show, Eq, Generic, ToJSON, FromJSON, Functor, Foldable, Traversable)
+
+
+type Location = LocationF FilePath
 
 
 yesLocation :: FilePath -> Location
