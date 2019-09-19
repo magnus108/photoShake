@@ -38,12 +38,12 @@ import Data.Foldable
 type Grade = String
 
 data GradesF a
-    = YesGrades a
+    = YesGrades (ListZipper a)
     | NoGrades 
     deriving (Show, Eq, Generic, ToJSON, FromJSON, Functor, Foldable, Traversable)
 
 
-type Grades = GradesF (ListZipper Grade)
+type Grades = GradesF Grade
 
 
 data GradeSelection
