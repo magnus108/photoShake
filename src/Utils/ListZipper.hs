@@ -11,17 +11,20 @@ module Utils.ListZipper
     , forward
     , toList
     , iextend
+    , insert
     ) where
 
 import GHC.Generics
-import Data.Aeson
-
+import Data.Aeson 
 import Data.Maybe
 
 import Utils.Comonad
 
 data ListZipper a = ListZipper [a] a [a] 
     deriving (Show, Eq, Generic, ToJSON, FromJSON)
+
+insert :: ListZipper a -> a -> ListZipper a
+insert (ListZipper ls a rs) b = ListZipper (a:ls) b rs
 
 
 back :: ListZipper a -> ListZipper a
