@@ -11,8 +11,10 @@ module Utils.ListZipper
     , forward
     , toList
     , iextend
+    , sorted
     , insert
     ) where
+
 
 import GHC.Generics
 import Data.Aeson 
@@ -74,9 +76,27 @@ toList (ListZipper ls x rs) = (reverse ls) ++ (x : rs)
 iextend :: (Int -> ListZipper a -> b) -> ListZipper a -> ListZipper b 
 iextend f = fmap (\xs@(ListZipper ls _ _) -> f (length ls) xs) . duplicate
 
+--move me
+insert' :: Ord a => a -> [a] -> [a]
+insert' x [] = [x]
+insert' x (y:ys) | x < y     = x:y:ys
+                 | otherwise = y:(insert' x ys)
+
+insert'' :: Ord a => a -> [a] -> [a]
+insert'' x [] = [x]
+insert'' x (y:ys) | x > y     = x:y:ys
+                  | otherwise = y:(insert'' x ys)
+
+
+sorted :: Ord a => [a] -> ListZipper a -> ListZipper a
+sorted [] z = z
+sorted (y:ys) (ListZipper ls a rs) | y < a = ListZipper (insert'' y ls) a rs
+                                   | otherwise = ListZipper ls a (insert' y rs) 
+
 
 instance Functor ListZipper where
     fmap f (ListZipper ls a rs) = ListZipper (fmap f ls) (f a) (fmap f rs)
+
 
 instance Comonad ListZipper where
     extract (ListZipper _ a _) = a
