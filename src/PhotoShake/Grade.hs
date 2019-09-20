@@ -17,7 +17,7 @@ module PhotoShake.Grade
     , gradeSelection
     , yesGradeSelection
     , noGradeSelection
-    , gradeDelete 
+    , delete 
     ) where
 
 import Data.String
@@ -97,8 +97,8 @@ setGrades :: FP -> Grades -> TerminalM Grades ()
 setGrades = writeFile 
 
 
-gradeDelete :: Grades -> Grades
-gradeDelete = grades noGrades $ \zipper ->
+delete :: Grades -> Grades
+delete = grades noGrades $ \zipper ->
     case zipper of
         ListZipper [] a [] -> noGrades
         ListZipper [] a (r:rs) -> yesGrades $ ListZipper [] r rs
