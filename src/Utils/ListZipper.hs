@@ -90,8 +90,8 @@ insert'' x (y:ys) | x > y     = x:y:ys
 
 sorted :: Ord a => [a] -> ListZipper a -> ListZipper a
 sorted [] z = z
-sorted (y:ys) (ListZipper ls a rs) | y < a = ListZipper (insert'' y ls) a rs
-                                   | otherwise = ListZipper ls a (insert' y rs) 
+sorted (y:ys) (ListZipper ls a rs) | y < a = sorted ys $ ListZipper (insert'' y ls) a rs
+                                   | otherwise = sorted ys $ ListZipper ls a (insert' y rs) 
 
 
 instance Functor ListZipper where
