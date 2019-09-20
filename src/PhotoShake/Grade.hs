@@ -17,6 +17,7 @@ module PhotoShake.Grade
     , gradeSelection
     , yesGradeSelection
     , noGradeSelection
+    , gradeDelete 
     ) where
 
 import Data.String
