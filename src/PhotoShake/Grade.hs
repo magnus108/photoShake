@@ -34,6 +34,8 @@ import Data.Functor
 import Data.Traversable
 import Data.Foldable
 
+import Prelude (($))
+
 
 type Grade = String
 
@@ -51,8 +53,10 @@ data GradeSelection
     | NoGradeSelection
     deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
+
 yesGradeSelection :: Grade -> GradeSelection
 yesGradeSelection = YesGradeSelection
+
 
 noGradeSelection :: GradeSelection
 noGradeSelection = NoGradeSelection
@@ -90,3 +94,11 @@ getGrades = readFile
 
 setGrades :: FP -> Grades -> TerminalM Grades ()
 setGrades = writeFile 
+
+
+gradeDelete :: Grades -> Grades
+gradeDelete = grades noGrades $ \zipper ->
+    case zipper of
+        ListZipper [] a [] -> noGrades
+        ListZipper [] a (r:rs) -> yesGrades $ ListZipper [] r rs
+        ListZipper (l:ls) a rs -> yesGrades $ ListZipper ls l rs 
