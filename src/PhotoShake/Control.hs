@@ -77,7 +77,6 @@ controlXMP config grade = do
 
                             let cr2s = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) what  
 
-                            putStrLn $ show cr2s
 
                             cr2s' <- mapM (\xx -> do
                                         res <- filterM (\f -> do
