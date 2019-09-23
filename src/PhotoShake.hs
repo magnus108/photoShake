@@ -123,7 +123,7 @@ actions config photographee location time removeIt = do
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
 
-        dumpFiles <- liftIO $ getDumpFiles =<< getDump config
+        (DumpFiles dumpFiles) <- liftIO $ getDumpFiles =<< getDump config
 
         dagsdatoBackup <- liftIO $ getDagsdatoBackup config
         doneshootingBackup <- liftIO $ getDoneshootingBackup config

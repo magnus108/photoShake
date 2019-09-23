@@ -1,5 +1,6 @@
 module PhotoShake.ShakeConfig
     ( ShakeConfig(..)
+    , DumpFiles(..)
     , getId
     , setId
     , toShakeConfig
@@ -45,6 +46,7 @@ import qualified Utils.FP as FP
 import qualified Utils.Actions as Actions
 
 import Prelude hiding (readFile, writeFile, length)
+import Control.Monad.Extra
 
 import Data.Vector (Vector, find, (++), fromList, toList)
 
@@ -503,19 +505,33 @@ setDump config dump = do
     seq (length dumps) (writeFile filepath (encode dump) `catchAny` (\_ -> throw DumpConfigFileMissing))
 
 
-getDumpFiles :: Dump -> IO [(FilePath, FilePath)]
-getDumpFiles x = do
-    dump (return []) (\x -> do
-            files <- listDirectory x `catchAny` (\_ -> throw DumpMissing)
-            let files' = filter (\z -> isExtensionOf "CR2" z || (isExtensionOf "cr2" z)) files -- bad use
-            let files2' = filter (\z -> isExtensionOf "JPG" z || (isExtensionOf "jpg" z)) files -- bad use
-            files'' <- mapM (\file -> do 
-                    b <- (doesFileExist (x </> file -<.> "JPG")) 
-                    b1 <- (doesFileExist (x </> file -<.> "jpg")) 
-                    let b3 = all id $ fmap (\z -> elem (z -<.> "CR2") files' || (elem (z -<.> "cr2") files')) files2'
-                    if ( b || b1 ) && b3 then return file else throw JPGMissing ) files' -- this is error
-            return $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
-            ) x
+data DumpFiles
+    = DumpFiles [(FilePath, FilePath)]
+    | DumpFilesError
+
+getDumpFiles :: Dump -> IO DumpFiles
+getDumpFiles = do
+    dump (return DumpFilesError) $ \x -> do
+        files <- listDirectory x
+        files' <- mapM (\f -> 
+            if (isExtensionOf "CR2" f || (isExtensionOf "cr2" f)) then
+                doesFileExist (x </> f -<.> "JPG") ||^ (doesFileExist (x </> f -<.> "jpg"))
+            else if (isExtensionOf "JPG" f || (isExtensionOf "jpg" f)) then 
+                doesFileExist (x </> f -<.> "CR2") ||^ (doesFileExist (x </> f -<.> "cr2"))
+            else
+                return False) files
+
+        let files'' = filter (\z -> isExtensionOf "CR2" z || (isExtensionOf "cr2" z)) files -- bad use
+
+        if all id files' then
+            return $ DumpFiles $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
+        else
+            return DumpFilesError
+
+        
+
+
+
 
 
 getLocationFile :: ShakeConfig -> IO Location.Location
