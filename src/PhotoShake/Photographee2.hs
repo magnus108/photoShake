@@ -14,6 +14,7 @@ module PhotoShake.Photographee2
     , name
     ) where
 
+import qualified Utils.ListZipper as ListZipper
 import qualified Data.Vector as Vector
 import Prelude (fromIntegral)
 import qualified PhotoShake.Location as Location
@@ -86,13 +87,14 @@ findPhotographee location id = do
         ) location
 
 
-fromGrade :: Location.Location -> Grade.Grade -> IO [Photographee]
-fromGrade location grade =
-    Location.location (return []) (\l -> do -- kind of bad
-        locationData' <-  BL.readFile l 
-        let locationData = decodeWith myOptionsDecode NoHeader $ locationData' 
-        let studentData = case locationData of
-                Left _ -> throw ParseLocationFile
-                Right locData -> Vector.filter ((grade ==) . _grade) locData
-        return $ Vector.toList $ studentData
-        ) location
+fromGrade :: Location.Location -> Grade.Grades -> IO [Photographee]
+fromGrade location grades =
+    Grade.grades (return []) (\g -> do
+        Location.location (return []) (\l -> do -- kind of bad
+            locationData' <-  BL.readFile l 
+            let locationData = decodeWith myOptionsDecode NoHeader $ locationData' 
+            let studentData = case locationData of
+                    Left _ -> throw ParseLocationFile
+                    Right locData -> Vector.filter (((ListZipper.focus g) ==) . _grade) locData
+            return $ Vector.toList $ studentData
+            ) location) grades
