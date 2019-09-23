@@ -1,7 +1,7 @@
 module PhotoShake.ShakeConfig
     ( ShakeConfig(..)
-    , getIdSelection
-    , setIdSelection
+    , getId
+    , setId
     , toShakeConfig
     , setGrades
     , catchAny
@@ -342,8 +342,8 @@ setGradeSelection config grade = do
     seq (length config) (writeFile filepath (encode grade) `catchAny` (\_ -> throw GradeConfigFileMissing))
 
 
-setIdSelection :: ShakeConfig -> Id.Id -> IO ()
-setIdSelection config x = do
+setId :: ShakeConfig -> Id.Id -> IO ()
+setId config x = do
     let filepath = _idConfig config
     Actions.interpret (Id.setId (FP.fp (FP.start filepath)) x)
 
@@ -397,8 +397,8 @@ getGradeSelection config = do
                 Nothing -> throw ConfigGradeMissing
                 Just y -> return $ y
 
-getIdSelection :: ShakeConfig -> IO Id.Id
-getIdSelection config = do
+getId :: ShakeConfig -> IO Id.Id
+getId config = do
         let filepath = _idConfig config
         Actions.interpret (Id.getId (FP.fp (FP.start filepath)))
 

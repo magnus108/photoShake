@@ -181,7 +181,7 @@ actions config photographee location time removeIt = do
 
         x <- liftIO $ getDump config
         dump (action $ return ()) (\fp -> do
-                    liftIO $ setIdSelection config Id.noId
+                    liftIO $ setId config Id.noId
                     if removeIt then
                         action $ removeFilesAfter fp ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg"]
                     else
