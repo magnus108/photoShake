@@ -6,6 +6,7 @@
 
 module PhotoShake.Id
     ( id
+    , toString
     , yesId
     , noId
     , Id
@@ -21,12 +22,17 @@ import System.FilePath
 import Data.Aeson
 import Utils.Actions
 import Utils.FP
+import qualified Prelude as Prelude
 
 
 data Id 
     = YesId String
     | NoId
     deriving (Show, Eq, Generic, ToJSON, FromJSON)
+
+
+toString :: Id -> String
+toString = id "" Prelude.id
 
 
 yesId :: FilePath -> Id
