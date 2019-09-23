@@ -7,6 +7,7 @@
 module PhotoShake.Id
     ( id
     , toString
+    , fromString
     , yesId
     , noId
     , Id
@@ -14,7 +15,7 @@ module PhotoShake.Id
     , getId
     ) where
 
-import Data.String
+import qualified Data.String as String
 import Data.Eq
 import Text.Show
 import GHC.Generics
@@ -26,14 +27,18 @@ import qualified Prelude as Prelude
 
 
 data Id 
-    = YesId String
+    = YesId String.String
     | NoId
     deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
 
-toString :: Id -> String
+toString :: Id -> String.String
 toString = id "" Prelude.id
 
+fromString :: String.String -> Id
+fromString = \case
+    "" -> noId
+    x -> yesId x
 
 yesId :: FilePath -> Id
 yesId = YesId
