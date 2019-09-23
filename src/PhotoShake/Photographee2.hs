@@ -9,6 +9,7 @@ module PhotoShake.Photographee2
     , noPhotographee
     , yesPhotographee
     , photographee
+    , findPhotographee
     ) where
 
 import Prelude (fromIntegral)
