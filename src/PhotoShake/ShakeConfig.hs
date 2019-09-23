@@ -508,10 +508,11 @@ setDump config dump = do
 data DumpFiles
     = DumpFiles [(FilePath, FilePath)]
     | DumpFilesError
+    | NoDump
 
 getDumpFiles :: Dump -> IO DumpFiles
 getDumpFiles = do
-    dump (return DumpFilesError) $ \x -> do
+    dump (return NoDump) $ \x -> do
         files <- listDirectory x
         files' <- mapM (\f -> 
             if (isExtensionOf "CR2" f || (isExtensionOf "cr2" f)) then
