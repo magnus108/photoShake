@@ -10,6 +10,8 @@ module PhotoShake.Photographee2
     , yesPhotographee
     , photographee
     , findPhotographee
+    , fromGrade
+    , name
     ) where
 
 import qualified Data.Vector as Vector
@@ -55,6 +57,9 @@ noPhotographee = NoPhotographee
 
 yesPhotographee :: String -> String -> String -> String -> Photographee
 yesPhotographee = YesPhotographee 
+
+name :: Photographee -> Maybe String
+name = photographee Nothing (\_ _ name _ -> Just name) 
 
 
 photographee :: a -> (String -> String -> String -> String -> a) -> Photographee -> a
