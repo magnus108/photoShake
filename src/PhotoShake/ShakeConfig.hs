@@ -40,6 +40,10 @@ module PhotoShake.ShakeConfig
     , getGradeSelection
     ) where
 
+import qualified PhotoShake.Id as Id
+import qualified Utils.FP as FP
+import qualified Utils.Actions as Actions
+
 import Prelude hiding (readFile, writeFile, length)
 
 import Data.Vector (Vector, find, (++), fromList, toList)
@@ -338,11 +342,10 @@ setGradeSelection config grade = do
     seq (length config) (writeFile filepath (encode grade) `catchAny` (\_ -> throw GradeConfigFileMissing))
 
 
-setIdSelection :: ShakeConfig -> Idd -> IO ()
-setIdSelection config idd = do
+setIdSelection :: ShakeConfig -> Id.Id -> IO ()
+setIdSelection config x = do
     let filepath = _idConfig config
-    config <- readFile filepath `catchAny` (\_ -> throw IdConfigFileMissing)
-    seq (length config) (writeFile filepath (encode idd) `catchAny` (\_ -> throw IdConfigFileMissing))
+    Actions.interpret (Id.setId (FP.fp (FP.start filepath)) x)
 
 
 
@@ -394,15 +397,11 @@ getGradeSelection config = do
                 Nothing -> throw ConfigGradeMissing
                 Just y -> return $ y
 
-getIdSelection :: ShakeConfig -> IO Idd
+getIdSelection :: ShakeConfig -> IO Id.Id
 getIdSelection config = do
         let filepath = _idConfig config
-        config <- readFile filepath `catchAny` (\_ -> error "lol") 
-        let idd = decode $ config :: Maybe Idd
-        seq (length config) (return ())
-        case idd of
-                Nothing -> throw ConfigIdMissing
-                Just y -> return $ y
+        Actions.interpret (Id.getId (FP.fp (FP.start filepath)))
+
 
 getSessionConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
 getSessionConfig root config = case (HM.lookup "sessionConfig" config) of

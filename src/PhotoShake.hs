@@ -11,6 +11,8 @@ import Prelude hiding (toInteger)
 import Data.Strings
 
 
+import qualified PhotoShake.Id as Id
+
 import Development.Shake hiding (Normal)
 import Development.Shake.FilePath
 
@@ -179,7 +181,7 @@ actions config photographee location time removeIt = do
 
         x <- liftIO $ getDump config
         dump (action $ return ()) (\fp -> do
-                    liftIO $ setIdSelection config (Idd "")
+                    liftIO $ setIdSelection config Id.noId
                     if removeIt then
                         action $ removeFilesAfter fp ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg"]
                     else

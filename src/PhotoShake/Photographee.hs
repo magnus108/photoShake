@@ -5,7 +5,6 @@ module PhotoShake.Photographee
     ( Photographee(..)
     , findPhotographee
     , insertPhotographee
-    , Idd(..)
     , Grades(..)
     , GradeSelection(..)
     , parseGrades
@@ -44,8 +43,6 @@ catchAny = catch
 type FullName = String
 type Ident = String
 
-data Idd = Idd String deriving (Show, Eq)
-deriveJSON DA.defaultOptions ''Idd
 
 data Photographee = Photographee 
     { _tea :: String 
