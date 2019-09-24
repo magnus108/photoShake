@@ -6,6 +6,7 @@
 
 module PhotoShake.Photographee2
     ( Photographee
+    , PhotographeeData
     , noPhotographee
     , yesPhotographee
     , photographee
