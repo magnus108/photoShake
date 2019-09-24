@@ -11,6 +11,8 @@ module PhotoShake.Photographee2
     , photographee
     , findPhotographee
     , fromGrade
+    , _name
+    , _ident
     ) where
 
 import qualified Utils.ListZipper as ListZipper
