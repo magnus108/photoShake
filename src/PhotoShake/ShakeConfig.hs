@@ -36,9 +36,6 @@ module PhotoShake.ShakeConfig
     , setBuilt
     , setBuilt'
     , getGrades
-    , getGradeSelectionConfig
-    , setGradeSelection
-    , getGradeSelection
     ) where
 
 import qualified PhotoShake.Id as Id
@@ -95,7 +92,6 @@ data ShakeConfig = ShakeConfig
     , _photographerConfig :: FilePath
     , _builtConfig :: FilePath
     , _gradeConfig :: FilePath
-    , _gradeSelectionConfig :: FilePath
 
     , _stateConfig :: FilePath
     , _idConfig :: FilePath
@@ -337,13 +333,6 @@ setDagsdatoBackup config dagsdato = do
     seq (length dagsdatoConfig) (writeFile filepath (encode dagsdato) `catchAny` (\_ -> throw DagsdatoConfigFileMissing))
 
 
-setGradeSelection :: ShakeConfig -> GradeSelection -> IO ()
-setGradeSelection config grade = do
-    let filepath = _gradeSelectionConfig config
-    config <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing)
-    seq (length config) (writeFile filepath (encode grade) `catchAny` (\_ -> throw GradeConfigFileMissing))
-
-
 setId :: ShakeConfig -> Id.Id -> IO ()
 setId config x = do
     let filepath = _idConfig config
@@ -389,15 +378,6 @@ getGradeSelectionConfig root config = case (HM.lookup "gradeSelectionConfig" con
         Nothing -> x 
         Just y -> y </> x
 
-getGradeSelection :: ShakeConfig -> IO GradeSelection
-getGradeSelection config = do
-        let filepath = _gradeSelectionConfig config
-        config <- readFile filepath `catchAny` (\_ -> error "lol") 
-        let grade = decode $ config :: Maybe GradeSelection
-        seq (length config) (return ())
-        case grade of
-                Nothing -> throw ConfigGradeMissing
-                Just y -> return $ y
 
 getId :: ShakeConfig -> IO Id.Id
 getId config = do
@@ -571,7 +551,6 @@ toShakeConfig root cfg = do
 
     let idConfig = getIdConfig root config
 
-    let gradeSelectionConfig = getGradeSelectionConfig root config
 
     let stateConfig = getStateConfig root config
 
@@ -586,7 +565,6 @@ toShakeConfig root cfg = do
                          , _photographerConfig = photographerConfig
                          , _builtConfig = builtConfig
                          , _gradeConfig = gradeConfig
-                         , _gradeSelectionConfig = gradeSelectionConfig
                          , _stateConfig = stateConfig
                          , _idConfig = idConfig
                          } 

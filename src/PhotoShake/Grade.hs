@@ -10,13 +10,9 @@
 module PhotoShake.Grade
     ( Grade
     , Grades
-    , GradeSelection
     , grades
     , yesGrades
     , noGrades
-    , gradeSelection
-    , yesGradeSelection
-    , noGradeSelection
     , delete 
     ) where
 
@@ -47,32 +43,6 @@ data GradesF a
 
 
 type Grades = GradesF Grade
-
-
-data GradeSelection
-    = YesGradeSelection Grade
-    | NoGradeSelection
-    deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
-
-yesGradeSelection :: Grade -> GradeSelection
-yesGradeSelection = YesGradeSelection
-
-
-noGradeSelection :: GradeSelection
-noGradeSelection = NoGradeSelection
-
-
-gradeSelection :: a -> (Grade -> a) -> GradeSelection -> a
-gradeSelection f g = \case
-    NoGradeSelection -> f
-    YesGradeSelection x -> g x
-
-getGradeSelection :: FP -> TerminalM GradeSelection GradeSelection
-getGradeSelection = readFile 
-
-setGradesSelection :: FP -> GradeSelection -> TerminalM GradeSelection ()
-setGradesSelection = writeFile 
 
 
 yesGrades :: ListZipper Grade -> Grades

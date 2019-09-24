@@ -6,12 +6,10 @@ module PhotoShake.Photographee
     , findPhotographee
     , insertPhotographee
     , Grades(..)
-    , GradeSelection(..)
     , parseGrades
     , findPhotographee2
     , findPhotographee3
     , myOptionsDecode 
-    , parsePhotographees 
     ) where
 
 
@@ -116,25 +114,6 @@ parseGrades location = do
 
 
 
-parsePhotographees :: FilePath -> GradeSelection -> IO [Photographee]
-parsePhotographees location gradeSelection_ = do
-    -- badness
-    let ext = takeExtension location
-    _ <- case ext of
-            ".csv" -> return ()
-            _ -> throw BadCsv
-
-    locationData' <-  BL.readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
-
-    putStrLn $ show locationData'
-
-    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
-
-    let studentData = case locationData of
-            Left _ -> throw ParseLocationFile
-            Right locData ->  gradeSelection mempty (\grade -> filter ((grade ==). _grade) locData) gradeSelection_
-
-    return $ toList $ studentData
 
     
 
