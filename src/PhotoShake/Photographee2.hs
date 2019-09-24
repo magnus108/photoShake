@@ -6,10 +6,6 @@
 
 module PhotoShake.Photographee2
     ( Photographee
-    , PhotographeeData
-    , noPhotographee
-    , yesPhotographee
-    , photographee
     , findPhotographee
     , fromGrade
     , _name
@@ -40,65 +36,36 @@ import Data.Function ((.), ($))
 import qualified PhotoShake.Grade as Grade
 
 
-
-data PhotographeeData = PhotographeeData
+data Photographee = Photographee 
     { _tea :: String 
     , _grade :: String
     , _name :: String
     , _ident :: String 
     } deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
-instance FromRecord PhotographeeData
-instance ToRecord PhotographeeData
-instance FromField PhotographeeData
-instance ToField PhotographeeData
-
-data Photographee 
-    = NoPhotographee
-    | YesPhotographee PhotographeeData
-        deriving (Show, Eq, Generic, ToJSON, FromJSON)
-
 instance FromRecord Photographee
 instance ToRecord Photographee
-
-
-noPhotographee :: Photographee
-noPhotographee = NoPhotographee
-
-
-yesPhotographee :: PhotographeeData -> Photographee
-yesPhotographee = YesPhotographee 
-
-
-photographee :: a -> (PhotographeeData -> a) -> Photographee -> a
-photographee f g = \case
-    NoPhotographee -> f
-    (YesPhotographee x) -> g x
-    
+ 
 
 myOptionsDecode :: DecodeOptions
 myOptionsDecode = defaultDecodeOptions { decDelimiter = fromIntegral (ord ';') }
 
 
-
-tryIdent :: Photographee -> Maybe String
-tryIdent = photographee Nothing (Just . _ident) 
-
-findPhotographee :: Location.Location -> Id.Id -> IO Photographee
+findPhotographee :: Location.Location -> Id.Id -> IO (Maybe Photographee)
 findPhotographee location id = do
-    Location.location (return noPhotographee) (\l -> do 
+    Location.location (return Nothing) (\l -> do 
         locationData' <- BL.readFile l
         let locationData = decodeWith myOptionsDecode NoHeader $ locationData'
         --could use some case of here and error handling
         let studentData = case locationData of
                 Left _ -> throw ParseLocationFile
-                Right locData -> Id.id noPhotographee 
-                        (\i -> fromMaybe noPhotographee (find ((Just i ==) . tryIdent ) locData)) id
+                Right locData -> Id.id Nothing 
+                        (\i -> find ((i ==) . _ident ) locData) id
         return studentData
         ) location
 
 
-fromGrade :: Location.Location -> Grade.Grades -> IO [PhotographeeData]
+fromGrade :: Location.Location -> Grade.Grades -> IO [Photographee]
 fromGrade location grades =
     Grade.grades (return []) (\g -> do
         Location.location (return []) (\l -> do -- kind of bad
