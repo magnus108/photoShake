@@ -7,16 +7,19 @@ import System.Directory
 
 import qualified Data.ByteString.Lazy as LBS
 
+import Data.Maybe
 
 
 import Data.Time
 
 import PhotoShake
 import PhotoShake.Location
+import qualified PhotoShake.Id as Id
 import PhotoShake.ShakeConfig
 import PhotoShake.Doneshooting hiding (getDoneshooting)
 import PhotoShake.Dagsdato
 import PhotoShake.Photographee
+import PhotoShake.Photographee2
 
 
 main :: IO ()
@@ -38,9 +41,9 @@ goldenTests = do
     --- ??????
     location (error "no location in test eeee") (\xxx -> do
             let photographeeId = "5678"
-            photographee <- findPhotographee xxx photographeeId 
+            photographee <- findPhotographee xxxx (Id.fromString photographeeId)
 
-            let ident = _ident photographee
+            let ident = _ident (fromJust  photographee)
             let goldenDir = "test" </> ident 
 
             -- uglys
@@ -56,7 +59,7 @@ goldenTests = do
             let day = fromGregorian 2009 12 31
             let time = UTCTime day (secondsToDiffTime 0)
 
-            myShake config photographee (takeBaseName xxx) time False
+            myShake config (fromJust photographee) (takeBaseName xxx) time False
 
             -- bads 
             photographer <- getPhotographer config
@@ -66,8 +69,8 @@ goldenTests = do
 
             -- de lader til at være en fejl at disse paths ligger her. og at null og 0 er med
             -- can throw error fixxxx
-            let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshootingX photographee (takeBaseName xxx) photographer session shooting "null" 0
-            let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdatoX photographee (takeBaseName xxx) "null" time
+            let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshootingX (fromJust photographee) (takeBaseName xxx) photographer session shooting "null" 0
+            let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdatoX (fromJust photographee) (takeBaseName xxx) "null" time
 
             doneShootingFiles <- listDirectory doneshootingPath
             dagsdatoFiles <- listDirectory dagsdatoPath

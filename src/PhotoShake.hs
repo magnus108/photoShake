@@ -19,6 +19,7 @@ import Development.Shake.FilePath
 import PhotoShake.ShakeConfig
 import PhotoShake.Dump
 import PhotoShake.Photographee
+import PhotoShake.Photographee2
 
 import PhotoShake.Location
 import PhotoShake.Dagsdato
@@ -49,13 +50,14 @@ entry = do
     xxxx <- getLocationFile config
     -- ehh
     -- can make error
-    location (error "no location given") (\xxx -> do
-            photographeeId <- getLine
-            photographee <- findPhotographee xxx photographeeId 
+    photographeeId <- getLine
+    photographee <- findPhotographee xxxx (Id.fromString photographeeId )
 
-            ---ehhh2
-            time <- getCurrentTime
-            myShake config photographee (takeBaseName xxx) time False) xxxx
+    ---ehhh2
+    time <- getCurrentTime
+    location (error "no location given") (\xxx -> do
+        maybe (error "no photographee found") (\p -> 
+            myShake config p (takeBaseName xxx) time False) photographee) xxxx
 
 
 shakeDir :: FilePath

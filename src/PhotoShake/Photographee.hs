@@ -3,7 +3,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module PhotoShake.Photographee
     ( Photographee(..)
-    , findPhotographee
     , insertPhotographee
     , Grades(..)
     , parseGrades
@@ -26,6 +25,8 @@ import qualified Data.ByteString.Lazy as BL
 
 import System.FilePath
 
+import PhotoShake.Photographee2
+
 import PhotoShake.ShakeError
 import PhotoShake.Grade
 import Control.Exception
@@ -41,18 +42,6 @@ catchAny = catch
 type FullName = String
 type Ident = String
 
-
-data Photographee = Photographee 
-    { _tea :: String 
-    , _grade :: Grade
-    , _name :: FullName
-    , _ident :: Ident 
-    } deriving (Generic, Show, Eq)
-
-deriveJSON DA.defaultOptions ''Photographee
-
-instance FromRecord Photographee
-instance ToRecord Photographee
 
 
 
@@ -80,7 +69,7 @@ insertPhotographee location photographeeId grade name = do
 
     let studentData = case locationData of
             Left _ -> throw ParseLocationFile
-            Right locData -> locData ++ (fromList [Photographee ("SYS_" PP.++ photographeeId) grade name "missing"])
+            Right locData -> locData ++ (fromList [photographee ("SYS_" PP.++ photographeeId) grade name "missing"])
 
     let moreData = encodeWith myOptionsEncode $ toList studentData --can throw error
 

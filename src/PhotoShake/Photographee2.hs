@@ -8,8 +8,11 @@ module PhotoShake.Photographee2
     ( Photographee
     , findPhotographee
     , fromGrade
+    , photographee
     , _name
     , _ident
+    , _tea
+    , _grade
     ) where
 
 import qualified Utils.ListZipper as ListZipper
@@ -46,6 +49,10 @@ data Photographee = Photographee
 instance FromRecord Photographee
 instance ToRecord Photographee
  
+
+photographee :: String -> String -> String -> String -> Photographee
+photographee = Photographee
+
 
 myOptionsDecode :: DecodeOptions
 myOptionsDecode = defaultDecodeOptions { decDelimiter = fromIntegral (ord ';') }
