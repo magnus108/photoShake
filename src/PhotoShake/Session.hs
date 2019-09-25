@@ -19,6 +19,8 @@ module PhotoShake.Session
     , session
     , type_
     , Type
+    , group
+    , single
     ) where
 
 
@@ -38,6 +40,11 @@ data Type
     | Single
     deriving (Show, Eq, Generic, ToJSON, FromJSON)
 
+group :: Type
+group = Group
+
+single :: Type
+single = Single
 
 type_ :: a -> a -> Type -> a
 type_ f g = \case
