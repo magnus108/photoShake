@@ -73,10 +73,8 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
     where
         progress p = do
             program <- progressProgram
-            getBuild config --why???
             progressDisplay 0.5 (\s -> do
-                setBuild config s photographee
-                getBuild config --why???
+                setBuild config "ys" photographee
                 program s
                 ) p
 
