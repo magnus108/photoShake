@@ -34,7 +34,6 @@ module PhotoShake.ShakeConfig
     , getSession
     , getBuild
     , setBuild
-    , setBuilt'
     , getGrades
     ) where
 
@@ -188,17 +187,12 @@ setBuild config s photographee = do
                 "Finished":_ -> Build.doneBuild photographee x
                 _ -> Build.building photographee x
 
+    putStrLn $ show b
+    
+
     let filepath = _buildConfig config
     buildConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length buildConfig) (writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing))
-
-
---dont use
-setBuilt' :: ShakeConfig -> Build.Build -> IO ()
-setBuilt' config build = do
-    let filepath = _buildConfig config
-    buildConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
-    seq (length buildConfig) (writeFile filepath (encode build) `catchAny` (\_ -> throw BuiltConfigFileMissing))
 
 
 
