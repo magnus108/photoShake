@@ -59,7 +59,7 @@ import System.Directory
 import qualified Data.HashMap.Lazy as HM
 
 
-import PhotoShake.Built
+import qualified PhotoShake.Build as Build
 import qualified PhotoShake.Location as Location
 import PhotoShake.Dagsdato
 import PhotoShake.Photographee
@@ -183,10 +183,10 @@ setBuilt:: ShakeConfig -> String -> Photographee -> IO ()
 setBuilt config s photographee = do
     -- there is a smarter way of doing this
     let b = case s of
-            "" -> NoBuilt
+            "" -> Build.noBuild
             x -> case words x of
-                "Finished":_ -> Built photographee x
-                _ -> Building photographee x
+                "Finished":_ -> Build.doneBuild photographee x
+                _ -> Build.building photographee x
 
     let filepath = _builtConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
@@ -194,7 +194,7 @@ setBuilt config s photographee = do
 
 
 --dont use
-setBuilt' :: ShakeConfig -> Built -> IO ()
+setBuilt' :: ShakeConfig -> Build.Build -> IO ()
 setBuilt' config built = do
     let filepath = _builtConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
@@ -467,12 +467,12 @@ getDump config = do
             Just y -> return y
 
 
-getBuilt :: ShakeConfig -> IO Built
+getBuilt :: ShakeConfig -> IO Build.Build
 getBuilt config = do
     let filepath = _builtConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length builtConfig) (return ())
-    let built = decode builtConfig :: Maybe Built
+    let built = decode builtConfig :: Maybe Build.Build
     case built of
             Nothing -> throw BuiltConfigFileMissing
             Just y -> return y
