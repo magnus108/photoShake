@@ -460,12 +460,7 @@ getDump config = do
 getBuild :: ShakeConfig -> IO Build.Build
 getBuild config = do
     let filepath = _buildConfig config
-    builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
-    seq (length builtConfig) (return ())
-    let built = decode builtConfig :: Maybe Build.Build
-    case built of
-            Nothing -> throw BuiltConfigFileMissing
-            Just y -> return y
+    Actions.interpret (Build.getBuild (FP.fp (FP.start filepath)))
 
 
 setDump :: ShakeConfig -> Dump -> IO ()
