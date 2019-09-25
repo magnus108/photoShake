@@ -21,6 +21,7 @@ import qualified Data.Vector as Vector
 import Prelude (fromIntegral, seq)
 import qualified PhotoShake.Location as Location
 import qualified PhotoShake.Id as Id
+import Data.Int
 import Data.Char
 import Control.Monad 
 import Data.Monoid
@@ -38,6 +39,8 @@ import PhotoShake.ShakeError
 import qualified Data.List as List
 import Data.Function ((.), ($))
 import qualified PhotoShake.Grade as Grade
+
+import System.Random
 
 
 data Photographee = Photographee 
@@ -83,9 +86,12 @@ insert location grade id name = do
         seq (BL.length locationData') (return ())
         let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector.Vector Photographee)
 
+        let low = 1000000 :: Int
+        let high = 9999999 :: Int
+        r <- getStdRandom (randomR (low, high))
         let studentData = case locationData of
                 Left _ -> throw ParseLocationFile
-                Right locData -> locData Vector.++ (Vector.fromList [photographee ("SYS_" List.++ id) grade name "missing"])
+                Right locData -> locData Vector.++ (Vector.fromList [photographee ("SYS_" List.++ id) grade name ("ny_" List.++ (show r))])
 
         let moreData = encodeWith myOptionsEncode $ Vector.toList studentData --can throw error
         BL.writeFile l moreData
