@@ -10,6 +10,8 @@ module PhotoShake.Build
     , noFind
     , noBuild
     , build'
+    , setBuild
+    , getBuild
     ) where
 
 import PhotoShake.Photographee2
@@ -18,6 +20,8 @@ import Data.Eq
 import Text.Show
 import GHC.Generics
 import Data.Aeson
+import Utils.Actions
+import Utils.FP
 
 
 data Build
@@ -45,3 +49,11 @@ build' f g h = \case
     Building p s -> h p s
     NoFind s -> g s
     NoBuild -> f
+
+
+getBuild :: FP -> TerminalM Build Build
+getBuild = readFile 
+
+
+setBuild :: FP -> Build -> TerminalM Build ()
+setBuild = writeFile 

@@ -187,12 +187,8 @@ setBuild config s photographee = do
                 "Finished":_ -> Build.doneBuild photographee x
                 _ -> Build.building photographee x
 
-    putStrLn $ show b
-    
-
     let filepath = _buildConfig config
-    buildConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
-    seq (length buildConfig) (writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing))
+    Actions.interpret (Build.setBuild (FP.fp (FP.start filepath)) b)
 
 
 
