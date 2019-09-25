@@ -32,7 +32,7 @@ module PhotoShake.ShakeConfig
     , getPhotographer 
     , getShooting
     , getSession
-    , getBuilt
+    , getBuild
     , setBuilt
     , setBuilt'
     , getGrades
@@ -467,8 +467,8 @@ getDump config = do
             Just y -> return y
 
 
-getBuilt :: ShakeConfig -> IO Build.Build
-getBuilt config = do
+getBuild :: ShakeConfig -> IO Build.Build
+getBuild config = do
     let filepath = _buildConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length builtConfig) (return ())
