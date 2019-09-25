@@ -72,6 +72,8 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
                     }
     where
         progress p = do
+            bob <- getBuild config
+            putStrLn $ show bob
             program <- progressProgram
             progressDisplay 0.5 (\s -> do
                 putStrLn "bgag222"
@@ -79,6 +81,8 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
                 putStrLn $ show (s ++ "a")
                 putStrLn "bgag"
                 setBuild config s photographee
+                bob <- getBuild config
+                putStrLn $ show bob
                 program s
                 ) p
 
