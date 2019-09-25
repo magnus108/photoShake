@@ -7,6 +7,7 @@
 module PhotoShake.Photographee2
     ( Photographee
     , findPhotographee
+    , insert
     , fromGrade
     , photographee
     , _name
@@ -34,7 +35,7 @@ import Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import Data.Csv
 import PhotoShake.ShakeError
-import Data.List 
+import qualified Data.List as List
 import Data.Function ((.), ($))
 import qualified PhotoShake.Grade as Grade
 
@@ -57,6 +58,9 @@ photographee = Photographee
 myOptionsDecode :: DecodeOptions
 myOptionsDecode = defaultDecodeOptions { decDelimiter = fromIntegral (ord ';') }
 
+myOptionsEncode :: EncodeOptions
+myOptionsEncode = defaultEncodeOptions { encDelimiter = fromIntegral (ord ';') }
+
 
 findPhotographee :: Location.Location -> Id.Id -> IO (Maybe Photographee)
 findPhotographee location id = do
@@ -67,8 +71,24 @@ findPhotographee location id = do
         let studentData = case locationData of
                 Left _ -> throw ParseLocationFile
                 Right locData -> Id.id Nothing 
-                        (\i -> find ((i ==) . _ident ) locData) id
+                        (\i -> List.find ((i ==) . _ident ) locData) id
         return studentData
+        ) location
+
+
+insert :: Location.Location -> Grade.Grade -> String -> String -> IO (Maybe ())
+insert location grade id name = do
+    Location.location (return Nothing) (\l -> do 
+        locationData' <- BL.readFile l
+        let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector.Vector Photographee)
+
+        let studentData = case locationData of
+                Left _ -> throw ParseLocationFile
+                Right locData -> locData Vector.++ (Vector.fromList [photographee ("SYS_" List.++ id) grade name "missing"])
+
+        let moreData = encodeWith myOptionsEncode $ Vector.toList studentData --can throw error
+        BL.writeFile l moreData
+        return $ Just ()
         ) location
 
 

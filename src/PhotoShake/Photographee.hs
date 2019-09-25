@@ -3,7 +3,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module PhotoShake.Photographee
     ( Photographee(..)
-    , insertPhotographee
     , Grades(..)
     , parseGrades
     , findPhotographee2
@@ -49,31 +48,6 @@ type Ident = String
 myOptionsDecode :: DecodeOptions
 myOptionsDecode = defaultDecodeOptions { decDelimiter = fromIntegral (ord ';') }
 
-myOptionsEncode :: EncodeOptions
-myOptionsEncode = defaultEncodeOptions { encDelimiter = fromIntegral (ord ';') }
-
-
-insertPhotographee :: FilePath -> Ident -> String -> FullName -> IO ()
-insertPhotographee location photographeeId grade name = do
-    -- badness
-    let ext = takeExtension location
-    _ <- case ext of
-            ".csv" -> return ()
-            _ -> throw BadCsv
-
-    locationData' <- BL.readFile location `catchAny` (\_ -> throw LocationConfigFileMissing)
-
-    putStrLn $ show locationData'
-
-    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector Photographee)
-
-    let studentData = case locationData of
-            Left _ -> throw ParseLocationFile
-            Right locData -> locData ++ (fromList [photographee ("SYS_" PP.++ photographeeId) grade name "missing"])
-
-    let moreData = encodeWith myOptionsEncode $ toList studentData --can throw error
-
-    BL.writeFile location moreData
 
 
 
