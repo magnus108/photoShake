@@ -66,17 +66,17 @@ shakeDir = "._build"
 
 opts :: Photographee -> ShakeConfig -> ShakeOptions
 opts photographee config = shakeOptions { shakeFiles = shakeDir
-                --    , shakeProgress = progress -- should change
+                    , shakeProgress = progress -- should change
                     , shakeThreads = 0
                     , shakeColor = True
                     }
-    --where
-    --    progress p = do
-      --      program <- progressProgram
-        --    progressDisplay 0.5 (\s -> do
-          --      setBuild config "ys" photographee
-            --    program s
-              --  ) p
+    where
+        progress p = do
+            program <- progressProgram
+            progressDisplay 1.5 (\s -> do
+                setBuild config s photographee
+                program s
+                ) p
 
 
 myShake :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> IO ()
@@ -122,7 +122,6 @@ mkDagsdatoPath xxx photographee location filename time =
 
 actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> Rules ()
 actions config photographee location time removeIt = do
-
         --
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
