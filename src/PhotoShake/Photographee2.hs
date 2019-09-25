@@ -18,7 +18,7 @@ module PhotoShake.Photographee2
 
 import qualified Utils.ListZipper as ListZipper
 import qualified Data.Vector as Vector
-import Prelude (fromIntegral)
+import Prelude (fromIntegral, seq)
 import qualified PhotoShake.Location as Location
 import qualified PhotoShake.Id as Id
 import Data.Char
@@ -82,6 +82,7 @@ insert location grade id name = do
     Location.location (return Nothing) (\l -> do 
         putStrLn "bob4"
         locationData' <- BL.readFile l
+        seq (BL.length locationData') (return ())
         let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector.Vector Photographee)
 
         let studentData = case locationData of
