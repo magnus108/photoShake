@@ -90,7 +90,7 @@ data ShakeConfig = ShakeConfig
     , _shootingsConfig :: FilePath
     , _sessionConfig :: FilePath
     , _photographerConfig :: FilePath
-    , _builtConfig :: FilePath
+    , _buildConfig :: FilePath
     , _gradeConfig :: FilePath
 
     , _stateConfig :: FilePath
@@ -103,8 +103,8 @@ catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
 
 
-getBuiltConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
-getBuiltConfig root config = case (HM.lookup "builtConfig" config) of
+getBuildConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getBuildConfig root config = case (HM.lookup "buildConfig" config) of
     Nothing -> throw ConfigBuiltMissing
     Just x -> case root of 
         Nothing -> x 
@@ -188,17 +188,17 @@ setBuilt config s photographee = do
                 "Finished":_ -> Build.doneBuild photographee x
                 _ -> Build.building photographee x
 
-    let filepath = _builtConfig config
-    builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
-    seq (length builtConfig) (writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing))
+    let filepath = _buildConfig config
+    buildConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    seq (length buildConfig) (writeFile filepath (encode b) `catchAny` (\_ -> throw BuiltConfigFileMissing))
 
 
 --dont use
 setBuilt' :: ShakeConfig -> Build.Build -> IO ()
-setBuilt' config built = do
-    let filepath = _builtConfig config
-    builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
-    seq (length builtConfig) (writeFile filepath (encode built) `catchAny` (\_ -> throw BuiltConfigFileMissing))
+setBuilt' config build = do
+    let filepath = _buildConfig config
+    buildConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
+    seq (length buildConfig) (writeFile filepath (encode build) `catchAny` (\_ -> throw BuiltConfigFileMissing))
 
 
 
@@ -469,7 +469,7 @@ getDump config = do
 
 getBuilt :: ShakeConfig -> IO Build.Build
 getBuilt config = do
-    let filepath = _builtConfig config
+    let filepath = _buildConfig config
     builtConfig <- readFile filepath `catchAny` (\_ -> throw BuiltConfigFileMissing)
     seq (length builtConfig) (return ())
     let built = decode builtConfig :: Maybe Build.Build
@@ -546,7 +546,7 @@ toShakeConfig root cfg = do
     let shootingsConfig = getShootingsConfig root config
     let sessionConfig = getSessionConfig root config
     let photographerConfig = getPhotographerConfig root config
-    let builtConfig = getBuiltConfig root config
+    let buildConfig = getBuildConfig root config
     let gradeConfig = getGradeConfig root config
 
     let idConfig = getIdConfig root config
@@ -563,7 +563,7 @@ toShakeConfig root cfg = do
                          , _shootingsConfig = shootingsConfig
                          , _sessionConfig = sessionConfig
                          , _photographerConfig = photographerConfig
-                         , _builtConfig = builtConfig
+                         , _buildConfig = buildConfig
                          , _gradeConfig = gradeConfig
                          , _stateConfig = stateConfig
                          , _idConfig = idConfig
