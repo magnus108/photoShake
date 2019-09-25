@@ -74,7 +74,7 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
         progress p = do
             program <- progressProgram
             progressDisplay 0.5 (\s -> do
-                setBuild config "ys" photographee
+                setBuild config s photographee
                 program s
                 ) p
 
@@ -122,6 +122,8 @@ mkDagsdatoPath xxx photographee location filename time =
 
 actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> Rules ()
 actions config photographee location time removeIt = do
+        action $ liftIO $ setBuild config "starting..." photographee
+
         --
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
