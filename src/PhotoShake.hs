@@ -10,6 +10,7 @@ module PhotoShake
 import Prelude hiding (toInteger)
 import Data.Strings
 
+import Control.Concurrent.MVar
 
 import qualified PhotoShake.Id as Id
 
@@ -72,10 +73,11 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
                     }
     where
         progress p = do
-            program <- progressProgram
-            progressDisplay 1.5 (\s -> do
+            lock <- newMVar ()
+            progressDisplay 0.05 (\s -> do
+                a <- takeMVar lock
                 setBuild config s photographee
-                program s
+                putMVar lock a
                 ) p
 
 
