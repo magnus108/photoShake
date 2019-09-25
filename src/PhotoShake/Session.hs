@@ -18,6 +18,7 @@ module PhotoShake.Session
     , toInteger
     , session
     , type_
+    , Type
     ) where
 
 
