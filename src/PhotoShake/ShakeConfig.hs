@@ -33,7 +33,7 @@ module PhotoShake.ShakeConfig
     , getShooting
     , getSession
     , getBuild
-    , setBuilt
+    , setBuild
     , setBuilt'
     , getGrades
     ) where
@@ -179,8 +179,8 @@ getDoneshootingBackup config = do
             Just y -> return y
 
 -- ikke en rigtig setter mere en der skriver
-setBuilt:: ShakeConfig -> String -> Photographee -> IO ()
-setBuilt config s photographee = do
+setBuild :: ShakeConfig -> String -> Photographee -> IO ()
+setBuild config s photographee = do
     -- there is a smarter way of doing this
     let b = case s of
             "" -> Build.noBuild
