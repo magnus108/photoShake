@@ -122,6 +122,8 @@ mkDagsdatoPath xxx photographee location filename time =
 
 actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> Rules ()
 actions config photographee location time removeIt = do
+        --
+        liftIO $ setBuild config "Started" photographee
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
 
