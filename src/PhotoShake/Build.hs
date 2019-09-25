@@ -39,9 +39,9 @@ building = Building
 doneBuild :: Photographee -> String -> Build
 doneBuild = DoneBuild
 
-build' :: a -> (String -> a) -> Build -> a
-build' f g = \case
-    DoneBuild _ s -> g s
-    Building _ s -> g s
+build' :: a -> (String -> a) -> (Photographee -> String -> a) -> Build -> a
+build' f g h = \case
+    DoneBuild p s -> h p s
+    Building p s -> h p s
     NoFind s -> g s
     NoBuild -> f
