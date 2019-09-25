@@ -9,6 +9,7 @@ module PhotoShake.Build
     , building
     , noFind
     , noBuild
+    , build'
     ) where
 
 import PhotoShake.Photographee2
@@ -37,3 +38,10 @@ building = Building
 
 doneBuild :: Photographee -> String -> Build
 doneBuild = DoneBuild
+
+build' :: a -> (String -> a) -> Build -> a
+build' f g = \case
+    DoneBuild _ s -> g s
+    Building _ s -> g s
+    NoFind s -> g s
+    NoBuild -> f
