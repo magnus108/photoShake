@@ -74,6 +74,10 @@ opts photographee config = shakeOptions { shakeFiles = shakeDir
         progress p = do
             program <- progressProgram
             progressDisplay 0.5 (\s -> do
+                putStrLn "bgag222"
+                putStrLn $ show (s == " ")
+                putStrLn $ show (s ++ "a")
+                putStrLn "bgag"
                 setBuild config s photographee
                 program s
                 ) p
@@ -123,7 +127,6 @@ mkDagsdatoPath xxx photographee location filename time =
 actions :: ShakeConfig -> Photographee -> String -> UTCTime -> Bool -> Rules ()
 actions config photographee location time removeIt = do
         --
-        liftIO $ setBuild config "Started" photographee
         -- badIO
         dagsdato <- liftIO $ getDagsdato config
 
