@@ -78,9 +78,7 @@ findPhotographee location id = do
 
 insert :: Location.Location -> Grade.Grade -> String -> String -> IO (Maybe ())
 insert location grade id name = do
-    putStrLn "bob5"
     Location.location (return Nothing) (\l -> do 
-        putStrLn "bob4"
         locationData' <- BL.readFile l
         seq (BL.length locationData') (return ())
         let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector.Vector Photographee)
@@ -88,12 +86,9 @@ insert location grade id name = do
         let studentData = case locationData of
                 Left _ -> throw ParseLocationFile
                 Right locData -> locData Vector.++ (Vector.fromList [photographee ("SYS_" List.++ id) grade name "missing"])
-        putStrLn "bob3"
 
         let moreData = encodeWith myOptionsEncode $ Vector.toList studentData --can throw error
-        putStrLn "bob2"
         BL.writeFile l moreData
-        putStrLn "bob1"
         return $ Just ()
         ) location
 
