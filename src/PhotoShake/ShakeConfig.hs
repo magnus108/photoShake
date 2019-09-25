@@ -185,7 +185,7 @@ setBuild config s photographee = do
             "" -> Build.noBuild
             x -> case words x of
                 "Finished":_ -> Build.doneBuild photographee x
-                _ -> Build.building photographee x
+                s -> Build.building photographee (show s)
 
     let filepath = _buildConfig config
     Actions.interpret (Build.setBuild (FP.fp (FP.start filepath)) b)
