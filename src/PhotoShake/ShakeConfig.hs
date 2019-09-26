@@ -61,7 +61,7 @@ import qualified Data.HashMap.Lazy as HM
 import qualified PhotoShake.Build as Build
 import qualified PhotoShake.Location as Location
 import PhotoShake.Dagsdato
-import PhotoShake.Photographee
+import qualified PhotoShake.Photographee2 as Photographee
 import PhotoShake.Doneshooting hiding (getDoneshooting, setDoneshooting)
 import PhotoShake.Dump
 import PhotoShake.ShakeError
@@ -178,7 +178,7 @@ getDoneshootingBackup config = do
             Just y -> return y
 
 -- ikke en rigtig setter mere en der skriver
-setBuild :: ShakeConfig -> String -> Photographee -> IO ()
+setBuild :: ShakeConfig -> String -> Photographee.Photographee -> IO ()
 setBuild config s photographee = do
     -- there is a smarter way of doing this
     let b = case s of
@@ -192,12 +192,12 @@ setBuild config s photographee = do
 
 
 
-getGrades :: ShakeConfig -> IO Grades
+getGrades :: ShakeConfig -> IO Grade.Grades
 getGrades config = do
         let filepath = _gradeConfig config
         gradesConfig <- readFile filepath `catchAny` (\_ -> throw GradeConfigFileMissing) 
         seq (length gradesConfig) (return ())
-        let grades = decode gradesConfig :: Maybe Grades
+        let grades = decode gradesConfig :: Maybe Grade.Grades
         case grades of
                 Nothing -> throw GradeConfigFileMissing
                 Just y -> return y
@@ -336,7 +336,7 @@ setLocation config xxx = do
     locationConfig <- readFile filepath `catchAny` (\_ -> throw LocationConfigFileMissing)
     seq (length locationConfig) (writeFile filepath (encode xxx) `catchAny` (\_ -> throw LocationConfigFileMissing))
     Location.location (setGrades config $ Grade.noGrades) (\ f -> do
-            grades <- parseGrades f
+            grades <- Photographee.parseGrades f
             setGrades config grades) xxx 
 
 

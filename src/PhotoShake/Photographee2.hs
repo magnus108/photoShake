@@ -9,12 +9,15 @@ module PhotoShake.Photographee2
     , findPhotographee
     , insert
     , fromGrade
+    , parseGrades
     , photographee
     , _name
     , _ident
     , _tea
     , _grade
     ) where
+
+import System.FilePath
 
 import qualified Utils.ListZipper as ListZipper
 import qualified Data.Vector as Vector
@@ -103,9 +106,35 @@ fromGrade location grades =
     Grade.grades (return []) (\g -> do
         Location.location (return []) (\l -> do -- kind of bad
             locationData' <-  BL.readFile l 
+            seq (BL.length locationData') (return ())
             let locationData = decodeWith myOptionsDecode NoHeader $ locationData' 
             let studentData = case locationData of
                     Left _ -> throw ParseLocationFile
                     Right locData -> Vector.filter (((ListZipper.focus g) ==) . _grade) locData
             return $ Vector.toList $ studentData
             ) location) grades
+
+
+parseGrades :: FilePath -> IO Grade.Grades
+parseGrades location = do
+    -- badness
+    let ext = takeExtension location
+    _ <- case ext of
+            ".csv" -> return ()
+            _ -> throw BadCsv
+
+    locationData' <-  BL.readFile location 
+
+    putStrLn $ show locationData'
+
+    let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector.Vector Photographee)
+
+    let studentData = case locationData of
+            Left _ -> throw ParseLocationFile
+            Right locData -> locData
+
+    let grades = List.nub $ Vector.toList $ fmap _grade studentData
+
+    case grades of 
+        [] -> return Grade.noGrades
+        x:xs -> return $ Grade.yesGrades $ ListZipper.ListZipper [] x xs
