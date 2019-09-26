@@ -79,14 +79,11 @@ findPhotographee location id = do
         ) location
 
 
-insert :: Location.Location -> Grade.Grade -> String -> String -> IO (Maybe ())
+insert :: Location.Location -> Grade.Grade -> String -> String -> Maybe (IO ())
 insert location grade id name = do
-    Location.location (return Nothing) (\l -> do 
-        putStrLn "bob3"
+    Location.location (Nothing) (\l -> Just $ do 
         locationData' <- BL.readFile l
-        seq (BL.length locationData') (return ())
         let locationData = decodeWith myOptionsDecode NoHeader $ locationData' :: Either String (Vector.Vector Photographee)
-        putStrLn "bob2"
 
         let low = 1000000 :: Int
         let high = 9999999 :: Int
@@ -95,12 +92,9 @@ insert location grade id name = do
                 Left _ -> throw ParseLocationFile
                 Right locData -> locData Vector.++ (Vector.fromList [photographee ("SYS_" List.++ id) grade name ("ny_" List.++ (show r))])
 
-        putStrLn "bob1"
         let moreData = encodeWith myOptionsEncode $ Vector.toList studentData --can throw error
-        putStrLn "bob"
-        BL.writeFile l moreData
-        putStrLn "bobF"
-        return $ Just ()
+
+        seq (BL.length locationData') (BL.writeFile l moreData)
         ) location
 
 
