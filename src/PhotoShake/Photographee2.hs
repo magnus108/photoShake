@@ -99,6 +99,7 @@ insert location grade id name = do
         let moreData = encodeWith myOptionsEncode $ Vector.toList studentData --can throw error
         putStrLn "bob"
         BL.writeFile l moreData
+        putStrLn "bobF"
         return $ Just ()
         ) location
 
