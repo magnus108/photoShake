@@ -20,7 +20,6 @@ import Development.Shake.FilePath
 import PhotoShake.ShakeConfig
 import PhotoShake.Dump
 import PhotoShake.Photographee
-import PhotoShake.Photographee2
 
 import PhotoShake.Location
 import PhotoShake.Dagsdato

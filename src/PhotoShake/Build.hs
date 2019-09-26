@@ -14,7 +14,7 @@ module PhotoShake.Build
     , getBuild
     ) where
 
-import PhotoShake.Photographee2
+import PhotoShake.Photographee
 import Data.String 
 import Data.Eq
 import Text.Show

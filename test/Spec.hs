@@ -19,7 +19,6 @@ import PhotoShake.ShakeConfig
 import PhotoShake.Doneshooting hiding (getDoneshooting)
 import PhotoShake.Dagsdato
 import PhotoShake.Photographee
-import PhotoShake.Photographee2
 
 
 main :: IO ()

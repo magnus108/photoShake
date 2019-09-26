@@ -61,7 +61,7 @@ import qualified Data.HashMap.Lazy as HM
 import qualified PhotoShake.Build as Build
 import qualified PhotoShake.Location as Location
 import PhotoShake.Dagsdato
-import qualified PhotoShake.Photographee2 as Photographee
+import qualified PhotoShake.Photographee as Photographee
 import PhotoShake.Doneshooting hiding (getDoneshooting, setDoneshooting)
 import PhotoShake.Dump
 import PhotoShake.ShakeError
