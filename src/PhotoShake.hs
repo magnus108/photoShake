@@ -17,6 +17,7 @@ import qualified PhotoShake.Id as Id
 import Development.Shake hiding (Normal)
 import Development.Shake.FilePath
 
+import qualified PhotoShake.Camera as Camera
 import PhotoShake.ShakeConfig
 import PhotoShake.Dump
 import PhotoShake.Photographee
@@ -30,6 +31,7 @@ import PhotoShake.ShakeError
 
 import qualified PhotoShake.Photographer as PR
 
+import Utils.ListZipper
 
 import Data.Time.Format
 import Data.Time.Clock
@@ -85,10 +87,12 @@ myShake config photographee location time removeIt = do
     shake (opts photographee config) $ actions config photographee location time removeIt
 
 
-mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session.Session -> Shooting -> String -> Int -> FilePath
-mkDoneshootingPath xxx photographee location photographer session shooting filename index = 
-    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
+mkDoneshootingPath :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session.Session -> Shooting -> String -> Int -> Camera.Camera -> FilePath
+mkDoneshootingPath xxx photographee location photographer session shooting filename index camera = 
+    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location 
+            </> extension </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
+            extension =  Camera.camera "cr2" "cr3" camera
             tea = _tea photographee
             grade = _grade photographee 
             sessionId = show $ Session.toInteger session 
@@ -98,10 +102,12 @@ mkDoneshootingPath xxx photographee location photographer session shooting filen
             pad x = strPadLeft '0' 3 (show x)
                 
 
-mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session.Session -> Shooting -> String -> Int -> FilePath
-mkDoneshootingPathJpg xxx photographee location photographer session shooting filename index = 
-    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> "cr2" </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
+mkDoneshootingPathJpg :: Doneshooting -> Photographee -> String -> PR.Photographer -> Session.Session -> Shooting -> String -> Int -> Camera.Camera -> FilePath
+mkDoneshootingPathJpg xxx photographee location photographer session shooting filename index camera = 
+    doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> extension
+            </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
+            extension =  Camera.camera "cr2" "cr3" camera
             tea = _tea photographee
             grade = _grade photographee 
             sessionId = show $ Session.toInteger session 
@@ -140,26 +146,27 @@ actions config photographee location time removeIt = do
         shooting <- liftIO $ getShooting config
         -- badIO
 
-        ifor_ (sort dumpFiles) $ \ index (cr2, jpg) -> do
-            let doneshootingCr2 = mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
-            let doneshootingJpg = mkDoneshootingPathJpg doneshooting photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
+        ifor_ (sort dumpFiles) $ \ index (cr, jpg) -> do
+            let doneshootingCr = Camera.cameras (error "FUCK") (\c -> mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr) index (focus c)) cameras
+            let doneshootingJpg = Camera.cameras (error "fuck") (\c -> mkDoneshootingPathJpg doneshooting photographee location photographer session shooting (takeFileName jpg) index (focus c) -<.> "jpg") cameras 
 
 
             --let doneshootingBackupCr2 = mkDoneshootingPath doneshootingBackup photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
             --let doneshootingBackupJpg = mkDoneshootingPathJpg doneshootingBackup photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
-            let dagsdatoCr2 = mkDagsdatoPath dagsdato photographee location (takeFileName cr2) time -<.> "cr2"
+            let extensionFIXME = Camera.cameras (error "fuck") (\c -> Camera.camera "cr2" "cr3" (focus c)) cameras
+            let dagsdatoCr = mkDagsdatoPath dagsdato photographee location (takeFileName cr) time -<.> extensionFIXME
             let dagsdatoJpg = mkDagsdatoPath dagsdato photographee location (takeFileName jpg) time -<.> "jpg"
 
-            let dagsdatoBackupCr2 = mkDagsdatoPath dagsdatoBackup photographee location (takeFileName cr2) time -<.> "cr2"
+            let dagsdatoBackupCr = mkDagsdatoPath dagsdatoBackup photographee location (takeFileName cr) time -<.> extensionFIXME
             let dagsdatoBackupJpg = mkDagsdatoPath dagsdatoBackup photographee location (takeFileName jpg) time -<.> "jpg"
 
-            want [doneshootingCr2, doneshootingJpg, dagsdatoCr2, dagsdatoJpg
+            want [doneshootingCr, doneshootingJpg, dagsdatoCr, dagsdatoJpg
                 -- , doneshootingBackupCr2, doneshootingBackupJpg, 
-                 , dagsdatoBackupCr2, dagsdatoBackupJpg] 
+                 , dagsdatoBackupCr, dagsdatoBackupJpg] 
 
-            doneshootingCr2 %> \f -> do
-                copyFile' cr2 f
+            doneshootingCr %> \f -> do
+                copyFile' cr f
 
             doneshootingJpg %> \f -> do
                 copyFile' jpg f
@@ -172,14 +179,14 @@ actions config photographee location time removeIt = do
                 copyFile' jpg f
             -}
 
-            dagsdatoCr2 %> \f -> do
-                copyFile' cr2 f
+            dagsdatoCr %> \f -> do
+                copyFile' cr f
 
             dagsdatoJpg %> \f -> do
                 copyFile' jpg f
 
-            dagsdatoBackupCr2 %> \f -> do
-                copyFile' cr2 f
+            dagsdatoBackupCr %> \f -> do
+                copyFile' cr f
 
             dagsdatoBackupJpg %> \f -> do
                 copyFile' jpg f
@@ -189,6 +196,6 @@ actions config photographee location time removeIt = do
         dump (action $ return ()) (\fp -> do
                     liftIO $ setId config Id.noId
                     if removeIt then
-                        action $ removeFilesAfter fp ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg"]
+                        action $ removeFilesAfter fp ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg","//*.CR3","//*.cr3"]
                     else
                         return () ) x

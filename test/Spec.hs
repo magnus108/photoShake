@@ -3,9 +3,13 @@ import Development.Shake.FilePath
 import Test.Tasty
 import Test.Tasty.Golden
 
+import qualified PhotoShake.Camera as Camera
 import System.Directory
 
 import qualified Data.ByteString.Lazy as LBS
+
+
+import Utils.ListZipper
 
 import Data.Maybe
 
@@ -68,7 +72,9 @@ goldenTests = do
 
             -- de lader til at være en fejl at disse paths ligger her. og at null og 0 er med
             -- can throw error fixxxx
-            let doneshootingPath = takeDirectory $ mkDoneshootingPath doneshootingX (fromJust photographee) (takeBaseName xxx) photographer session shooting "null" 0
+            cameras <- getCameras config
+
+            let doneshootingPath = Camera.cameras (error "lol") (\c -> takeDirectory $ mkDoneshootingPath doneshootingX (fromJust photographee) (takeBaseName xxx) photographer session shooting "null" 0 (focus c)) cameras
             let dagsdatoPath = takeDirectory $ mkDagsdatoPath dagsdatoX (fromJust photographee) (takeBaseName xxx) "null" time
 
             doneShootingFiles <- listDirectory doneshootingPath

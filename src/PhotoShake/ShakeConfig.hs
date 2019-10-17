@@ -542,11 +542,6 @@ getDumpFiles d cameras = do
                 c ) cameras ) d
 
         
-
-
-
-
-
 getLocationFile :: ShakeConfig -> IO Location.Location
 getLocationFile config = do
     let filepath = _locationConfig config
