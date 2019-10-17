@@ -503,7 +503,7 @@ data DumpFiles
 getDumpFiles :: Dump -> Camera.Cameras -> IO DumpFiles
 getDumpFiles d cameras = do
     dump (return NoDump) (\xx -> do
-        Camera.cameras (return  NoCamera) (\(ListZipper _ c _) ->
+        Camera.cameras (return NoCamera) (\(ListZipper _ c _) ->
             Camera.camera  
                 ((\ x -> do
                     files <- listDirectory x

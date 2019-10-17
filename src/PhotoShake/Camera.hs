@@ -36,7 +36,7 @@ data Camera
 camera :: a -> a -> Camera -> a
 camera f g = \case
     JpgCr2 -> f
-    JpgCr3  -> g
+    JpgCr3 -> g
 
 
 jpgCr2 :: Camera
