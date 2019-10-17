@@ -13,6 +13,8 @@ module PhotoShake.ShakeConfig
     , setShooting
     , setSession
     , getDumpConfig
+    , getCameras
+    , setCameras
     , getDagsdato
     , getDagsdatoBackup
     , setDagsdato
@@ -37,6 +39,7 @@ module PhotoShake.ShakeConfig
     , getGrades
     ) where
 
+import qualified PhotoShake.Camera as Camera
 import qualified PhotoShake.Id as Id
 import qualified Utils.FP as FP
 import qualified Utils.Actions as Actions
@@ -91,6 +94,7 @@ data ShakeConfig = ShakeConfig
     , _photographerConfig :: FilePath
     , _buildConfig :: FilePath
     , _gradeConfig :: FilePath
+    , _cameraConfig :: FilePath
 
     , _stateConfig :: FilePath
     , _idConfig :: FilePath
@@ -100,6 +104,14 @@ data ShakeConfig = ShakeConfig
 -- concider moving this or getting rid of it
 catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
+
+
+getCameraConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getCameraConfig root config = case (HM.lookup "cameraConfig" config) of
+    Nothing -> error "missing camera setting"
+    Just x -> case root of 
+        Nothing -> x 
+        Just y -> y </> x
 
 
 getBuildConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
@@ -329,6 +341,12 @@ setId config x = do
     Actions.interpret (Id.setId (FP.fp (FP.start filepath)) x)
 
 
+setCameras :: ShakeConfig -> Camera.Cameras -> IO ()
+setCameras config x = do
+    let filepath = _cameraConfig config
+    Actions.interpret (Camera.setCameras (FP.fp (FP.start filepath)) x)
+
+
 
 setLocation :: ShakeConfig -> Location.Location -> IO ()
 setLocation config xxx = do
@@ -367,6 +385,12 @@ getGradeSelectionConfig root config = case (HM.lookup "gradeSelectionConfig" con
     Just x -> case root of 
         Nothing -> x 
         Just y -> y </> x
+
+
+getCameras :: ShakeConfig -> IO Camera.Cameras
+getCameras config = do
+        let filepath = _cameraConfig config
+        Actions.interpret (Camera.getCameras (FP.fp (FP.start filepath)))
 
 
 getId :: ShakeConfig -> IO Id.Id
@@ -474,25 +498,48 @@ data DumpFiles
     = DumpFiles [(FilePath, FilePath)]
     | DumpFilesError
     | NoDump
+    | NoCamera
 
-getDumpFiles :: Dump -> IO DumpFiles
-getDumpFiles = do
-    dump (return NoDump) $ \x -> do
-        files <- listDirectory x
-        files' <- mapM (\f -> 
-            if (isExtensionOf "CR2" f || (isExtensionOf "cr2" f)) then
-                doesFileExist (x </> f -<.> "JPG") ||^ (doesFileExist (x </> f -<.> "jpg"))
-            else if (isExtensionOf "JPG" f || (isExtensionOf "jpg" f)) then 
-                doesFileExist (x </> f -<.> "CR2") ||^ (doesFileExist (x </> f -<.> "cr2"))
-            else
-                return False) files
+getDumpFiles :: Dump -> Camera.Cameras -> IO DumpFiles
+getDumpFiles d cameras = do
+    dump (return NoDump) (\xx -> do
+        Camera.cameras (return  NoCamera) (\(ListZipper _ c _) ->
+            Camera.camera  
+                ((\ x -> do
+                    files <- listDirectory x
+                    files' <- mapM (\f -> 
+                        if (isExtensionOf "CR2" f || (isExtensionOf "cr2" f)) then
+                            doesFileExist (x </> f -<.> "JPG") ||^ (doesFileExist (x </> f -<.> "jpg"))
+                        else if (isExtensionOf "JPG" f || (isExtensionOf "jpg" f)) then 
+                            doesFileExist (x </> f -<.> "CR2") ||^ (doesFileExist (x </> f -<.> "cr2"))
+                        else
+                            return False) files
 
-        let files'' = filter (\z -> isExtensionOf "CR2" z || (isExtensionOf "cr2" z)) files -- bad use
+                    let files'' = filter (\z -> isExtensionOf "CR2" z || (isExtensionOf "cr2" z)) files -- bad use
 
-        if all id files' then
-            return $ DumpFiles $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
-        else
-            return DumpFilesError
+                    if all id files' then
+                        return $ DumpFiles $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
+                    else
+                        return DumpFilesError
+                ) xx)
+                ((\x -> do
+                    files <- listDirectory x
+                    files' <- mapM (\f -> 
+                        if (isExtensionOf "CR3" f || (isExtensionOf "cr3" f)) then
+                            doesFileExist (x </> f -<.> "JPG") ||^ (doesFileExist (x </> f -<.> "jpg"))
+                        else if (isExtensionOf "JPG" f || (isExtensionOf "jpg" f)) then 
+                            doesFileExist (x </> f -<.> "CR3") ||^ (doesFileExist (x </> f -<.> "cr3"))
+                        else
+                            return False) files
+
+                    let files'' = filter (\z -> isExtensionOf "CR3" z || (isExtensionOf "cr3" z)) files -- bad use
+
+                    if all id files' then
+                        return $ DumpFiles $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer
+                    else
+                        return DumpFilesError
+                ) xx)
+                c ) cameras ) d
 
         
 
@@ -533,6 +580,7 @@ toShakeConfig root cfg = do
     let photographerConfig = getPhotographerConfig root config
     let buildConfig = getBuildConfig root config
     let gradeConfig = getGradeConfig root config
+    let cameraConfig = getCameraConfig root config
 
     let idConfig = getIdConfig root config
 
@@ -550,6 +598,7 @@ toShakeConfig root cfg = do
                          , _photographerConfig = photographerConfig
                          , _buildConfig = buildConfig
                          , _gradeConfig = gradeConfig
+                         , _cameraConfig = cameraConfig
                          , _stateConfig = stateConfig
                          , _idConfig = idConfig
                          } 
