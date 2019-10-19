@@ -94,7 +94,7 @@ data ShakeConfig = ShakeConfig
     , _photographerConfig :: FilePath
     , _buildConfig :: FilePath
     , _gradeConfig :: FilePath
-    , _cameraConfig :: FilePath
+    , _camerasConfig :: FilePath
 
     , _stateConfig :: FilePath
     , _idConfig :: FilePath
@@ -106,8 +106,8 @@ catchAny :: IO a -> (SomeException -> IO a) -> IO a
 catchAny = catch
 
 
-getCameraConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
-getCameraConfig root config = case (HM.lookup "cameraConfig" config) of
+getCamerasConfig :: Maybe FilePath -> HM.HashMap String String -> FilePath
+getCamerasConfig root config = case (HM.lookup "camerasConfig" config) of
     Nothing -> error "missing camera setting"
     Just x -> case root of 
         Nothing -> x 
@@ -343,7 +343,7 @@ setId config x = do
 
 setCameras :: ShakeConfig -> Camera.Cameras -> IO ()
 setCameras config x = do
-    let filepath = _cameraConfig config
+    let filepath = _camerasConfig config
     Actions.interpret (Camera.setCameras (FP.fp (FP.start filepath)) x)
 
 
@@ -389,7 +389,7 @@ getGradeSelectionConfig root config = case (HM.lookup "gradeSelectionConfig" con
 
 getCameras :: ShakeConfig -> IO Camera.Cameras
 getCameras config = do
-        let filepath = _cameraConfig config
+        let filepath = _camerasConfig config
         Actions.interpret (Camera.getCameras (FP.fp (FP.start filepath)))
 
 
@@ -575,7 +575,7 @@ toShakeConfig root cfg = do
     let photographerConfig = getPhotographerConfig root config
     let buildConfig = getBuildConfig root config
     let gradeConfig = getGradeConfig root config
-    let cameraConfig = getCameraConfig root config
+    let camerasConfig = getCamerasConfig root config
 
     let idConfig = getIdConfig root config
 
@@ -593,7 +593,7 @@ toShakeConfig root cfg = do
                          , _photographerConfig = photographerConfig
                          , _buildConfig = buildConfig
                          , _gradeConfig = gradeConfig
-                         , _cameraConfig = cameraConfig
+                         , _camerasConfig = camerasConfig
                          , _stateConfig = stateConfig
                          , _idConfig = idConfig
                          } 
