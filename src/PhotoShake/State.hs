@@ -32,6 +32,7 @@ data State
     | Doneshooting
     | DoneshootingBackup
     | Photographer
+    | Camera
     | Shooting
     | Session
     | Location
