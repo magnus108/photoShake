@@ -19,11 +19,13 @@ module PhotoShake.Photographee
 
 import System.FilePath
 
+import qualified System.Directory as SD
 import qualified Utils.ListZipper as ListZipper
 import qualified Data.Vector as Vector
 import Prelude (fromIntegral, seq)
 import qualified PhotoShake.Location as Location
 import qualified PhotoShake.Id as Id
+import Data.Bool
 import Data.Int
 import Data.Char
 import Control.Monad 
@@ -71,14 +73,18 @@ myOptionsEncode = defaultEncodeOptions { encDelimiter = fromIntegral (ord ';') }
 findPhotographee :: Location.Location -> Id.Id -> IO (Maybe Photographee)
 findPhotographee location id = do
     Location.location (return Nothing) (\l -> do 
-        locationData' <- BL.readFile l
-        let locationData = decodeWith myOptionsDecode NoHeader $ locationData'
-        --could use some case of here and error handling
-        let studentData = case locationData of
-                Left _ -> throw ParseLocationFile
-                Right locData -> Id.id Nothing 
-                        (\i -> List.find ((i ==) . _ident ) locData) id
-        return studentData
+        b <- SD.doesFileExist l
+        case b of
+            True -> do
+                locationData' <- BL.readFile l
+                let locationData = decodeWith myOptionsDecode NoHeader $ locationData'
+                --could use some case of here and error handling
+                let studentData = case locationData of
+                        Left _ -> throw ParseLocationFile
+                        Right locData -> Id.id Nothing 
+                                (\i -> List.find ((i ==) . _ident ) locData) id
+                return studentData
+            False -> return Nothing
         ) location
 
 
