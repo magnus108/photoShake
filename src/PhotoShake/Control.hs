@@ -68,12 +68,15 @@ controlXMP config grade = do
             locationFile <- getLocationFile config
             location ( return NoErrors) (\ loc -> do
                     let path = doneshootingDir </> (takeBaseName loc) </> "cr2" </> grade
+                    let path2 = doneshootingDir </> (takeBaseName loc) </> "cr3" </> grade
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
-                    case files of
+                    files2 <- try $ listDirectory path2 :: IO (Either SomeException [FilePath])
+                    let files3 = liftA2 (++) files files2
+                    case files3 of
                         Left z -> return Empty
                         Right [] -> return Empty
                         Right z -> do
-                            let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f) (sort z)
+                            let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f || isExtensionOf "cr3" f) (sort z)
 
                             let cr2s = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) what  
 
