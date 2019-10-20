@@ -147,14 +147,14 @@ actions config photographee location time removeIt = do
         -- badIO
 
         ifor_ (sort dumpFiles) $ \ index (cr, jpg) -> do
-            let doneshootingCr = Camera.cameras (error "FUCK") (\c -> mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr) index (focus c)) cameras
+            let extensionFIXME = Camera.cameras (error "fuck") (\c -> Camera.camera "cr2" "cr3" (focus c)) cameras
+            let doneshootingCr = Camera.cameras (error "FUCK") (\c -> mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr) index (focus c) -<.> extensionFIXME) cameras
             let doneshootingJpg = Camera.cameras (error "fuck") (\c -> mkDoneshootingPathJpg doneshooting photographee location photographer session shooting (takeFileName jpg) index (focus c) -<.> "jpg") cameras 
 
 
             --let doneshootingBackupCr2 = mkDoneshootingPath doneshootingBackup photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
             --let doneshootingBackupJpg = mkDoneshootingPathJpg doneshootingBackup photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
-            let extensionFIXME = Camera.cameras (error "fuck") (\c -> Camera.camera "cr2" "cr3" (focus c)) cameras
             let dagsdatoCr = mkDagsdatoPath dagsdato photographee location (takeFileName cr) time -<.> extensionFIXME
             let dagsdatoJpg = mkDagsdatoPath dagsdato photographee location (takeFileName jpg) time -<.> "jpg"
 
