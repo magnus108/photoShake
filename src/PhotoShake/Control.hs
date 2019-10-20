@@ -71,8 +71,8 @@ controlXMP config grade = do
                     let path2 = doneshootingDir </> (takeBaseName loc) </> "cr3" </> grade
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
                     files2 <- try $ listDirectory path2 :: IO (Either SomeException [FilePath])
-                    putStrLn $ show files2
                     let files3 = liftA2 (++) files files2
+                    putStrLn $ show files3
                     case files3 of
                         Left z -> return Empty
                         Right [] -> return Empty
@@ -84,7 +84,9 @@ controlXMP config grade = do
 
                             cr2s' <- mapM (\xx -> do
                                         res <- filterM (\f -> do
-                                             doesFileExist (path </> f -<.> "xmp")
+                                             a <- doesFileExist (path </> f -<.> "xmp")
+                                             b <- doesFileExist (path2 </> f -<.> "xmp")
+                                             return (a || b)
                                              ) (snd xx)
                                         return (fst xx, res)
                                         ) $ cr2s
@@ -93,9 +95,11 @@ controlXMP config grade = do
                                     let xxxx = fst xxx
                                     let lencheck = length (snd xxx) >= 6
                                     only1with5' <- mapM (only1With5 path) (snd xxx)
-                                    let sum = 1 == (foldl (\ss acc -> ss + acc) 0 only1with5')
+                                    only1with5'' <- mapM (only1With5 path2) (snd xxx)
+                                    let sum = 1 == (foldl (\ss acc -> ss + acc) 0 (only1with5' ++ only1with5''))
                                     atleast5With1' <- mapM (atleast5With1 path) (snd xxx)
-                                    let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 atleast5With1')
+                                    atleast5With1'' <- mapM (atleast5With1 path2) (snd xxx)
+                                    let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 (atleast5With1' ++ atleast5With1''))
                                     return (xxxx, lencheck, sum, sum2)
                                 ) cr2s'
 
