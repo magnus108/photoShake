@@ -94,6 +94,7 @@ controlXMP config grade = do
                             gg <- mapM (\xxx -> do
                                     let xxxx = fst xxx
                                     let lencheck = length (snd xxx) >= 6
+                                    putStrLn $ show lencheck
                                     only1with5' <- mapM (only1With5 path) (snd xxx)
                                     only1with5'' <- mapM (only1With5 path2) (snd xxx)
                                     let sum = 1 == (foldl (\ss acc -> ss + acc) 0 (only1with5' ++ only1with5''))
