@@ -90,6 +90,8 @@ controlXMP config grade = do
                                              ) (snd xx)
                                         return (fst xx, res)
                                         ) $ cr2s
+
+                            putStrLn $ show cr2s'
              
                             gg <- mapM (\xxx -> do
                                     let xxxx = fst xxx
