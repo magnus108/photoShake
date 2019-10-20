@@ -73,6 +73,7 @@ controlXMP config grade = do
                     files2 <- try $ listDirectory path2 :: IO (Either SomeException [FilePath])
                     let files3 = liftA2 (++) files files2
                     putStrLn $ show files3
+                    putStrLn "bbb"
                     case files3 of
                         Left z -> return Empty
                         Right [] -> return Empty
@@ -80,6 +81,8 @@ controlXMP config grade = do
                             let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f || isExtensionOf "cr3" f) (sort z)
 
                             let cr2s = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) what  
+
+                            putStrLn $ show cr2s
 
 
                             cr2s' <- mapM (\xx -> do
