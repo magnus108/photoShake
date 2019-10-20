@@ -44,18 +44,18 @@ prefix (x:xs) [] = False
 prefix (x:xs) (y:ys) = (x == y) && prefix xs ys
 
 
-only1With5 :: FilePath -> FilePath -> IO Integer
-only1With5 root filepath = do
-    content <- readFile $ root </> filepath  -<.> "xmp"
+only1With5 :: FilePath -> IO Integer
+only1With5 filepath = do
+    content <- readFile $ filepath  -<.> "xmp"
     if (substring "<xmp:Rating>5</xmp:Rating>" (toString content)) then
         return 1
     else
         return 0
 
 
-atleast5With1 :: FilePath -> FilePath -> IO Integer
-atleast5With1 root filepath = do
-    content <- readFile $ root </> filepath  -<.> "xmp"
+atleast5With1 :: FilePath -> IO Integer
+atleast5With1 filepath = do
+    content <- readFile $ filepath  -<.> "xmp"
     if (substring "<xmp:Rating>1</xmp:Rating>" (toString content)) then
         return 1
     else
@@ -99,13 +99,10 @@ controlXMP config grade = do
                             gg <- mapM (\xxx -> do
                                     let xxxx = fst xxx
                                     let lencheck = length (snd xxx) >= 6
-                                    putStrLn $ show lencheck
-                                    only1with5' <- mapM (only1With5 path) (snd xxx)
-                                    only1with5'' <- mapM (only1With5 path2) (snd xxx)
-                                    let sum = 1 == (foldl (\ss acc -> ss + acc) 0 (only1with5' ++ only1with5''))
-                                    atleast5With1' <- mapM (atleast5With1 path) (snd xxx)
-                                    atleast5With1'' <- mapM (atleast5With1 path2) (snd xxx)
-                                    let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 (atleast5With1' ++ atleast5With1''))
+                                    only1with5' <- mapM (only1With5) (fmap (\xxxx -> if isExtensionOf "cr2" xxxx then (path </> xxxx) else (path2 </> xxxx)) (snd xxx))
+                                    let sum = 1 == (foldl (\ss acc -> ss + acc) 0 (only1with5')) 
+                                    atleast5With1' <- mapM (atleast5With1) (fmap (\xxxx -> if isExtensionOf "cr2" xxxx then (path </> xxxx) else (path2 </> xxxx)) (snd xxx))
+                                    let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 (atleast5With1')) 
                                     return (xxxx, lencheck, sum, sum2)
                                 ) cr2s'
 
