@@ -110,7 +110,7 @@ parseRating fp = do
     return (Rating.fromString (toString rating))
 
 what :: Grade.Grade -> FilePath -> FilePath -> IO Results  --bads
-what doneshootingDir location grade = do
+what grade location doneshootingDir = do
     let cameras = Camera.supported
     let extension = fmap Camera.toString cameras 
     let name = takeBaseName location --bads
