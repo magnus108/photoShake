@@ -145,6 +145,7 @@ what doneshootingDir location grade = do
                         else 
                             Errors xxxx [exactly1With5] 
                         ) yy
+            putStrLn $ show abc
             
             return abc
             ) extension
