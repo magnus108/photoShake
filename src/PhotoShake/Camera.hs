@@ -6,6 +6,7 @@
 
 module PhotoShake.Camera
     ( cameras
+    , toString
     , yesCameras
     , noCameras
     , getCameras
@@ -15,9 +16,11 @@ module PhotoShake.Camera
     , jpgCr2
     , jpgCr3
     , camera
+    , supported
     ) where
 
 
+import Data.String
 import Data.Eq
 import Text.Show
 import GHC.Generics
@@ -31,6 +34,13 @@ data Camera
     = JpgCr2
     | JpgCr3
     deriving (Show, Eq, Generic, ToJSON, FromJSON)
+
+
+supported :: [Camera]
+supported = [jpgCr2, jpgCr3]
+
+toString :: Camera -> String
+toString = camera "cr2" "cr3" 
 
 
 camera :: a -> a -> Camera -> a

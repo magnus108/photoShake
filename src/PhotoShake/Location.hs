@@ -13,8 +13,14 @@ module PhotoShake.Location
     , noLocation
     , setLocation
     , getLocation
+    , toName
+    , toMaybe
     ) where
 
+
+import Data.Function
+import Data.Eq
+import Data.Maybe
 import Data.Eq
 import Data.String
 import Text.Show
@@ -46,10 +52,18 @@ noLocation :: Location
 noLocation = NoLocation
 
 
-location :: a -> (FilePath -> a) -> Location -> a
+location :: a -> (b -> a) -> LocationF b -> a
 location f g = \case
     NoLocation -> f
     YesLocation x -> g x
+
+
+toMaybe :: LocationF a -> Maybe a
+toMaybe = location Nothing Just
+
+
+toName :: Location -> Maybe String
+toName = fmap takeBaseName . toMaybe 
 
 
 getLocation :: FP -> TerminalM Location Location

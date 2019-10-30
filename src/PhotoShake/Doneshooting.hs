@@ -1,3 +1,6 @@
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE NoImplicitPrelude #-}                                                                                                                                                                              
 {-# LANGUAGE OverloadedStrings #-}
@@ -11,8 +14,10 @@ module PhotoShake.Doneshooting
     , Doneshooting
     , getDoneshooting
     , setDoneshooting
+    , toMaybe
     ) where
 
+import Data.Maybe
 import Data.Eq
 import Text.Show
 import GHC.Generics
@@ -21,11 +26,18 @@ import Data.Aeson
 import Utils.Actions
 import Utils.FP
 
+import Data.Functor
+import Data.Traversable
+import Data.Foldable
 
-data Doneshooting 
-    = YesDoneshooting FilePath
+
+data DoneshootingF a
+    = YesDoneshooting a
     | NoDoneshooting
-    deriving (Show, Eq, Generic, ToJSON, FromJSON)
+    deriving (Show, Eq, Generic, ToJSON, FromJSON, Functor, Foldable, Traversable)
+
+
+type Doneshooting = DoneshootingF FilePath
 
 
 yesDoneshooting :: FilePath -> Doneshooting
@@ -36,7 +48,11 @@ noDoneshooting :: Doneshooting
 noDoneshooting = NoDoneshooting
 
 
-doneshooting :: a -> (FilePath -> a) -> Doneshooting -> a
+toMaybe :: DoneshootingF a -> Maybe a
+toMaybe = doneshooting Nothing Just
+
+
+doneshooting :: a -> (b -> a) -> DoneshootingF b -> a
 doneshooting f g = \case
     NoDoneshooting -> f
     YesDoneshooting x -> g x

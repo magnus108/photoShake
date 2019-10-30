@@ -13,9 +13,11 @@ module PhotoShake.Grade
     , grades
     , yesGrades
     , noGrades
+    , toMaybe
     , delete 
     ) where
 
+import Data.Maybe
 import Data.String
 import Data.Eq
 import Text.Show
@@ -45,6 +47,10 @@ data GradesF a
 type Grades = GradesF Grade
 
 
+toMaybe :: GradesF a -> Maybe (ListZipper a)
+toMaybe = grades Nothing Just
+
+
 yesGrades :: ListZipper Grade -> Grades
 yesGrades = YesGrades
 
@@ -53,7 +59,7 @@ noGrades :: Grades
 noGrades = NoGrades
 
 
-grades :: a -> (ListZipper Grade -> a) -> Grades -> a
+grades :: a -> (ListZipper b -> a) -> GradesF b -> a
 grades f g = \case
     NoGrades -> f
     YesGrades x -> g x
