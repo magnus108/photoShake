@@ -119,6 +119,9 @@ what doneshootingDir location grade = do
             let path = doneshootingDir </> name </> ext </> grade
             putStrLn $ "hsdhg"
             putStrLn $ path 
+            putStrLn $ name 
+            putStrLn $ ext 
+            putStrLn $ grade 
             files <- listDirectory path 
             putStrLn $ "hhg"
             putStrLn $ show files
