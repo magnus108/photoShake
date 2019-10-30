@@ -118,6 +118,8 @@ what doneshootingDir location grade = do
     eh <- sequence $ fmap (\ext -> do
             let path = doneshootingDir </> name </> ext </> grade
             files <- listDirectory path 
+            putStrLn $ "hhg"
+            putStrLn $ show files
             let filtered = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf ext f) (sort files)
             
             let studentAndCrs = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) filtered
@@ -135,6 +137,9 @@ what doneshootingDir location grade = do
                     let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 (atleast5With1')) 
                     return (xxxx, sum, sum2)
                 ) studentAndCrs'
+
+            putStrLn $ "hh"
+            putStrLn $ show gg
  
             let yy = filter (\(xxxx, sum, sum2) -> not sum || not sum2 ) gg
 
