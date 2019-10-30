@@ -3,6 +3,8 @@
 
 module PhotoShake.Control
     ( Results 
+    , controlXMP
+    , empty
     ) where
 
 import Prelude ((+))
@@ -18,7 +20,7 @@ import Text.Show
 import System.IO 
 import Data.Int
 import System.FilePath
-import Control.Applicative
+import Control.Applicative ((<*>), (<$>))
 import Control.Monad
 import Data.Function
 import System.Directory
@@ -93,6 +95,9 @@ data Errors = Errors String [Error]
 data Results = Results [Errors]
     deriving (Show, Eq)
 
+empty :: Results
+empty = Results []
+
 
 parseRating :: FilePath -> IO Rating.Rating
 parseRating fp = do
@@ -146,8 +151,8 @@ what doneshootingDir location grade = do
     return (Results (join eh))
 
 
-controlDoneshooting :: Config.ShakeConfig -> IO Results -- ku også lave kontrol af klasse
-controlDoneshooting config = do
+controlXMP :: Config.ShakeConfig -> IO Results -- ku også lave kontrol af klasse
+controlXMP config = do
     doneshooting <- Config.getDoneshooting config
     locationFile <- Config.getLocationFile config
     grades <- Config.getGrades config
