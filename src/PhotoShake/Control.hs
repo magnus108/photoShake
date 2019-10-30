@@ -2,7 +2,9 @@
 {-# LANGUAGE NoImplicitPrelude #-}                                                                                                                                                                              
 
 module PhotoShake.Control
-    ( Results 
+    ( Results(..)
+    , Errors(..)
+    , Error(..)
     , controlXMP
     , empty
     ) where
