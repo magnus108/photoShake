@@ -117,6 +117,8 @@ what doneshootingDir location grade = do
 
     eh <- sequence $ fmap (\ext -> do
             let path = doneshootingDir </> name </> ext </> grade
+            putStrLn $ "hsdhg"
+            putStrLn $ path 
             files <- listDirectory path 
             putStrLn $ "hhg"
             putStrLn $ show files
