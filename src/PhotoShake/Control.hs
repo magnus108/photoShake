@@ -119,6 +119,7 @@ what doneshootingDir location grade = do
             let path = doneshootingDir </> name </> ext </> grade
             putStrLn $ "hsdhg"
             putStrLn $ path 
+            putStrLn $ doneshootingDir
             putStrLn $ name 
             putStrLn $ ext 
             putStrLn $ grade 
