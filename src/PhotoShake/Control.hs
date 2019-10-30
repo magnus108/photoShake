@@ -146,9 +146,9 @@ what grade location doneshootingDir = do
          
                     let yy = filter (\(xxxx, sum, sum2) -> not sum || not sum2 ) gg
 
-                    let abc = fmap (\(xxxx, sum, sum2) ->  if (sum && sum2) then
+                    let abc = fmap (\(xxxx, sum, sum2) ->  if ((not sum) &&  (not sum2)) then
                                     Errors xxxx [atleast5With1, exactly1With5]
-                                else if sum then
+                                else if (not sum) then
                                     Errors xxxx [atleast5With1]
                                 else 
                                     Errors xxxx [exactly1With5] 
