@@ -9,8 +9,10 @@ module PhotoShake.Control
     , empty
     ) where
 
+import Control.Exception
 import Prelude ((+))
 import Data.Ord
+import Data.Either
 import Data.Bool
 import Data.String
 import Data.Tuple
@@ -119,36 +121,39 @@ what grade location doneshootingDir = do
             let path = doneshootingDir </> name </> ext </> grade
             putStrLn $ path 
             putStrLn $ doneshootingDir
-            files <- listDirectory path 
-            let filtered = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf ext f) (sort files)
-            
-            let studentAndCrs = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) filtered
+            z <- try $ listDirectory path :: IO (Either SomeException [FilePath])
+            case z of 
+                Left _ -> return []
+                Right files -> do
+                    let filtered = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf ext f) (sort files)
+                    
+                    let studentAndCrs = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) filtered
 
-            studentAndCrs' <- mapM (\xx -> do
-                        res <- filterM (\f -> doesFileExist (path </> f -<.> "xmp")) (snd xx)
-                        return (fst xx, res)
-                        ) $ studentAndCrs
+                    studentAndCrs' <- mapM (\xx -> do
+                                res <- filterM (\f -> doesFileExist (path </> f -<.> "xmp")) (snd xx)
+                                return (fst xx, res)
+                                ) $ studentAndCrs
 
-            gg <- mapM (\xxx -> do
-                    let xxxx = fst xxx
-                    only1with5' <- mapM (only1With5_) $ (fmap (\xxxx -> (path </> xxxx))) (snd xxx)
-                    let sum = 1 == (foldl (\ss acc -> ss + acc) 0 (only1with5'))
-                    atleast5With1' <- mapM (atleast5With1_) $ (fmap (\xxxx -> (path </> xxxx))) (snd xxx)
-                    let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 (atleast5With1')) 
-                    return (xxxx, sum, sum2)
-                ) studentAndCrs'
+                    gg <- mapM (\xxx -> do
+                            let xxxx = fst xxx
+                            only1with5' <- mapM (only1With5_) $ (fmap (\xxxx -> (path </> xxxx))) (snd xxx)
+                            let sum = 1 == (foldl (\ss acc -> ss + acc) 0 (only1with5'))
+                            atleast5With1' <- mapM (atleast5With1_) $ (fmap (\xxxx -> (path </> xxxx))) (snd xxx)
+                            let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 (atleast5With1')) 
+                            return (xxxx, sum, sum2)
+                        ) studentAndCrs'
 
- 
-            let yy = filter (\(xxxx, sum, sum2) -> not sum || not sum2 ) gg
+         
+                    let yy = filter (\(xxxx, sum, sum2) -> not sum || not sum2 ) gg
 
-            let abc = fmap (\(xxxx, sum, sum2) ->  if (sum && sum2) then
-                            Errors xxxx [atleast5With1, exactly1With5]
-                        else if sum then
-                            Errors xxxx [atleast5With1]
-                        else 
-                            Errors xxxx [exactly1With5] 
-                        ) yy
-            return abc
+                    let abc = fmap (\(xxxx, sum, sum2) ->  if (sum && sum2) then
+                                    Errors xxxx [atleast5With1, exactly1With5]
+                                else if sum then
+                                    Errors xxxx [atleast5With1]
+                                else 
+                                    Errors xxxx [exactly1With5] 
+                                ) yy
+                    return abc
             ) extension
 
    -- eh
