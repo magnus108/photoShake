@@ -110,13 +110,17 @@ insert location grade id name = do
 fromGrade :: Location.Location -> Grade.Grades -> IO [Photographee]
 fromGrade location grades =
     Grade.grades (return []) (\g -> do
+        putStrLn "gg1"
         Location.location (return []) (\l -> do -- kind of bad
+            putStrLn "gg2"
             locationData' <-  BL.readFile l 
+            putStrLn "glg2"
             seq (BL.length locationData') (return ())
             let locationData = decodeWith myOptionsDecode NoHeader $ locationData' 
             let studentData = case locationData of
                     Left _ -> throw ParseLocationFile
                     Right locData -> Vector.filter (((ListZipper.focus g) ==) . _grade) locData
+            putStrLn "glg2"
             return $ Vector.toList $ studentData
             ) location) grades
 
