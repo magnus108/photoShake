@@ -34,7 +34,7 @@ data Terminal x a where
 
 deriving instance Functor (Terminal x)
 
-type TerminalM x = Free (Terminal x) 
+type TerminalM x = Free (Terminal x)
 
 
 sinkFromJSON :: (MonadThrow m, FromJSON a) => ConduitM ByteString o m a
