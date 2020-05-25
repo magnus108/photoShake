@@ -178,7 +178,7 @@ controlXMP config grade = do
     doneshooting (return NoErrors) (\doneshootingDir -> do
             locationFile <- getLocationFile config
             location ( return NoErrors) (\ loc -> do
-                    let path = doneshootingDir </> (takeBaseName loc) </> "cr2" </> grade
+                    let path = doneshootingDir </> (takeBaseName loc) </> "cr3" </> grade
                     let path2 = doneshootingDir </> (takeBaseName loc) </> "cr3" </> grade
                     files <- try $ listDirectory path :: IO (Either SomeException [FilePath])
                     files2 <- try $ listDirectory path2 :: IO (Either SomeException [FilePath])
@@ -188,28 +188,28 @@ controlXMP config grade = do
                         Left z -> return Empty
                         Right [] -> return Empty
                         Right z -> do
-                            let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr2" f || isExtensionOf "cr3" f) (sort z)
+                            let what = groupOn (\f -> (splitOn "."  f) !! 1) $ filter (\f -> isExtensionOf "cr3" f || isExtensionOf "cr3" f) (sort z)
 
-                            let cr2s = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) what  
+                            let cr3s = fmap (\xx -> ((splitOn "." (xx !! 0)) !! 1 , xx)) what  
 
-                            cr2s' <- mapM (\xx -> do
+                            cr3s' <- mapM (\xx -> do
                                         res <- filterM (\f -> do
                                              a <- doesFileExist (path </> f -<.> "xmp")
                                              b <- doesFileExist (path2 </> f -<.> "xmp")
                                              return (a || b)
                                              ) (snd xx)
                                         return (fst xx, res)
-                                        ) $ cr2s
+                                        ) $ cr3s
 
                             gg <- mapM (\xxx -> do
                                     let xxxx = fst xxx
                                     let lencheck = length (snd xxx) >= 6
-                                    only1with5' <- mapM (only1With5) (fmap (\xxxx -> if isExtensionOf "cr2" xxxx then (path </> xxxx) else (path2 </> xxxx)) (snd xxx))
+                                    only1with5' <- mapM (only1With5) (fmap (\xxxx -> if isExtensionOf "cr3" xxxx then (path </> xxxx) else (path2 </> xxxx)) (snd xxx))
                                     let sum = 1 == (foldl (\ss acc -> ss + acc) 0 (only1with5')) 
-                                    atleast5With1' <- mapM (atleast5With1) (fmap (\xxxx -> if isExtensionOf "cr2" xxxx then (path </> xxxx) else (path2 </> xxxx)) (snd xxx))
+                                    atleast5With1' <- mapM (atleast5With1) (fmap (\xxxx -> if isExtensionOf "cr3" xxxx then (path </> xxxx) else (path2 </> xxxx)) (snd xxx))
                                     let sum2 = 5 <= (foldl (\ss acc -> ss + acc) 0 (atleast5With1')) 
                                     return (xxxx, lencheck, sum, sum2)
-                                ) cr2s'
+                                ) cr3s'
 
                             let yy = filter (\(xxxx, lencheck, sum, sum2) -> not sum || not sum2 || not lencheck) gg
                             case yy of

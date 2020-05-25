@@ -40,7 +40,7 @@ supported :: [Camera]
 supported = [jpgCr2, jpgCr3]
 
 toString :: Camera -> String
-toString = camera "cr2" "cr3" 
+toString = camera "cr3" "cr3" 
 
 
 camera :: a -> a -> Camera -> a

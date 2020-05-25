@@ -43,7 +43,7 @@ data ShakeError
 
 instance Show ShakeError where
     show BadCsv = "lokationsfil er ikke en csv"
-    show JPGMissing = "CR2 og JPG stemmer ikke overens"
+    show JPGMissing = "CR3 og JPG stemmer ikke overens"
     show DumpMissing = "Kunne ikke finde dumpmappe"
     show DoneshootingDirectoryMissing = "Kunne ikke finde doneshootingmappe"
     show DagsdatoDirectoryMissing = "Kunne ikke finde dagsdatomappe"

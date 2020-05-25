@@ -508,14 +508,14 @@ getDumpFiles d cameras = do
                 ((\ x -> do
                     files <- listDirectory x
                     files' <- mapM (\f -> 
-                        if (isExtensionOf "CR2" f || (isExtensionOf "cr2" f)) then
+                        if (isExtensionOf "CR3" f || (isExtensionOf "cr3" f)) then
                             doesFileExist (x </> f -<.> "JPG") ||^ (doesFileExist (x </> f -<.> "jpg"))
                         else if (isExtensionOf "JPG" f || (isExtensionOf "jpg" f)) then 
-                            doesFileExist (x </> f -<.> "CR2") ||^ (doesFileExist (x </> f -<.> "cr2"))
+                            doesFileExist (x </> f -<.> "CR3") ||^ (doesFileExist (x </> f -<.> "cr3"))
                         else
                             return False) files
 
-                    let files'' = filter (\z -> isExtensionOf "CR2" z || (isExtensionOf "cr2" z)) files -- bad use
+                    let files'' = filter (\z -> isExtensionOf "CR3" z || (isExtensionOf "cr3" z)) files -- bad use
 
                     if all id files' then
                         return $ DumpFiles $ fmap (\y -> (x </> y, x </> y -<.> "JPG")) files'' -- could be nicer

@@ -92,7 +92,7 @@ mkDoneshootingPath xxx photographee location photographer session shooting filen
     doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location 
             </> extension </> grade </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
-            extension =  Camera.camera "cr2" "cr3" camera
+            extension =  Camera.camera "cr3" "cr3" camera
             tea = _tea photographee
             grade = _grade photographee 
             sessionId = show $ Session.toInteger session 
@@ -107,7 +107,7 @@ mkDoneshootingPathJpg xxx photographee location photographer session shooting fi
     doneshooting (throw ConfigDoneshootingMissing) (\doneshootingDir -> doneshootingDir </> location </> extension
             </> "_webshop" </> sessionId ++ "." ++ tea ++ "." ++ shootingId ++ "." ++ (PR._tid photographer) ++ "." ++ (pad $ index + 1) ++ (takeExtension filename)) xxx
         where
-            extension =  Camera.camera "cr2" "cr3" camera
+            extension =  Camera.camera "cr3" "cr3" camera
             tea = _tea photographee
             grade = _grade photographee 
             sessionId = show $ Session.toInteger session 
@@ -147,12 +147,12 @@ actions config photographee location time removeIt = do
         -- badIO
 
         ifor_ (sort dumpFiles) $ \ index (cr, jpg) -> do
-            let extensionFIXME = Camera.cameras (error "fuck") (\c -> Camera.camera "cr2" "cr3" (focus c)) cameras
+            let extensionFIXME = Camera.cameras (error "fuck") (\c -> Camera.camera "cr3" "cr3" (focus c)) cameras
             let doneshootingCr = Camera.cameras (error "FUCK") (\c -> mkDoneshootingPath doneshooting photographee location photographer session shooting (takeFileName cr) index (focus c) -<.> extensionFIXME) cameras
             let doneshootingJpg = Camera.cameras (error "fuck") (\c -> mkDoneshootingPathJpg doneshooting photographee location photographer session shooting (takeFileName jpg) index (focus c) -<.> "jpg") cameras 
 
 
-            --let doneshootingBackupCr2 = mkDoneshootingPath doneshootingBackup photographee location photographer session shooting (takeFileName cr2) index -<.> "cr2"
+            --let doneshootingBackupCr2 = mkDoneshootingPath doneshootingBackup photographee location photographer session shooting (takeFileName cr3) index -<.> "cr3"
             --let doneshootingBackupJpg = mkDoneshootingPathJpg doneshootingBackup photographee location photographer session shooting (takeFileName jpg) index -<.> "jpg"
 
             let dagsdatoCr = mkDagsdatoPath dagsdato photographee location (takeFileName cr) time -<.> extensionFIXME
@@ -173,7 +173,7 @@ actions config photographee location time removeIt = do
 
             {-
             doneshootingBackupCr2 %> \f -> do
-                copyFile' cr2 f
+                copyFile' cr3 f
 
             doneshootingBackupJpg %> \f -> do
                 copyFile' jpg f
@@ -196,6 +196,6 @@ actions config photographee location time removeIt = do
         dump (action $ return ()) (\fp -> do
                     liftIO $ setId config Id.noId
                     if removeIt then
-                        action $ removeFilesAfter fp ["//*.CR2", "//*.JPG", "//*.cr2", "//*.jpg","//*.CR3","//*.cr3"]
+                        action $ removeFilesAfter fp ["//*.CR3", "//*.JPG", "//*.cr3", "//*.jpg","//*.CR3","//*.cr3"]
                     else
                         return () ) x
