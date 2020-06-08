@@ -69,7 +69,7 @@ shakeDir = "._build"
 opts :: Photographee -> ShakeConfig -> ShakeOptions
 opts photographee config = shakeOptions { shakeFiles = shakeDir
                     , shakeProgress = progress -- should change
-                    , shakeThreads = 0
+                    , shakeThreads = 2
                     , shakeColor = True
                     }
     where
