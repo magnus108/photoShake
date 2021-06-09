@@ -72,8 +72,8 @@ session f g = \case
 
 toInteger :: Session -> Integer
 toInteger = \case
-    Kindergarten _ -> 9
-    School -> 10
+    Kindergarten _ -> 11
+    School -> 12
 
 
 data Sessions 
